@@ -35,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          sparse-checkout: examples/${{ matrix.example }}
       - name: Cache NPM modules
         uses: actions/cache@v4
         with:
@@ -45,12 +47,6 @@ jobs:
         with:
           path: ~/.cache/Cypress
           key: cypress-examples
-      # In lack of native support, https://github.com/actions/checkout/issues/172.
-      - name: Make checkout sparse
-        run: |
-          shopt -s extglob
-          rm -rf examples/!(${{ matrix.example }})
-          rm -rf !(examples)
       - name: Install NPM modules
         working-directory: examples/${{ matrix.example }}
         run: npm install
