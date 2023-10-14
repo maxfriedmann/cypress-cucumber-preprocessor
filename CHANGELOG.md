@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+Breaking changes:
+
+- Run `After(..)` hooks in reversed order of definition. This is in line with how cucumber-js behaves.
+
 ## v18.0.6
 
 - Make the compile output play nicer with ESM, relates to [#1093](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1093).

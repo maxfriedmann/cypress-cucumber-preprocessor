@@ -272,7 +272,7 @@ export class Registry {
   }
 
   public resolveAfterHooks(tags: string[]) {
-    return this.resolveHooks("After", tags);
+    return this.resolveHooks("After", tags).reverse();
   }
 
   public runHook(world: Mocha.Context, hook: IHook) {
