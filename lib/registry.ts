@@ -22,6 +22,7 @@ import {
   IStepHookParameter,
   IParameterTypeDefinition,
   IStepDefinitionBody,
+  IHookParameter,
 } from "./public-member-types";
 
 import {
@@ -275,8 +276,8 @@ export class Registry {
     return this.resolveHooks("After", tags).reverse();
   }
 
-  public runHook(world: Mocha.Context, hook: IHook) {
-    return hook.implementation.call(world);
+  public runHook(world: Mocha.Context, hook: IHook, options: IHookParameter) {
+    return hook.implementation.call(world, options);
   }
 
   public resolveStepHooks(keyword: StepHookKeyword, tags: string[]) {

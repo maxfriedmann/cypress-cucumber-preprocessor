@@ -63,7 +63,7 @@ import { runStepWithLogGroup } from "./helpers/cypress";
 
 import { getTags } from "./helpers/environment";
 
-import { IStepHookParameter } from "./public-member-types";
+import { IHookParameter, IStepHookParameter } from "./public-member-types";
 
 type Node = ReturnType<typeof parse>;
 
@@ -449,8 +449,14 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
           return cy.wrap(start, { log: false });
         })
           .then((start) => {
+            const options: IHookParameter = {
+              pickle,
+              gherkinDocument,
+              testCaseStartedId,
+            };
+
             runStepWithLogGroup({
-              fn: () => registry.runHook(this, hook),
+              fn: () => registry.runHook(this, hook, options),
               keyword: hook.keyword,
               text: hook.tags,
             });

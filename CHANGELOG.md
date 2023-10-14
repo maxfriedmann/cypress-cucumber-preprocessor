@@ -12,6 +12,10 @@ Breaking changes:
 
   - String literal attachments are now base64-encoded in JSON reports, ref. [cucumber/cucumber-js#2261](https://github.com/cucumber/cucumber-js/pull/2261).
 
+Other changes:
+
+- Scenario hooks (`Before(..)` and `After(..)`) are now invoked with an object containing a bunch of relevant data. This is in line with how cucumber-js behaves.
+
 ## v18.0.6
 
 - Make the compile output play nicer with ESM, relates to [#1093](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1093).

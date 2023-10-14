@@ -7,7 +7,13 @@ export interface IParameterTypeDefinition<T, C extends Mocha.Context> {
 }
 
 export interface IHookBody {
-  (this: Mocha.Context): void;
+  (this: Mocha.Context, options: IHookParameter): void;
+}
+
+export interface IHookParameter {
+  pickle: messages.Pickle;
+  gherkinDocument: messages.GherkinDocument;
+  testCaseStartedId: string;
 }
 
 export interface IStepHookParameter {

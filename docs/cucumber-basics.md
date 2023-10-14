@@ -148,6 +148,10 @@ Before({ tags: "@foo and @bar" }, function () {
 Before({ tags: "@foo or @bar" }, function () {
   // This hook will be executed before scenarios tagged with @foo or @bar.
 });
+
+Before(function ({ pickle, gherkinDocument, testCaseStartedId }) {
+  // Scenario hooks are invoked with an object containing a bunch of relevant data.
+});
 ```
 
 # Step hooks
