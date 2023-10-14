@@ -290,7 +290,7 @@ export class Registry {
   }
 
   public resolveAfterStepHooks(tags: string[]) {
-    return this.resolveStepHooks("AfterStep", tags);
+    return this.resolveStepHooks("AfterStep", tags).reverse();
   }
 
   public runStepHook(
