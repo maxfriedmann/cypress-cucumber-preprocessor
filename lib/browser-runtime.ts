@@ -556,7 +556,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   fn: () => registry.runStepDefininition(this, text, argument),
                 }).then((result) => {
                   return afterStepHooks
-                    .reverse()
+                    .toReversed()
                     .reduce((chain, afterStepHook) => {
                       return chain.then(() =>
                         runStepWithLogGroup({
