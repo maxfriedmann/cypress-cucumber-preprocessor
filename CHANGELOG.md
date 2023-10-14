@@ -8,6 +8,10 @@ Breaking changes:
 
 - Run `After(..)` hooks in reversed order of definition. This is in line with how cucumber-js behaves.
 
+- Updated all dependencies, including `@cucumber/cucumber` to v10.
+
+  - String literal attachments are now base64-encoded in JSON reports, ref. [cucumber/cucumber-js#2261](https://github.com/cucumber/cucumber-js/pull/2261).
+
 ## v18.0.6
 
 - Make the compile output play nicer with ESM, relates to [#1093](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1093).

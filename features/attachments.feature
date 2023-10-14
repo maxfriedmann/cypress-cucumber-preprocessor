@@ -10,9 +10,6 @@ Feature: attachments
       }
       """
 
-  # This test's result will likely change in the future, see
-  # https://github.com/cucumber/cucumber-js/issues/2260 and
-  # https://github.com/cucumber/cucumber-js/pull/2261
   Scenario: string identity
     Given a file named "cypress/e2e/a.feature" with:
       """
@@ -29,7 +26,7 @@ Feature: attachments
       """
     When I run cypress
     Then it passes
-    And there should be a JSON output similar to "fixtures/attachments/string-literal.json"
+    And there should be a JSON output similar to "fixtures/attachments/string.json"
 
   Scenario: array buffer
     Given a file named "cypress/e2e/a.feature" with:
@@ -47,7 +44,7 @@ Feature: attachments
       """
     When I run cypress
     Then it passes
-    And there should be a JSON output similar to "fixtures/attachments/string-base64.json"
+    And there should be a JSON output similar to "fixtures/attachments/string.json"
 
   Scenario: string encoded
     Given a file named "cypress/e2e/a.feature" with:
@@ -66,4 +63,4 @@ Feature: attachments
       """
     When I run cypress
     Then it passes
-    And there should be a JSON output similar to "fixtures/attachments/string-base64.json"
+    And there should be a JSON output similar to "fixtures/attachments/string.json"
