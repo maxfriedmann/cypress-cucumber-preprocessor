@@ -176,7 +176,7 @@ BeforeStep({ tags: "@foo or @bar" }, function () {
   // This hook will be executed before steps in scenarios tagged with @foo or @bar.
 });
 
-BeforeStep(function ({ pickle, pickleStep, gherkinDocument, result, testCaseStartedId, testStepId }) {
+BeforeStep(function ({ pickle, pickleStep, gherkinDocument, testCaseStartedId, testStepId }) {
   // Step hooks are invoked with an object containing a bunch of relevant data.
 });
 ```
