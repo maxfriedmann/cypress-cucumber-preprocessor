@@ -137,7 +137,9 @@ function createStringAttachment(
     encoding,
   };
 
-  cy.task(TASK_CREATE_STRING_ATTACHMENT, taskData);
+  cy.task(TASK_CREATE_STRING_ATTACHMENT, taskData, {
+    log: false,
+  });
 }
 
 export function attach(data: string | ArrayBuffer, mediaType?: string) {

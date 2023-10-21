@@ -16,6 +16,8 @@ Other changes:
 
 - Scenario hooks (`Before(..)` and `After(..)`) are now invoked with an object containing a bunch of relevant data. This is in line with how cucumber-js behaves.
 
+- Omit outputting internal task to the command log when using `attach(..)`.
+
 ## v18.0.6
 
 - Make the compile output play nicer with ESM, relates to [#1093](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1093).
