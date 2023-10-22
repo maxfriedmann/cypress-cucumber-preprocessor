@@ -37,7 +37,7 @@ Configuration values for specific types of testing (e2e / component) can be conf
   "e2e": {
     "stepDefintions": "cypress/e2e/[filepath].{js,mjs,ts,tsx}"
   },
-  "ct": {
+  "component": {
     "stepDefintions": "src/[filepath].{js,mjs,ts,tsx}"
   }
 }
