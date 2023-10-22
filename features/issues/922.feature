@@ -1,4 +1,4 @@
-# https://github.com/badeball/cypress-cucumber-preprocessor/issues/946
+# https://github.com/badeball/cypress-cucumber-preprocessor/issues/922
 
 Feature: visualizing hook with filter
   Scenario: visualizing hook with filter
