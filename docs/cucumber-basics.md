@@ -1,6 +1,22 @@
 [← Back to documentation](readme.md)
 
-# Expressions
+# Table of Contents <!-- omit from toc -->
+
+- [Step definitions](#step-definitions)
+  - [Expressions](#expressions)
+  - [Arguments](#arguments)
+  - [Custom parameter types](#custom-parameter-types)
+  - [Pending steps](#pending-steps)
+  - [Skipped steps](#skipped-steps)
+  - [Nested steps](#nested-steps)
+- [Hooks](#hooks)
+  - [Scenario hooks](#scenario-hooks)
+  - [Step hooks](#step-hooks)
+  - [Named hooks](#named-hooks)
+
+# Step definitions
+
+## Expressions
 
 A step definition’s *expression* can either be a regular expression or a [cucumber expression](https://github.com/cucumber/cucumber-expressions#readme). The examples in this section use cucumber expressions. If you prefer to use regular expressions, each *capture group* from the match will be passed as arguments to the step definition’s function.
 
@@ -8,7 +24,7 @@ A step definition’s *expression* can either be a regular expression or a [cucu
 Given("I have {int} cukes in my belly", (cukes: number) => {});
 ```
 
-# Arguments
+## Arguments
 
 Steps can be accompanied by [doc strings](https://cucumber.io/docs/gherkin/reference/#doc-strings) or [data tables](https://cucumber.io/docs/gherkin/reference/#data-tables), both which will be passed to the step definition as the last argument, as shown below.
 
@@ -34,7 +50,7 @@ Given(/^a table step$/, (table: DataTable) => {
 
 See [here](https://github.com/cucumber/cucumber-js/blob/main/docs/support_files/data_table_interface.md) for `DataTable`'s interface.
 
-# Custom parameter types
+## Custom parameter types
 
 Custom parameter types can be registered using `defineParameterType()`. They share the same scope as tests and you can invoke `defineParameterType()` anywhere you define steps, though the order of definition is unimportant. The table below explains the various arguments you can pass when defining a parameter type.
 
@@ -44,7 +60,7 @@ Custom parameter types can be registered using `defineParameterType()`. They sha
 | `regexp`      | A regexp that will match the parameter. May include capture groups.
 | `transformer` | A function or method that transforms the match from the regexp. Must have arity 1 if the regexp doesn't have any capture groups. Otherwise the arity must match the number of capture groups in `regexp`. |
 
-# Pending steps
+## Pending steps
 
 You can return `"pending"` from a step defintion or a chain to mark a step as pending. This will halt the execution and Cypress will report the test as "skipped". This is generally used for marking steps as "unimplemented" and allows you to commit unfinished work without breaking the test suite.
 
@@ -66,7 +82,7 @@ When("a step", () => {
 });
 ```
 
-# Skipped steps
+## Skipped steps
 
 You can return `"skipped"` from a step defintion or a chain to mark a step as pending. This will halt the execution and Cypress will report the test as "skipped". This however is generally used for conditionally short circuiting a test.
 
@@ -88,7 +104,7 @@ When("a step", () => {
 });
 ```
 
-# Nested steps
+## Nested steps
 
 You can invoke other steps from a step using `Step()`, as shown below.
 
@@ -123,7 +139,11 @@ When("I fill in the entire form", function () {
 });
 ```
 
-# Scenario hooks
+# Hooks
+
+There are two types of hooks, scenario hooks and step hooks, each explained below.
+
+## Scenario hooks
 
 `Before()` and `After()` is similar to Cypress' `beforeEach()` and `afterEach()`, but they can be selected to conditionally run based on the tags of each scenario, as shown below. Furthermore, failure in these hooks does **not** result in remaining tests being skipped. This is contrary to Cypress' `beforeEach` and `afterEach`.
 
@@ -154,7 +174,7 @@ Before(function ({ pickle, gherkinDocument, testCaseStartedId }) {
 });
 ```
 
-# Step hooks
+## Step hooks
 
 `BeforeStep()` and `AfterStep()` are hooks invoked before and after each step, respectively. These too can be selected to conditionally run based on the tags of each scenario, as shown below.
 
@@ -186,3 +206,16 @@ BeforeStep(function ({ pickle, pickleStep, gherkinDocument, testCaseStartedId, t
 ```
 
 [^1]: This discrepancy between the preprocessor and cucumber-js is currently considered to be unsolvable, as explained [here](https://github.com/badeball/cypress-cucumber-preprocessor/issues/824#issuecomment-1561492281).
+
+## Named hooks
+
+Both scenario hooks and step hooks can optionally be named. Names are displayed in the command log, as well as in [messages reports](messages-report.md).
+
+```ts
+import { Before, BeforeStep, After, AfterStep } from "@badeball/cypress-cucumber-preprocessor";
+
+Before({ name: "foo" }, function () {});
+BeforeStep({ name: "bar" }, function () {});
+After({ name: "baz" }, function () {});
+AfterStep({ name: "qux" }, function () {});
+```

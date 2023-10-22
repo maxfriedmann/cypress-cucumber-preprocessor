@@ -16,6 +16,8 @@ Other changes:
 
 - Scenario hooks (`Before(..)` and `After(..)`) are now invoked with an object containing a bunch of relevant data. This is in line with how cucumber-js behaves.
 
+- Hooks may now be optionally named. This is in line with how cucumber-js behaves.
+
 - Omit outputting internal task to the command log when using `attach(..)`.
 
 ## v18.0.6

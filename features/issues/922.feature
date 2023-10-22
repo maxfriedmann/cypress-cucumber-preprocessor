@@ -15,12 +15,9 @@ Feature: visualizing hook with filter
       Before(() => {})
       Before({ tags: "@foo or @bar" }, () => {})
       Given("a step", function() {
-        cy.then(() => {}).should(() => {
-          expect(
-            Cypress.$(top.document).find(
-              ".command-info:has(> .command-method:contains('Before')) .command-message-text:contains('@foo or @bar')"
-            )
-          ).to.exist;
+        cy.expectCommandLogEntry({
+          method: "Before",
+          message: "@foo or @bar"
         });
       })
       """

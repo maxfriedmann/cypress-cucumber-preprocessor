@@ -47,6 +47,7 @@ export type StepHookKeyword = "BeforeStep" | "AfterStep";
 
 interface IBaseHook<Implementation, Keyword> {
   tags?: string;
+  name?: string;
   node: ReturnType<typeof parse>;
   implementation: Implementation;
   keyword: Keyword;
@@ -62,13 +63,14 @@ export type IStepHook = IBaseHook<IStepHookBody, StepHookKeyword>;
 const noopNode = { evaluate: () => true };
 
 function parseHookArguments<Implementation, Keyword>(
-  options: { tags?: string },
+  options: { tags?: string; name?: string },
   fn: Implementation,
   keyword: Keyword,
   position?: Position
 ): IBaseHook<Implementation, Keyword> {
   return {
     tags: options.tags,
+    name: options.name,
     node: options.tags ? parse(options.tags) : noopNode,
     implementation: fn,
     keyword,

@@ -264,6 +264,24 @@ function getTestStepId(options: {
   );
 }
 
+function createStepDescription({
+  name,
+  tags,
+}: {
+  name?: string;
+  tags?: string;
+}): string | undefined {
+  if (name == null && tags == null) {
+    return;
+  } else if (name == null) {
+    return tags;
+  } else if (tags == null) {
+    return name;
+  } else {
+    return `${name} (${tags})`;
+  }
+}
+
 function createFeature(context: CompositionContext, feature: messages.Feature) {
   describe(feature.name || "<unamed feature>", () => {
     before(function () {
@@ -458,7 +476,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             runStepWithLogGroup({
               fn: () => registry.runHook(this, hook, options),
               keyword: hook.keyword,
-              text: hook.tags,
+              text: createStepDescription(hook),
             });
 
             return cy.wrap(start, { log: false });
@@ -541,7 +559,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                 return chain.then(() =>
                   runStepWithLogGroup({
                     keyword: "BeforeStep",
-                    text: beforeStepHook.tags,
+                    text: createStepDescription(beforeStepHook),
                     fn: () =>
                       registry.runStepHook(this, beforeStepHook, options),
                   })
@@ -566,7 +584,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                       return chain.then(() =>
                         runStepWithLogGroup({
                           keyword: "AfterStep",
-                          text: afterStepHook.tags,
+                          text: createStepDescription(afterStepHook),
                           fn: () =>
                             registry.runStepHook(this, afterStepHook, options),
                         })
@@ -1075,6 +1093,7 @@ export default function createTests(
     specEnvelopes.push({
       hook: {
         id: hook.id,
+        name: hook.name,
         sourceReference,
       },
     });
