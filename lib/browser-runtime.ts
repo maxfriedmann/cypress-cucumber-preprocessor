@@ -1082,8 +1082,7 @@ export default function createTests(
         gherkinDocument.uri,
         "Expected gherkin document to have URI"
       ),
-      mediaType:
-        "text/x.cucumber.gherkin+plain" as messages.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
+      mediaType: messages.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
     },
   });
 
