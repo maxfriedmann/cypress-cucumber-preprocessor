@@ -139,7 +139,7 @@ function taskSpecEnvelopes(context: CompositionContext) {
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_SPEC_ENVELOPES,
-      { messages: context.specEnvelopes } as ITaskSpecEnvelopes,
+      { messages: context.specEnvelopes } satisfies ITaskSpecEnvelopes,
       {
         log: false,
       }
@@ -152,9 +152,13 @@ function taskTestCaseStarted(
   testCaseStarted: messages.TestCaseStarted
 ) {
   if (shouldPropagateMessages(context)) {
-    cy.task(TASK_TEST_CASE_STARTED, testCaseStarted as ITaskTestCaseStarted, {
-      log: false,
-    });
+    cy.task(
+      TASK_TEST_CASE_STARTED,
+      testCaseStarted satisfies ITaskTestCaseStarted,
+      {
+        log: false,
+      }
+    );
   }
 }
 
@@ -165,7 +169,7 @@ function taskTestCaseFinished(
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_TEST_CASE_FINISHED,
-      testCasefinished as ITaskTestCaseFinished,
+      testCasefinished satisfies ITaskTestCaseFinished,
       {
         log: false,
       }
@@ -178,9 +182,13 @@ function taskTestStepStarted(
   testStepStarted: messages.TestStepStarted
 ) {
   if (shouldPropagateMessages(context)) {
-    cy.task(TASK_TEST_STEP_STARTED, testStepStarted as ITaskTestStepStarted, {
-      log: false,
-    });
+    cy.task(
+      TASK_TEST_STEP_STARTED,
+      testStepStarted satisfies ITaskTestStepStarted,
+      {
+        log: false,
+      }
+    );
   }
 }
 
@@ -191,7 +199,7 @@ function taskTestStepFinished(
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_TEST_STEP_FINISHED,
-      testStepfinished as ITaskTestStepFinished,
+      testStepfinished satisfies ITaskTestStepFinished,
       {
         log: false,
       }
