@@ -20,6 +20,8 @@ Other changes:
 
 - Omit outputting internal task to the command log when using `attach(..)`.
 
+- Add an [API](docs/json-report.md#attachments-node-environment) for adding attachments from the Node environment, fixes [#1089](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1089).
+
 ## v18.0.6
 
 - Make the compile output play nicer with ESM, relates to [#1093](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1093).
