@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Fix type members to account for scenario hook names, fixes [#1113](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1113).
+
 ## v19.0.0
 
 Breaking changes:

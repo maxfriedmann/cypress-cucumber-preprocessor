@@ -5,6 +5,7 @@ import {
   IStepHookBody,
   IParameterTypeDefinition,
   IStepDefinitionBody,
+  IHookOptions,
 } from "./public-member-types";
 
 export {
@@ -74,44 +75,44 @@ export function attach(data: string | ArrayBuffer, mediaType?: string) {
   throw createUnimplemented();
 }
 
-export function Before(options: { tags?: string }, fn: IHookBody): void;
+export function Before(options: IHookOptions, fn: IHookBody): void;
 export function Before(fn: IHookBody): void;
 export function Before(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IHookBody | { tags?: string },
+  optionsOrFn: IHookBody | IHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IHookBody
 ) {
   throw createUnimplemented();
 }
 
-export function After(options: { tags?: string }, fn: IHookBody): void;
+export function After(options: IHookOptions, fn: IHookBody): void;
 export function After(fn: IHookBody): void;
 export function After(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IHookBody | { tags?: string },
+  optionsOrFn: IHookBody | IHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IHookBody
 ) {
   throw createUnimplemented();
 }
 
-export function BeforeStep(options: { tags?: string }, fn: IStepHookBody): void;
+export function BeforeStep(options: IHookOptions, fn: IStepHookBody): void;
 export function BeforeStep(fn: IStepHookBody): void;
 export function BeforeStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IStepHookBody | { tags?: string },
+  optionsOrFn: IStepHookBody | IHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IStepHookBody
 ) {
   throw createUnimplemented();
 }
 
-export function AfterStep(options: { tags?: string }, fn: IStepHookBody): void;
+export function AfterStep(options: IHookOptions, fn: IStepHookBody): void;
 export function AfterStep(fn: IStepHookBody): void;
 export function AfterStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IStepHookBody | { tags?: string },
+  optionsOrFn: IStepHookBody | IHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IStepHookBody
 ) {

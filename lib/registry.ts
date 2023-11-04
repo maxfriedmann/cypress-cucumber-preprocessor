@@ -23,6 +23,7 @@ import {
   IParameterTypeDefinition,
   IStepDefinitionBody,
   IHookParameter,
+  IHookOptions,
 } from "./public-member-types";
 
 import {
@@ -163,7 +164,7 @@ export class Registry {
 
   public defineHook(
     keyword: ScenarioHookKeyword,
-    options: { tags?: string },
+    options: IHookOptions,
     fn: IHookBody
   ) {
     this.preliminaryHooks.push(
@@ -176,17 +177,17 @@ export class Registry {
     );
   }
 
-  public defineBefore(options: { tags?: string }, fn: IHookBody) {
+  public defineBefore(options: IHookOptions, fn: IHookBody) {
     this.defineHook("Before", options, fn);
   }
 
-  public defineAfter(options: { tags?: string }, fn: IHookBody) {
+  public defineAfter(options: IHookOptions, fn: IHookBody) {
     this.defineHook("After", options, fn);
   }
 
   public defineStepHook(
     keyword: StepHookKeyword,
-    options: { tags?: string },
+    options: IHookOptions,
     fn: IStepHookBody
   ) {
     this.stepHooks.push(
@@ -199,11 +200,11 @@ export class Registry {
     );
   }
 
-  public defineBeforeStep(options: { tags?: string }, fn: IStepHookBody) {
+  public defineBeforeStep(options: IHookOptions, fn: IStepHookBody) {
     this.defineStepHook("BeforeStep", options, fn);
   }
 
-  public defineAfterStep(options: { tags?: string }, fn: IStepHookBody) {
+  public defineAfterStep(options: IHookOptions, fn: IStepHookBody) {
     this.defineStepHook("AfterStep", options, fn);
   }
 

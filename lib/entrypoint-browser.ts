@@ -30,6 +30,7 @@ import {
   IStepHookBody,
   IParameterTypeDefinition,
   IStepDefinitionBody,
+  IHookOptions,
 } from "./public-member-types";
 
 import {
@@ -66,10 +67,10 @@ function defineParameterType<T, C extends Mocha.Context>(
   getRegistry().defineParameterType(options);
 }
 
-function defineBefore(options: { tags?: string }, fn: IHookBody): void;
+function defineBefore(options: IHookOptions, fn: IHookBody): void;
 function defineBefore(fn: IHookBody): void;
 function defineBefore(
-  optionsOrFn: IHookBody | { tags?: string },
+  optionsOrFn: IHookBody | IHookOptions,
   maybeFn?: IHookBody
 ) {
   if (typeof optionsOrFn === "function") {
@@ -81,10 +82,10 @@ function defineBefore(
   }
 }
 
-function defineAfter(options: { tags?: string }, fn: IHookBody): void;
+function defineAfter(options: IHookOptions, fn: IHookBody): void;
 function defineAfter(fn: IHookBody): void;
 function defineAfter(
-  optionsOrFn: IHookBody | { tags?: string },
+  optionsOrFn: IHookBody | IHookOptions,
   maybeFn?: IHookBody
 ) {
   if (typeof optionsOrFn === "function") {
@@ -96,10 +97,10 @@ function defineAfter(
   }
 }
 
-function defineBeforeStep(options: { tags?: string }, fn: IStepHookBody): void;
+function defineBeforeStep(options: IHookOptions, fn: IStepHookBody): void;
 function defineBeforeStep(fn: IStepHookBody): void;
 function defineBeforeStep(
-  optionsOrFn: IStepHookBody | { tags?: string },
+  optionsOrFn: IStepHookBody | IHookOptions,
   maybeFn?: IStepHookBody
 ) {
   if (typeof optionsOrFn === "function") {
@@ -111,10 +112,10 @@ function defineBeforeStep(
   }
 }
 
-function defineAfterStep(options: { tags?: string }, fn: IStepHookBody): void;
+function defineAfterStep(options: IHookOptions, fn: IStepHookBody): void;
 function defineAfterStep(fn: IStepHookBody): void;
 function defineAfterStep(
-  optionsOrFn: IStepHookBody | { tags?: string },
+  optionsOrFn: IStepHookBody | IHookOptions,
   maybeFn?: IStepHookBody
 ) {
   if (typeof optionsOrFn === "function") {

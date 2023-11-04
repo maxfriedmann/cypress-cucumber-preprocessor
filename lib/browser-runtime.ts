@@ -63,7 +63,11 @@ import { runStepWithLogGroup } from "./helpers/cypress";
 
 import { getTags } from "./helpers/environment";
 
-import { IHookParameter, IStepHookParameter } from "./public-member-types";
+import {
+  IHookOptions,
+  IHookParameter,
+  IStepHookParameter,
+} from "./public-member-types";
 
 type Node = ReturnType<typeof parse>;
 
@@ -279,10 +283,7 @@ function getTestStepId(options: {
 function createStepDescription({
   name,
   tags,
-}: {
-  name?: string;
-  tags?: string;
-}): string | undefined {
+}: IHookOptions): string | undefined {
   if (name == null && tags == null) {
     return;
   } else if (name == null) {

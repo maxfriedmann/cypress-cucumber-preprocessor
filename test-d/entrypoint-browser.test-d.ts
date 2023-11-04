@@ -146,7 +146,7 @@ Before({}, function () {
   expectType<Mocha.Context>(this);
 });
 
-Before({ tags: "foo" }, function () {
+Before({ tags: "foo", name: "bar" }, function () {
   expectType<Mocha.Context>(this);
 });
 
@@ -158,7 +158,7 @@ After({}, function () {
   expectType<Mocha.Context>(this);
 });
 
-After({ tags: "foo" }, function () {
+After({ tags: "foo", name: "bar" }, function () {
   expectType<Mocha.Context>(this);
 });
 
@@ -196,7 +196,7 @@ BeforeStep(
 );
 
 BeforeStep(
-  { tags: "foo" },
+  { tags: "foo", name: "bar" },
   function ({
     pickle,
     pickleStep,
@@ -247,7 +247,7 @@ AfterStep(
 );
 
 AfterStep(
-  { tags: "foo" },
+  { tags: "foo", name: "bar" },
   function ({
     pickle,
     pickleStep,
