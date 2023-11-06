@@ -1,4 +1,4 @@
-# https://github.com/badeball/cypress-cucumber-preprocessor/issues/946
+# https://github.com/badeball/cypress-cucumber-preprocessor/issues/922
 
 Feature: visualizing hook with filter
   Scenario: visualizing hook with filter
@@ -15,7 +15,10 @@ Feature: visualizing hook with filter
       Before(() => {})
       Before({ tags: "@foo or @bar" }, () => {})
       Given("a step", function() {
-        // TODO: figure out how to query Cypress' own UI, if at all possible.
+        cy.expectCommandLogEntry({
+          method: "Before",
+          message: "@foo or @bar"
+        });
       })
       """
     When I run cypress

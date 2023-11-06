@@ -62,13 +62,16 @@ Feature: hooks ordering
         }
       })
       After(function() {
+        expect(counter++, "Expected After() to be called in reverse order of definition").to.equal(8)
+      })
+      After(function() {
         expect(counter++, "Expected After() to be called after ordinary steps").to.equal(7)
       })
       afterEach(function() {
-        expect(counter++, "Expected afterEach() to be called after After()").to.equal(8)
+        expect(counter++, "Expected afterEach() to be called after After()").to.equal(9)
       })
       after(function() {
-        expect(counter++, "Expected after() to be called after afterEach()").to.equal(9)
+        expect(counter++, "Expected after() to be called after afterEach()").to.equal(10)
       })
       """
     When I run cypress

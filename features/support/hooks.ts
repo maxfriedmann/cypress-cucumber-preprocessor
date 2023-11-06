@@ -20,7 +20,17 @@ Before(async function ({ gherkinDocument, pickle }) {
 
   await fs.rm(this.tmpDir, { recursive: true, force: true });
 
-  await writeFile(path.join(this.tmpDir, "cypress", "support", "e2e.js"), "");
+  await writeFile(
+    path.join(this.tmpDir, "cypress", "support", "e2e.js"),
+    `
+      Cypress.Commands.add("expectCommandLogEntry", ({ method, message }) => {
+        const selector = \`.command-info:has(> .command-method:contains('\${method}')) .command-message-text:contains('\${message}')\`;
+        cy.then(() => {}).should(() => {
+          expect(Cypress.$(top.document).find(selector)).to.exist;
+        });
+      });
+    `
+  );
 
   await writeFile(
     path.join(this.tmpDir, "cypress.config.js"),

@@ -12,7 +12,7 @@ import chalk from "chalk";
 
 import { NdjsonToMessageStream } from "@cucumber/message-streams";
 
-import messages from "@cucumber/messages";
+import * as messages from "@cucumber/messages";
 
 import split from "split";
 
@@ -590,9 +590,17 @@ export function testStepStartedHandler(
   return true;
 }
 
-export function testStepFinishedHandler(
+export type Attach = (data: string | Buffer, mediaType?: string) => void;
+
+export type OnAfterStep = (options: {
+  wasLastStep: boolean;
+  attach: Attach;
+}) => Promise<void> | void;
+
+export async function testStepFinishedHandler(
   config: Cypress.PluginConfigOptions,
-  data: ITaskTestStepFinished
+  options: { onAfterStep?: OnAfterStep },
+  { wasLastStep, ...testStepFinished }: ITaskTestStepFinished
 ) {
   debug("testStepFinishedHandler()");
 
@@ -611,14 +619,55 @@ export function testStepFinishedHandler(
 
   if (state.pretty.enabled) {
     state.pretty.broadcaster.emit("envelope", {
-      testStepFinished: data,
+      testStepFinished,
     });
+  }
+
+  const attachments: ITaskCreateStringAttachment[] = [];
+
+  await options.onAfterStep?.({
+    wasLastStep,
+    attach(data, mediaType) {
+      if (typeof data === "string") {
+        mediaType = mediaType ?? "text/plain";
+
+        if (mediaType.startsWith("base64:")) {
+          attachments.push({
+            data,
+            mediaType: mediaType.replace("base64:", ""),
+            encoding: messages.AttachmentContentEncoding.BASE64,
+          });
+        } else {
+          attachments.push({
+            data,
+            mediaType: mediaType ?? "text/plain",
+            encoding: messages.AttachmentContentEncoding.IDENTITY,
+          });
+        }
+      } else if (data instanceof Buffer) {
+        if (typeof mediaType !== "string") {
+          throw Error("Buffer attachments must specify a media type");
+        }
+
+        attachments.push({
+          data: data.toString("base64"),
+          mediaType,
+          encoding: messages.AttachmentContentEncoding.BASE64,
+        });
+      } else {
+        throw Error("Invalid attachment data: must be a Buffer or string");
+      }
+    },
+  });
+
+  for (const attachment of attachments) {
+    await createStringAttachmentHandler(config, attachment);
   }
 
   state = {
     state: "step-finished",
     pretty: state.pretty,
-    messages: state.messages.concat({ testStepFinished: data }),
+    messages: state.messages.concat({ testStepFinished }),
     testCaseStartedId: state.testCaseStartedId,
   };
 

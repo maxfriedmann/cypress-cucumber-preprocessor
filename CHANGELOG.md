@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## v19.0.1
+
+- Fix type members to account for scenario hook names, fixes [#1113](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1113).
+
+## v19.0.0
+
+Breaking changes:
+
+- Run `After(..)` hooks in reversed order of definition. This is in line with how cucumber-js behaves.
+
+- Updated all dependencies, including `@cucumber/cucumber` to v10.
+
+  - String literal attachments are now base64-encoded in JSON reports, ref. [cucumber/cucumber-js#2261](https://github.com/cucumber/cucumber-js/pull/2261).
+
+Other changes:
+
+- Scenario hooks (`Before(..)` and `After(..)`) are now invoked with an object containing a bunch of relevant data. This is in line with how cucumber-js behaves.
+
+- Hooks may now be optionally named. This is in line with how cucumber-js behaves.
+
+- Omit outputting internal task to the command log when using `attach(..)`.
+
+- Add an [API](docs/json-report.md#attachments-node-environment) for adding attachments from the Node environment, fixes [#1089](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1089).
+
 ## v18.0.6
 
 - Make the compile output play nicer with ESM, relates to [#1093](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1093).

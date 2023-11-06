@@ -133,6 +133,43 @@ Then(
   }
 );
 
+Then(
+  "there should be two attachments containing false and true, respectively",
+  async function () {
+    const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
+
+    const jsonFile = await fs.readFile(absolutejsonPath);
+
+    const actualJsonOutput = JSON.parse(jsonFile.toString());
+
+    const embeddings: { data: string; mime_type: string }[] = actualJsonOutput
+      .flatMap((feature: any) => feature.elements)
+      .flatMap((element: any) => element.steps)
+      .flatMap((step: any) => step.embeddings ?? []);
+
+    if (embeddings.length !== 2) {
+      throw new Error(
+        "Expected to find two embeddings in JSON, but found " +
+          embeddings.length
+      );
+    }
+
+    const [first, second] = embeddings;
+
+    assert.strictEqual(
+      Buffer.from(first.data, "base64").toString(),
+      "false",
+      "Expected first attachment to equal 'false'"
+    );
+
+    assert.strictEqual(
+      Buffer.from(second.data, "base64").toString(),
+      "true",
+      "Expected second attachment to equal 'true'"
+    );
+  }
+);
+
 Then("the JSON report should contain a spec", async function () {
   const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 

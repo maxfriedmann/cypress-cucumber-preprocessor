@@ -22,6 +22,8 @@ import {
   IStepHookParameter,
   IParameterTypeDefinition,
   IStepDefinitionBody,
+  IHookParameter,
+  IHookOptions,
 } from "./public-member-types";
 
 import {
@@ -46,6 +48,7 @@ export type StepHookKeyword = "BeforeStep" | "AfterStep";
 
 interface IBaseHook<Implementation, Keyword> {
   tags?: string;
+  name?: string;
   node: ReturnType<typeof parse>;
   implementation: Implementation;
   keyword: Keyword;
@@ -61,13 +64,14 @@ export type IStepHook = IBaseHook<IStepHookBody, StepHookKeyword>;
 const noopNode = { evaluate: () => true };
 
 function parseHookArguments<Implementation, Keyword>(
-  options: { tags?: string },
+  options: { tags?: string; name?: string },
   fn: Implementation,
   keyword: Keyword,
   position?: Position
 ): IBaseHook<Implementation, Keyword> {
   return {
     tags: options.tags,
+    name: options.name,
     node: options.tags ? parse(options.tags) : noopNode,
     implementation: fn,
     keyword,
@@ -159,7 +163,7 @@ export class Registry {
 
   public defineHook(
     keyword: ScenarioHookKeyword,
-    options: { tags?: string },
+    options: IHookOptions,
     fn: IHookBody
   ) {
     this.preliminaryHooks.push(
@@ -172,17 +176,17 @@ export class Registry {
     );
   }
 
-  public defineBefore(options: { tags?: string }, fn: IHookBody) {
+  public defineBefore(options: IHookOptions, fn: IHookBody) {
     this.defineHook("Before", options, fn);
   }
 
-  public defineAfter(options: { tags?: string }, fn: IHookBody) {
+  public defineAfter(options: IHookOptions, fn: IHookBody) {
     this.defineHook("After", options, fn);
   }
 
   public defineStepHook(
     keyword: StepHookKeyword,
-    options: { tags?: string },
+    options: IHookOptions,
     fn: IStepHookBody
   ) {
     this.stepHooks.push(
@@ -195,11 +199,11 @@ export class Registry {
     );
   }
 
-  public defineBeforeStep(options: { tags?: string }, fn: IStepHookBody) {
+  public defineBeforeStep(options: IHookOptions, fn: IStepHookBody) {
     this.defineStepHook("BeforeStep", options, fn);
   }
 
-  public defineAfterStep(options: { tags?: string }, fn: IStepHookBody) {
+  public defineAfterStep(options: IHookOptions, fn: IStepHookBody) {
     this.defineStepHook("AfterStep", options, fn);
   }
 
@@ -279,11 +283,11 @@ export class Registry {
   }
 
   public resolveAfterHooks(tags: string[]) {
-    return this.resolveHooks("After", tags);
+    return this.resolveHooks("After", tags).reverse();
   }
 
-  public runHook(world: Mocha.Context, hook: IHook) {
-    return hook.implementation.call(world);
+  public runHook(world: Mocha.Context, hook: IHook, options: IHookParameter) {
+    return hook.implementation.call(world, options);
   }
 
   public resolveStepHooks(keyword: StepHookKeyword, tags: string[]) {
@@ -297,7 +301,7 @@ export class Registry {
   }
 
   public resolveAfterStepHooks(tags: string[]) {
-    return this.resolveStepHooks("AfterStep", tags);
+    return this.resolveStepHooks("AfterStep", tags).reverse();
   }
 
   public resolveBeforeAllHooks() {

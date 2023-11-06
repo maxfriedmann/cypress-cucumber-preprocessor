@@ -25,7 +25,9 @@ export type ITaskTestStepStarted = messages.TestStepStarted;
 export const TASK_TEST_STEP_FINISHED =
   "cypress-cucumber-preprocessor:test-step-finished";
 
-export type ITaskTestStepFinished = messages.TestStepFinished;
+export type ITaskTestStepFinished = messages.TestStepFinished & {
+  wasLastStep: boolean;
+};
 
 export const TASK_CREATE_STRING_ATTACHMENT =
   "cypress-cucumber-preprocessor:create-string-attachment";
