@@ -118,4 +118,20 @@ export function AfterStep(
   throw createUnimplemented();
 }
 
+export function BeforeAll(fn: IStepHookBody): void;
+export function BeforeAll(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  maybeFn?: IStepHookBody
+) {
+  throw createUnimplemented();
+}
+
+export function AfterAll(fn: IStepHookBody): void;
+export function AfterAll(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  maybeFn?: IStepHookBody
+) {
+  throw createUnimplemented();
+}
+
 export { default as DataTable } from "./data_table";

@@ -25,6 +25,8 @@ import {
   After,
   BeforeStep,
   AfterStep,
+  BeforeAll,
+  AfterAll,
   DataTable,
 } from "../lib/entrypoint-node";
 

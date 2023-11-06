@@ -25,6 +25,8 @@ import {
   After,
   BeforeStep,
   AfterStep,
+  BeforeAll,
+  AfterAll,
   DataTable,
 } from "../lib/entrypoint-browser";
 
@@ -138,6 +140,10 @@ defineParameterType({
   },
 });
 
+BeforeAll(function () {
+  expectType<Mocha.Context>(this);
+});
+
 Before(function () {
   expectType<Mocha.Context>(this);
 });
@@ -159,6 +165,10 @@ After({}, function () {
 });
 
 After({ tags: "foo" }, function () {
+  expectType<Mocha.Context>(this);
+});
+
+AfterAll(function () {
   expectType<Mocha.Context>(this);
 });
 

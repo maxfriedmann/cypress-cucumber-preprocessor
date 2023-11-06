@@ -126,6 +126,28 @@ function defineAfterStep(
   }
 }
 
+function defineBeforeAll(fn: IHookBody): void;
+function defineBeforeAll(
+  maybeFn?: IHookBody
+) {
+  if (typeof maybeFn === "function") {
+    getRegistry().defineBeforeAll(maybeFn);
+  } else {
+    throw new Error("Unexpected argument for BeforeAll hook");
+  }
+}
+
+function defineAfterAll(fn: IHookBody): void;
+function defineAfterAll(
+  maybeFn?: IHookBody
+) {
+  if (typeof maybeFn === "function") {
+    getRegistry().defineAfterAll(maybeFn);
+  } else {
+    throw new Error("Unexpected argument for AfterAll hook");
+  }
+}
+
 function createStringAttachment(
   data: string,
   mediaType: string,
@@ -205,6 +227,8 @@ export {
   defineAfter as After,
   defineBeforeStep as BeforeStep,
   defineAfterStep as AfterStep,
+  defineBeforeAll as BeforeAll,
+  defineAfterAll as AfterAll
 };
 
 /**
