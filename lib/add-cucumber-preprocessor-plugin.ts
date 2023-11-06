@@ -34,6 +34,7 @@ import {
   testStepStartedHandler,
   testStepFinishedHandler,
   testCaseFinishedHandler,
+  OnAfterStep,
 } from "./plugin-event-handlers";
 
 import { resolve as origResolve } from "./preprocessor-configuration";
@@ -52,6 +53,7 @@ export type AddOptions = {
   omitBeforeSpecHandler?: boolean;
   omitAfterSpecHandler?: boolean;
   omitAfterScreenshotHandler?: boolean;
+  onAfterStep?: OnAfterStep;
 };
 
 type PreservedPluginConfigOptions = ICypressConfiguration & {
@@ -114,7 +116,11 @@ export async function addCucumberPreprocessorPlugin(
     [TASK_SPEC_ENVELOPES]: specEnvelopesHandler.bind(null, config),
     [TASK_TEST_CASE_STARTED]: testCaseStartedHandler.bind(null, config),
     [TASK_TEST_STEP_STARTED]: testStepStartedHandler.bind(null, config),
-    [TASK_TEST_STEP_FINISHED]: testStepFinishedHandler.bind(null, config),
+    [TASK_TEST_STEP_FINISHED]: testStepFinishedHandler.bind(
+      null,
+      config,
+      options
+    ),
     [TASK_TEST_CASE_FINISHED]: testCaseFinishedHandler.bind(null, config),
     [TASK_CREATE_STRING_ATTACHMENT]: createStringAttachmentHandler.bind(
       null,

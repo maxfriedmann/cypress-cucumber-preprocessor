@@ -18,9 +18,9 @@ The report is outputted to `cucumber-report.json` in the project directory, but 
 
 Screenshots are automatically added to JSON reports, including that of failed tests (unless you have disabled `screenshotOnRunFailure`).
 
-## Attachments
+## Attachments (browser environment)
 
-Text, images and other data can be added to the output of the messages and JSON reports with attachments.
+Text, images and other data can be added to the output of the messages and JSON reports with attachments, using the browser API explained below.
 
 ```ts
 import { Given, attach } from "@badeball/cypress-cucumber-preprocessor";
@@ -57,5 +57,59 @@ import { Given, attach } from "@badeball/cypress-cucumber-preprocessor";
 
 Given("a step", function() {
   attach("Zm9vYmFy", "base64:text/plain");
+});
+```
+
+## Attachments (node environment)
+
+Similar to the browser API explained above, attachments can also be added using a Node API. This is less typical and only required in specific scenarios. This API is available through the `onAfterStep` option in `addCucumberPreprocessorPlugin`, like shown below. The Node API mimicks the options found in the browser API.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ wasLastStep, attach }) {
+    attach("foobar");
+  }
+});
+```
+
+By default, text is saved with a MIME type of text/plain. You can also specify a different MIME type.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ wasLastStep, attach }) {
+    attach('{ "name": "foobar" }', "application/json");
+  }
+});
+```
+
+Images and other binary data can be attached using a Buffer. The data will be base64 encoded in the output.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ wasLastStep, attach }) {
+    attach(Buffer.from("foobar"), "text/plain");
+  }
+});
+```
+
+If you've already got a base64-encoded string, you can prefix your mime type with `base64:` to indicate this.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ wasLastStep, attach }) {
+    attach("Zm9vYmFy", "base64:text/plain");
+  }
+});
+```
+
+A `wasLastStep` option is available if you need to attach something at the end of the test.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ wasLastStep, attach }) {
+    if (wasLastStep) {
+      attach("foobar");
+    }
+  }
 });
 ```

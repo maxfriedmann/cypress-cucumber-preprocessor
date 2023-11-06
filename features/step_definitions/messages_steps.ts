@@ -5,6 +5,7 @@ import { promises as fs } from "fs";
 import assert from "assert";
 import { toByteArray } from "base64-js";
 import { PNG } from "pngjs";
+import { assertAndReturn } from "../support/helpers";
 
 function isObject(object: any): object is object {
   return typeof object === "object" && object != null;
@@ -264,5 +265,19 @@ Then(
     ) {
       throw new Error("Expected to find non-zero duration");
     }
+  }
+);
+
+Then(
+  "the message report should contain a hook named {string}",
+  async function (name) {
+    const messages = await readMessagesReport(this.tmpDir);
+
+    const hook = assertAndReturn(
+      messages.map((message) => message.hook).find((hook) => hook),
+      "Expected to find a hook among messages"
+    );
+
+    assert.equal(hook.name, name);
   }
 );

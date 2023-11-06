@@ -3,11 +3,7 @@ import { JSDOM } from "jsdom";
 import path from "path";
 import { promises as fs } from "fs";
 import assert from "assert";
-
-function assertAndReturn<T>(value: T | null | undefined, msg?: string): T {
-  assert(value, msg);
-  return value;
-}
+import { assertAndReturn } from "../support/helpers";
 
 Then("there should be a HTML report", async function () {
   await assert.doesNotReject(

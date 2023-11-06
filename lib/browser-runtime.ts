@@ -63,7 +63,11 @@ import { runStepWithLogGroup } from "./helpers/cypress";
 
 import { getTags } from "./helpers/environment";
 
-import { IStepHookParameter } from "./public-member-types";
+import {
+  IHookOptions,
+  IHookParameter,
+  IStepHookParameter,
+} from "./public-member-types";
 
 type Node = ReturnType<typeof parse>;
 
@@ -139,7 +143,7 @@ function taskSpecEnvelopes(context: CompositionContext) {
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_SPEC_ENVELOPES,
-      { messages: context.specEnvelopes } as ITaskSpecEnvelopes,
+      { messages: context.specEnvelopes } satisfies ITaskSpecEnvelopes,
       {
         log: false,
       }
@@ -152,9 +156,13 @@ function taskTestCaseStarted(
   testCaseStarted: messages.TestCaseStarted
 ) {
   if (shouldPropagateMessages(context)) {
-    cy.task(TASK_TEST_CASE_STARTED, testCaseStarted as ITaskTestCaseStarted, {
-      log: false,
-    });
+    cy.task(
+      TASK_TEST_CASE_STARTED,
+      testCaseStarted satisfies ITaskTestCaseStarted,
+      {
+        log: false,
+      }
+    );
   }
 }
 
@@ -165,7 +173,7 @@ function taskTestCaseFinished(
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_TEST_CASE_FINISHED,
-      testCasefinished as ITaskTestCaseFinished,
+      testCasefinished satisfies ITaskTestCaseFinished,
       {
         log: false,
       }
@@ -178,20 +186,28 @@ function taskTestStepStarted(
   testStepStarted: messages.TestStepStarted
 ) {
   if (shouldPropagateMessages(context)) {
-    cy.task(TASK_TEST_STEP_STARTED, testStepStarted as ITaskTestStepStarted, {
-      log: false,
-    });
+    cy.task(
+      TASK_TEST_STEP_STARTED,
+      testStepStarted satisfies ITaskTestStepStarted,
+      {
+        log: false,
+      }
+    );
   }
 }
 
 function taskTestStepFinished(
   context: CompositionContext,
-  testStepfinished: messages.TestStepFinished
+  testStepfinished: messages.TestStepFinished,
+  wasLastStep: boolean
 ) {
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_TEST_STEP_FINISHED,
-      testStepfinished as ITaskTestStepFinished,
+      {
+        ...testStepfinished,
+        wasLastStep,
+      } satisfies ITaskTestStepFinished,
       {
         log: false,
       }
@@ -262,6 +278,25 @@ function getTestStepId(options: {
     "Expected to find test step ID for hook or pickleStep = " +
       hookIdOrPickleStepId
   );
+}
+
+function createStepDescription({
+  name,
+  tags,
+}: IHookOptions): string | undefined {
+  if (name == null && tags == null) {
+    return;
+  } else if (name == null) {
+    return tags;
+  } else if (tags == null) {
+    return name;
+  } else {
+    return `${name} (${tags})`;
+  }
+}
+
+function isLastEl<T>(col: T[], el: T): boolean {
+  return col[col.length - 1] === el;
 }
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
@@ -454,10 +489,16 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
           return cy.wrap(start, { log: false });
         })
           .then((start) => {
+            const options: IHookParameter = {
+              pickle,
+              gherkinDocument,
+              testCaseStartedId,
+            };
+
             runStepWithLogGroup({
-              fn: () => registry.runHook(this, hook),
+              fn: () => registry.runHook(this, hook, options),
               keyword: hook.keyword,
-              text: hook.tags,
+              text: createStepDescription(hook),
             });
 
             return cy.wrap(start, { log: false });
@@ -465,15 +506,19 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
           .then((start) => {
             const end = createTimestamp();
 
-            taskTestStepFinished(context, {
-              testStepId,
-              testCaseStartedId,
-              testStepResult: {
-                status: messages.TestStepResultStatus.PASSED,
-                duration: duration(start, end),
+            taskTestStepFinished(
+              context,
+              {
+                testStepId,
+                testCaseStartedId,
+                testStepResult: {
+                  status: messages.TestStepResultStatus.PASSED,
+                  duration: duration(start, end),
+                },
+                timestamp: end,
               },
-              timestamp: end,
-            });
+              isLastEl(steps, step)
+            );
 
             remainingSteps.shift();
           });
@@ -540,7 +585,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                 return chain.then(() =>
                   runStepWithLogGroup({
                     keyword: "BeforeStep",
-                    text: beforeStepHook.tags,
+                    text: createStepDescription(beforeStepHook),
                     fn: () =>
                       registry.runStepHook(this, beforeStepHook, options),
                   })
@@ -561,12 +606,11 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   fn: () => registry.runStepDefininition(this, text, argument),
                 }).then((result) => {
                   return afterStepHooks
-                    .reverse()
                     .reduce((chain, afterStepHook) => {
                       return chain.then(() =>
                         runStepWithLogGroup({
                           keyword: "AfterStep",
-                          text: afterStepHook.tags,
+                          text: createStepDescription(afterStepHook),
                           fn: () =>
                             registry.runStepHook(this, afterStepHook, options),
                         })
@@ -596,25 +640,33 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
 
             if (result === "pending" || result === "skipped") {
               if (result === "pending") {
-                taskTestStepFinished(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.PENDING,
-                    duration: duration(start, end),
+                taskTestStepFinished(
+                  context,
+                  {
+                    testStepId,
+                    testCaseStartedId,
+                    testStepResult: {
+                      status: messages.TestStepResultStatus.PENDING,
+                      duration: duration(start, end),
+                    },
+                    timestamp: end,
                   },
-                  timestamp: end,
-                });
+                  isLastEl(steps, step)
+                );
               } else {
-                taskTestStepFinished(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.SKIPPED,
-                    duration: duration(start, end),
+                taskTestStepFinished(
+                  context,
+                  {
+                    testStepId,
+                    testCaseStartedId,
+                    testStepResult: {
+                      status: messages.TestStepResultStatus.SKIPPED,
+                      duration: duration(start, end),
+                    },
+                    timestamp: end,
                   },
-                  timestamp: end,
-                });
+                  isLastEl(steps, step)
+                );
               }
 
               remainingSteps.shift();
@@ -637,18 +689,22 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   timestamp: createTimestamp(),
                 });
 
-                taskTestStepFinished(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.SKIPPED,
-                    duration: {
-                      seconds: 0,
-                      nanos: 0,
+                taskTestStepFinished(
+                  context,
+                  {
+                    testStepId,
+                    testCaseStartedId,
+                    testStepResult: {
+                      status: messages.TestStepResultStatus.SKIPPED,
+                      duration: {
+                        seconds: 0,
+                        nanos: 0,
+                      },
                     },
+                    timestamp: createTimestamp(),
                   },
-                  timestamp: createTimestamp(),
-                });
+                  isLastEl(remainingSteps, skippedStep)
+                );
               }
 
               for (let i = 0, count = remainingSteps.length; i < count; i++) {
@@ -657,15 +713,19 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
 
               cy.then(() => this.skip());
             } else {
-              taskTestStepFinished(context, {
-                testStepId,
-                testCaseStartedId,
-                testStepResult: {
-                  status: messages.TestStepResultStatus.PASSED,
-                  duration: duration(start, end),
+              taskTestStepFinished(
+                context,
+                {
+                  testStepId,
+                  testCaseStartedId,
+                  testStepResult: {
+                    status: messages.TestStepResultStatus.PASSED,
+                    duration: duration(start, end),
+                  },
+                  timestamp: end,
                 },
-                timestamp: end,
-              });
+                isLastEl(steps, step)
+              );
 
               remainingSteps.shift();
             }
@@ -820,7 +880,11 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
             timestamp: endTimestamp,
           };
 
-      taskTestStepFinished(context, failedTestStepFinished);
+      taskTestStepFinished(
+        context,
+        failedTestStepFinished,
+        remainingSteps.length === 0
+      );
 
       for (const skippedStep of remainingSteps) {
         const hookIdOrPickleStepId = assertAndReturn(
@@ -840,18 +904,22 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           timestamp: endTimestamp,
         });
 
-        taskTestStepFinished(context, {
-          testStepId,
-          testCaseStartedId,
-          testStepResult: {
-            status: messages.TestStepResultStatus.SKIPPED,
-            duration: {
-              seconds: 0,
-              nanos: 0,
+        taskTestStepFinished(
+          context,
+          {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.SKIPPED,
+              duration: {
+                seconds: 0,
+                nanos: 0,
+              },
             },
+            timestamp: endTimestamp,
           },
-          timestamp: endTimestamp,
-        });
+          isLastEl(remainingSteps, skippedStep)
+        );
       }
     } else if (this.currentTest?.state === "pending") {
       if (currentStepStartedAt) {
@@ -871,15 +939,19 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           hookIdOrPickleStepId,
         });
 
-        taskTestStepFinished(context, {
-          testStepId,
-          testCaseStartedId,
-          testStepResult: {
-            status: messages.TestStepResultStatus.SKIPPED,
-            duration: duration(currentStepStartedAt, endTimestamp),
+        taskTestStepFinished(
+          context,
+          {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.SKIPPED,
+              duration: duration(currentStepStartedAt, endTimestamp),
+            },
+            timestamp: endTimestamp,
           },
-          timestamp: endTimestamp,
-        });
+          remainingSteps.length === 0
+        );
       }
 
       for (const remainingStep of remainingSteps) {
@@ -900,18 +972,22 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           timestamp: endTimestamp,
         });
 
-        taskTestStepFinished(context, {
-          testStepId,
-          testCaseStartedId,
-          testStepResult: {
-            status: messages.TestStepResultStatus.SKIPPED,
-            duration: {
-              seconds: 0,
-              nanos: 0,
+        taskTestStepFinished(
+          context,
+          {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.SKIPPED,
+              duration: {
+                seconds: 0,
+                nanos: 0,
+              },
             },
+            timestamp: endTimestamp,
           },
-          timestamp: endTimestamp,
-        });
+          isLastEl(remainingSteps, remainingStep)
+        );
       }
     } else {
       for (const remainingStep of remainingSteps) {
@@ -932,18 +1008,22 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           timestamp: endTimestamp,
         });
 
-        taskTestStepFinished(context, {
-          testStepId,
-          testCaseStartedId,
-          testStepResult: {
-            status: messages.TestStepResultStatus.UNKNOWN,
-            duration: {
-              seconds: 0,
-              nanos: 0,
+        taskTestStepFinished(
+          context,
+          {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.UNKNOWN,
+              duration: {
+                seconds: 0,
+                nanos: 0,
+              },
             },
+            timestamp: endTimestamp,
           },
-          timestamp: endTimestamp,
-        });
+          isLastEl(remainingSteps, remainingStep)
+        );
       }
     }
   }
@@ -1104,8 +1184,7 @@ export default function createTests(
         gherkinDocument.uri,
         "Expected gherkin document to have URI"
       ),
-      mediaType:
-        "text/x.cucumber.gherkin+plain" as messages.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
+      mediaType: messages.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
     },
   });
 
@@ -1123,6 +1202,7 @@ export default function createTests(
     specEnvelopes.push({
       hook: {
         id: hook.id,
+        name: hook.name,
         sourceReference,
       },
     });

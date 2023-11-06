@@ -79,10 +79,10 @@ Feature: asynchronous world
         """
         const { After, Given } = require("@badeball/cypress-cucumber-preprocessor");
         After(function() {
-          cy.then(() => this.isWorld = true);
+          expect(this.isWorld).to.be.true;
         });
         After(function() {
-          expect(this.isWorld).to.be.true;
+          cy.then(() => this.isWorld = true);
         });
         Given("a step", function() {});
         """
