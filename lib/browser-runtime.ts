@@ -1170,7 +1170,7 @@ export default function createTests(
         testSteps: [
           ...beforeHooks.map(hooksToStep),
           ...pickle.steps.map(pickleStepToTestStep),
-          ...afterHooks.map(hooksToStep)
+          ...afterHooks.map(hooksToStep),
         ],
       };
     });
