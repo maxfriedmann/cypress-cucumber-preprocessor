@@ -1053,8 +1053,6 @@ export default function createTests(
       const tags = collectTagNames(pickle.tags);
       const beforeHooks = registry.resolveBeforeHooks(tags);
       const afterHooks = registry.resolveAfterHooks(tags);
-      const beforeAllHooks = registry.resolveBeforeAllHooks();
-      const afterAllHooks = registry.resolveAfterAllHooks();
       const hooksToStep = (hook: IHook): messages.TestStep => {
         return {
           id: createTestStepId({
@@ -1090,11 +1088,9 @@ export default function createTests(
         id: pickle.id,
         pickleId: pickle.id,
         testSteps: [
-          ...beforeAllHooks.map(hooksToStep),
           ...beforeHooks.map(hooksToStep),
           ...pickle.steps.map(pickleStepToTestStep),
-          ...afterHooks.map(hooksToStep),
-          ...afterAllHooks.map(hooksToStep)
+          ...afterHooks.map(hooksToStep)
         ],
       };
     });
