@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v19.1.0
 
 - Add `BeforeAll(..)` and `AfterAll(..)` hooks, fixes [#758](https://github.com/badeball/cypress-cucumber-preprocessor/issues/758).
 
