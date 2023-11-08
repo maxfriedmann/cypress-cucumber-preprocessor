@@ -309,6 +309,10 @@ function createFeature(context: CompositionContext, feature: messages.Feature) {
       beforeEachHandler.call(this, context);
     });
 
+    after(function () {
+      afterAllHandler.call(this, context);
+    });
+
     afterEach(function () {
       afterEachHandler.call(this, context);
     });
@@ -765,13 +769,22 @@ function shouldSkipPickle(testFilter: Node, pickle: messages.Pickle) {
   return !testFilter.evaluate(tags) || tags.includes("@skip");
 }
 
-function beforeHandler(context: CompositionContext) {
+function beforeHandler(this: Mocha.Context, context: CompositionContext) {
   if (!retrieveInternalSuiteProperties()?.isEventHandlersAttached) {
     fail(
       "Missing preprocessor event handlers (this usally means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)"
     );
   }
-
+  // Handle BeforeAll hook
+  const { registry } = context;
+  const beforeAllHooks = registry.resolveBeforeAllHooks();
+  for (const beforeAllHook of beforeAllHooks) {
+    const hook = beforeAllHook;
+    runStepWithLogGroup({
+      fn: () => registry.runHook(this, hook),
+      keyword: "BeforeAll",
+    });
+  }
   taskSpecEnvelopes(context);
 }
 
@@ -1026,6 +1039,17 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
   });
 }
 
+function afterAllHandler(this: Mocha.Context, context: CompositionContext) {
+  const { registry } = context;
+  const afterAllHooks = registry.resolveAfterAllHooks();
+  for (const afterAllHook of afterAllHooks) {
+    const hook = afterAllHook;
+    runStepWithLogGroup({
+      fn: () => registry.runHook(this, hook),
+      keyword: "AfterAll",
+    });
+  }
+}
 export default function createTests(
   registry: Registry,
   seed: number,
@@ -1079,7 +1103,6 @@ export default function createTests(
       const tags = collectTagNames(pickle.tags);
       const beforeHooks = registry.resolveBeforeHooks(tags);
       const afterHooks = registry.resolveAfterHooks(tags);
-
       const hooksToStep = (hook: IHook): messages.TestStep => {
         return {
           id: createTestStepId({

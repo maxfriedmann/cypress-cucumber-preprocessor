@@ -12,7 +12,7 @@ export interface IHookOptions {
 }
 
 export interface IHookBody {
-  (this: Mocha.Context, options: IHookParameter): void;
+  (this: Mocha.Context, options?: IHookParameter): void;
 }
 
 export interface IHookParameter {

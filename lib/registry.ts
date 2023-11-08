@@ -42,7 +42,7 @@ export class MissingDefinitionError extends CypressCucumberError {}
 
 export class MultipleDefinitionsError extends CypressCucumberError {}
 
-export type ScenarioHookKeyword = "Before" | "After";
+export type ScenarioHookKeyword = "Before" | "After" | "BeforeAll" | "AfterAll";
 
 export type StepHookKeyword = "BeforeStep" | "AfterStep";
 
@@ -208,6 +208,14 @@ export class Registry {
     this.defineStepHook("AfterStep", options, fn);
   }
 
+  public defineBeforeAll(fn: IHookBody) {
+    this.defineHook("BeforeAll", {}, fn);
+  }
+
+  public defineAfterAll(fn: IHookBody) {
+    this.defineHook("AfterAll", {}, fn);
+  }
+
   public getMatchingStepDefinitions(text: string) {
     return this.stepDefinitions.filter((stepDefinition) =>
       stepDefinition.expression.match(text)
@@ -279,7 +287,7 @@ export class Registry {
     return this.resolveHooks("After", tags).reverse();
   }
 
-  public runHook(world: Mocha.Context, hook: IHook, options: IHookParameter) {
+  public runHook(world: Mocha.Context, hook: IHook, options?: IHookParameter) {
     return hook.implementation.call(world, options);
   }
 
@@ -297,6 +305,13 @@ export class Registry {
     return this.resolveStepHooks("AfterStep", tags).reverse();
   }
 
+  public resolveBeforeAllHooks() {
+    return this.resolveHooks("BeforeAll", []);
+  }
+
+  public resolveAfterAllHooks() {
+    return this.resolveHooks("AfterAll", []);
+  }
   public runStepHook(
     world: Mocha.Context,
     hook: IStepHook,
