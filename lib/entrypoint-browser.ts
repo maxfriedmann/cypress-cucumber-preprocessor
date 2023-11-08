@@ -127,23 +127,17 @@ function defineAfterStep(
   }
 }
 
-function defineBeforeAll(fn: IHookBody): void;
-function defineBeforeAll(
-  maybeFn?: IHookBody
-) {
-  if (typeof maybeFn === "function") {
-    getRegistry().defineBeforeAll(maybeFn);
+function defineBeforeAll(fn: IHookBody) {
+  if (typeof fn === "function") {
+    getRegistry().defineBeforeAll(fn);
   } else {
     throw new Error("Unexpected argument for BeforeAll hook");
   }
 }
 
-function defineAfterAll(fn: IHookBody): void;
-function defineAfterAll(
-  maybeFn?: IHookBody
-) {
-  if (typeof maybeFn === "function") {
-    getRegistry().defineAfterAll(maybeFn);
+function defineAfterAll(fn: IHookBody) {
+  if (typeof fn === "function") {
+    getRegistry().defineAfterAll(fn);
   } else {
     throw new Error("Unexpected argument for AfterAll hook");
   }
@@ -231,7 +225,7 @@ export {
   defineBeforeStep as BeforeStep,
   defineAfterStep as AfterStep,
   defineBeforeAll as BeforeAll,
-  defineAfterAll as AfterAll
+  defineAfterAll as AfterAll,
 };
 
 /**

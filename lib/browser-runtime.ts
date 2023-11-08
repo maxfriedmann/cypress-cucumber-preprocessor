@@ -18,7 +18,7 @@ import DataTable from "./data_table";
 
 import {
   assignRegistry,
-  freeRegistry, getRegistry,
+  freeRegistry,
   IHook,
   MissingDefinitionError,
   Registry,
@@ -303,7 +303,6 @@ function createFeature(context: CompositionContext, feature: messages.Feature) {
   describe(feature.name || "<unamed feature>", () => {
     before(function () {
       beforeHandler.call(this, context);
-      beforeAllHandler.call(this, context);
     });
 
     beforeEach(function () {
@@ -770,39 +769,23 @@ function shouldSkipPickle(testFilter: Node, pickle: messages.Pickle) {
   return !testFilter.evaluate(tags) || tags.includes("@skip");
 }
 
-function beforeHandler(context: CompositionContext) {
+function beforeHandler(this: Mocha.Context, context: CompositionContext) {
   if (!retrieveInternalSuiteProperties()?.isEventHandlersAttached) {
     fail(
       "Missing preprocessor event handlers (this usally means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)"
     );
   }
-
-  taskSpecEnvelopes(context);
-}
-
-function beforeAllHandler(this: Mocha.Context, context: CompositionContext) {
+  // Handle BeforeAll hook
   const { registry } = context;
-  let beforeAllHooks = registry.resolveBeforeAllHooks();
-  for(const beforeAllHook of beforeAllHooks) {
-      if (beforeAllHook) {
-        const hook = beforeAllHook;
-        cy.then(() => {
-          const start = createTimestamp();
-          return cy.wrap(start, { log: false });
-        })
-          .then((start) => {
-            runStepWithLogGroup({
-              fn: () => registry.runHook(this, hook),
-              keyword: "BeforeAll"
-            });
-
-            return cy.wrap(start, { log: false });
-          })
-          .then((start) => {
-            const end = createTimestamp();
-          });
-      }
-    }
+  const beforeAllHooks = registry.resolveBeforeAllHooks();
+  for (const beforeAllHook of beforeAllHooks) {
+    const hook = beforeAllHook;
+    runStepWithLogGroup({
+      fn: () => registry.runHook(this, hook),
+      keyword: "BeforeAll",
+    });
+  }
+  taskSpecEnvelopes(context);
 }
 
 function beforeEachHandler(context: CompositionContext) {
@@ -1058,26 +1041,13 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
 
 function afterAllHandler(this: Mocha.Context, context: CompositionContext) {
   const { registry } = context;
-  let afterAllHooks = registry.resolveAfterAllHooks();
-  for(const afterAllHook of afterAllHooks) {
-    if (afterAllHook) {
-      const hook = afterAllHook;
-      cy.then(() => {
-        const start = createTimestamp();
-        return cy.wrap(start, { log: false });
-      })
-        .then((start) => {
-          runStepWithLogGroup({
-            fn: () => registry.runHook(this, hook),
-            keyword: "AfterAll"
-          });
-
-          return cy.wrap(start, { log: false });
-        })
-        .then((start) => {
-          const end = createTimestamp();
-        });
-    }
+  const afterAllHooks = registry.resolveAfterAllHooks();
+  for (const afterAllHook of afterAllHooks) {
+    const hook = afterAllHook;
+    runStepWithLogGroup({
+      fn: () => registry.runHook(this, hook),
+      keyword: "AfterAll",
+    });
   }
 }
 export default function createTests(

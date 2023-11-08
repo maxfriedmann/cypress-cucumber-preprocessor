@@ -101,6 +101,7 @@ export class Registry {
     this.runStepDefininition = this.runStepDefininition.bind(this);
     this.defineParameterType = this.defineParameterType.bind(this);
     this.defineBefore = this.defineBefore.bind(this);
+    this.defineAfter = this.defineAfter.bind(this);
 
     this.parameterTypeRegistry = new ParameterTypeRegistry();
   }
@@ -286,7 +287,7 @@ export class Registry {
     return this.resolveHooks("After", tags).reverse();
   }
 
-  public runHook(world: Mocha.Context, hook: IHook, options: IHookParameter) {
+  public runHook(world: Mocha.Context, hook: IHook, options?: IHookParameter) {
     return hook.implementation.call(world, options);
   }
 

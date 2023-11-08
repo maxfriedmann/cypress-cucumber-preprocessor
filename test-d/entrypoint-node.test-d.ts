@@ -140,6 +140,10 @@ defineParameterType({
   },
 });
 
+BeforeAll(function () {
+  expectType<Mocha.Context>(this);
+});
+
 Before(function () {
   expectType<Mocha.Context>(this);
 });
@@ -161,6 +165,10 @@ After({}, function () {
 });
 
 After({ tags: "foo", name: "bar" }, function () {
+  expectType<Mocha.Context>(this);
+});
+
+AfterAll(function () {
   expectType<Mocha.Context>(this);
 });
 
