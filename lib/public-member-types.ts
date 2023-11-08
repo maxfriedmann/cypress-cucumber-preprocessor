@@ -6,19 +6,28 @@ export interface IParameterTypeDefinition<T, C extends Mocha.Context> {
   transformer: (this: C, ...match: string[]) => T;
 }
 
-export interface IHookOptions {
+export interface IRunHookBody {
+  (this: Mocha.Context): void;
+}
+
+export interface ICaseHookOptions {
   name?: string;
   tags?: string;
 }
 
-export interface IHookBody {
-  (this: Mocha.Context, options?: IHookParameter): void;
-}
-
-export interface IHookParameter {
+export interface ICaseHookParameter {
   pickle: messages.Pickle;
   gherkinDocument: messages.GherkinDocument;
   testCaseStartedId: string;
+}
+
+export interface ICaseHookBody {
+  (this: Mocha.Context, options: ICaseHookParameter): void;
+}
+
+export interface IStepHookOptions {
+  name?: string;
+  tags?: string;
 }
 
 export interface IStepHookParameter {

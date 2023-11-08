@@ -14,14 +14,12 @@ Feature: hooks ordering
    - AfterAll
    - after
 
-  @foo
   Scenario: with all hooks incrementing a counter
     Given a file named "cypress/e2e/a.feature" with:
       """
       Feature: a feature
         Background:
           Given a background step
-        @foo
         Scenario: a scenario
           Given an ordinary step
       """
@@ -41,7 +39,7 @@ Feature: hooks ordering
         counter = 0;
       })
       BeforeAll(() => {
-        expect(counter++, "Expect BeforeAll() to be called after beforeEach()").to.equal(0)
+        expect(counter++, "Expect BeforeAll() to be called after before()").to.equal(0)
       })
       beforeEach(function() {
         expect(counter++, "Expected beforeEach() to be called after before()").to.equal(1)

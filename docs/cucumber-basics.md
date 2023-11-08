@@ -10,6 +10,7 @@
   - [Skipped steps](#skipped-steps)
   - [Nested steps](#nested-steps)
 - [Hooks](#hooks)
+  - [Run hooks](#run-hooks)
   - [Scenario hooks](#scenario-hooks)
   - [Step hooks](#step-hooks)
   - [Named hooks](#named-hooks)
@@ -141,7 +142,19 @@ When("I fill in the entire form", function () {
 
 # Hooks
 
-There are two types of hooks, scenario hooks and step hooks, each explained below.
+There are three types of hooks, run hooks, scenario hooks and step hooks, each explained below.
+
+## Run hooks
+
+`BeforeAll()` and `AfterAll()` are identical to Cypress' `before()` and `after()`.
+
+```ts
+import { BeforeAll } from "@badeball/cypress-cucumber-preprocessor";
+
+BeforeAll(function () {
+  // This hook will be executed once at the beginnig of a feature.
+});
+```
 
 ## Scenario hooks
 

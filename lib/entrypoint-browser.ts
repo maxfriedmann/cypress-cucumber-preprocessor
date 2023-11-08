@@ -26,11 +26,13 @@ import DataTable from "./data_table";
 import { getRegistry } from "./registry";
 
 import {
-  IHookBody,
-  IStepHookBody,
+  ICaseHookBody,
+  ICaseHookOptions,
   IParameterTypeDefinition,
+  IRunHookBody,
   IStepDefinitionBody,
-  IHookOptions,
+  IStepHookBody,
+  IStepHookOptions,
 } from "./public-member-types";
 
 import {
@@ -67,11 +69,11 @@ function defineParameterType<T, C extends Mocha.Context>(
   getRegistry().defineParameterType(options);
 }
 
-function defineBefore(options: IHookOptions, fn: IHookBody): void;
-function defineBefore(fn: IHookBody): void;
+function defineBefore(options: ICaseHookOptions, fn: ICaseHookBody): void;
+function defineBefore(fn: ICaseHookBody): void;
 function defineBefore(
-  optionsOrFn: IHookBody | IHookOptions,
-  maybeFn?: IHookBody
+  optionsOrFn: ICaseHookBody | ICaseHookOptions,
+  maybeFn?: ICaseHookBody
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineBefore({}, optionsOrFn);
@@ -82,11 +84,11 @@ function defineBefore(
   }
 }
 
-function defineAfter(options: IHookOptions, fn: IHookBody): void;
-function defineAfter(fn: IHookBody): void;
+function defineAfter(options: ICaseHookOptions, fn: ICaseHookBody): void;
+function defineAfter(fn: ICaseHookBody): void;
 function defineAfter(
-  optionsOrFn: IHookBody | IHookOptions,
-  maybeFn?: IHookBody
+  optionsOrFn: ICaseHookBody | ICaseHookOptions,
+  maybeFn?: ICaseHookBody
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineAfter({}, optionsOrFn);
@@ -97,10 +99,10 @@ function defineAfter(
   }
 }
 
-function defineBeforeStep(options: IHookOptions, fn: IStepHookBody): void;
+function defineBeforeStep(options: IStepHookOptions, fn: IStepHookBody): void;
 function defineBeforeStep(fn: IStepHookBody): void;
 function defineBeforeStep(
-  optionsOrFn: IStepHookBody | IHookOptions,
+  optionsOrFn: IStepHookBody | IStepHookOptions,
   maybeFn?: IStepHookBody
 ) {
   if (typeof optionsOrFn === "function") {
@@ -112,10 +114,10 @@ function defineBeforeStep(
   }
 }
 
-function defineAfterStep(options: IHookOptions, fn: IStepHookBody): void;
+function defineAfterStep(options: IStepHookOptions, fn: IStepHookBody): void;
 function defineAfterStep(fn: IStepHookBody): void;
 function defineAfterStep(
-  optionsOrFn: IStepHookBody | IHookOptions,
+  optionsOrFn: IStepHookBody | IStepHookOptions,
   maybeFn?: IStepHookBody
 ) {
   if (typeof optionsOrFn === "function") {
@@ -127,7 +129,7 @@ function defineAfterStep(
   }
 }
 
-function defineBeforeAll(fn: IHookBody) {
+function defineBeforeAll(fn: IRunHookBody) {
   if (typeof fn === "function") {
     getRegistry().defineBeforeAll(fn);
   } else {
@@ -135,7 +137,7 @@ function defineBeforeAll(fn: IHookBody) {
   }
 }
 
-function defineAfterAll(fn: IHookBody) {
+function defineAfterAll(fn: IRunHookBody) {
   if (typeof fn === "function") {
     getRegistry().defineAfterAll(fn);
   } else {

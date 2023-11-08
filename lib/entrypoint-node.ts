@@ -1,11 +1,13 @@
 import DataTable from "./data_table";
 
 import {
-  IHookBody,
-  IStepHookBody,
+  ICaseHookBody,
+  ICaseHookOptions,
   IParameterTypeDefinition,
+  IRunHookBody,
   IStepDefinitionBody,
-  IHookOptions,
+  IStepHookBody,
+  IStepHookOptions,
 } from "./public-member-types";
 
 export {
@@ -75,44 +77,44 @@ export function attach(data: string | ArrayBuffer, mediaType?: string) {
   throw createUnimplemented();
 }
 
-export function Before(options: IHookOptions, fn: IHookBody): void;
-export function Before(fn: IHookBody): void;
+export function Before(options: ICaseHookOptions, fn: ICaseHookBody): void;
+export function Before(fn: ICaseHookBody): void;
 export function Before(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IHookBody | IHookOptions,
+  optionsOrFn: ICaseHookBody | ICaseHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: IHookBody
+  maybeFn?: ICaseHookBody
 ) {
   throw createUnimplemented();
 }
 
-export function After(options: IHookOptions, fn: IHookBody): void;
-export function After(fn: IHookBody): void;
+export function After(options: ICaseHookOptions, fn: ICaseHookBody): void;
+export function After(fn: ICaseHookBody): void;
 export function After(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IHookBody | IHookOptions,
+  optionsOrFn: ICaseHookBody | ICaseHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: IHookBody
+  maybeFn?: ICaseHookBody
 ) {
   throw createUnimplemented();
 }
 
-export function BeforeStep(options: IHookOptions, fn: IStepHookBody): void;
+export function BeforeStep(options: IStepHookOptions, fn: IStepHookBody): void;
 export function BeforeStep(fn: IStepHookBody): void;
 export function BeforeStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IStepHookBody | IHookOptions,
+  optionsOrFn: IStepHookBody | IStepHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IStepHookBody
 ) {
   throw createUnimplemented();
 }
 
-export function AfterStep(options: IHookOptions, fn: IStepHookBody): void;
+export function AfterStep(options: IStepHookOptions, fn: IStepHookBody): void;
 export function AfterStep(fn: IStepHookBody): void;
 export function AfterStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IStepHookBody | IHookOptions,
+  optionsOrFn: IStepHookBody | IStepHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IStepHookBody
 ) {
@@ -121,14 +123,14 @@ export function AfterStep(
 
 export function BeforeAll(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fn: IStepHookBody
+  fn: IRunHookBody
 ) {
   throw createUnimplemented();
 }
 
 export function AfterAll(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fn: IHookBody
+  fn: IRunHookBody
 ) {
   throw createUnimplemented();
 }

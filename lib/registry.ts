@@ -17,13 +17,14 @@ import DataTable from "./data_table";
 import { CypressCucumberError } from "./helpers/error";
 
 import {
-  IHookBody,
+  ICaseHookBody,
+  ICaseHookOptions,
+  ICaseHookParameter,
+  IParameterTypeDefinition,
+  IRunHookBody,
+  IStepDefinitionBody,
   IStepHookBody,
   IStepHookParameter,
-  IParameterTypeDefinition,
-  IStepDefinitionBody,
-  IHookParameter,
-  IHookOptions,
 } from "./public-member-types";
 
 import {
@@ -42,41 +43,43 @@ export class MissingDefinitionError extends CypressCucumberError {}
 
 export class MultipleDefinitionsError extends CypressCucumberError {}
 
-export type ScenarioHookKeyword = "Before" | "After" | "BeforeAll" | "AfterAll";
+export type RunHookKeyword = "BeforeAll" | "AfterAll";
+
+export type CaseHookKeyword = "Before" | "After";
 
 export type StepHookKeyword = "BeforeStep" | "AfterStep";
 
-interface IBaseHook<Implementation, Keyword> {
-  tags?: string;
-  name?: string;
-  node: ReturnType<typeof parse>;
-  implementation: Implementation;
-  keyword: Keyword;
+type Node = ReturnType<typeof parse>;
+
+export interface IRunHook {
+  implementation: IRunHookBody;
+  keyword: RunHookKeyword;
   position?: Position;
 }
 
-export interface IHook extends IBaseHook<IHookBody, ScenarioHookKeyword> {
+export interface ICaseHook {
   id: string;
+  node: Node;
+  implementation: ICaseHookBody;
+  keyword: CaseHookKeyword;
+  position?: Position;
+  tags?: string;
+  name?: string;
 }
 
-export type IStepHook = IBaseHook<IStepHookBody, StepHookKeyword>;
+export interface IStepHook {
+  node: Node;
+  implementation: IStepHookBody;
+  keyword: StepHookKeyword;
+  position?: Position;
+  tags?: string;
+  name?: string;
+}
 
 const noopNode = { evaluate: () => true };
 
-function parseHookArguments<Implementation, Keyword>(
-  options: { tags?: string; name?: string },
-  fn: Implementation,
-  keyword: Keyword,
-  position?: Position
-): IBaseHook<Implementation, Keyword> {
-  return {
-    tags: options.tags,
-    name: options.name,
-    node: options.tags ? parse(options.tags) : noopNode,
-    implementation: fn,
-    keyword,
-    position,
-  };
+function parseMaybeTags(tags?: string): Node {
+  return tags ? parse(tags) : noopNode;
 }
 
 export class Registry {
@@ -90,9 +93,11 @@ export class Registry {
 
   public stepDefinitions: IStepDefinition<unknown[], Mocha.Context>[] = [];
 
-  private preliminaryHooks: Omit<IHook, "id">[] = [];
+  private preliminaryHooks: Omit<ICaseHook, "id">[] = [];
 
-  public hooks: IHook[] = [];
+  public runHooks: IRunHook[] = [];
+
+  public caseHooks: ICaseHook[] = [];
 
   public stepHooks: IStepHook[] = [];
 
@@ -133,7 +138,7 @@ export class Registry {
     }
 
     for (const preliminaryHook of this.preliminaryHooks) {
-      this.hooks.push({
+      this.caseHooks.push({
         id: newId(),
         ...preliminaryHook,
       });
@@ -162,58 +167,64 @@ export class Registry {
     );
   }
 
-  public defineHook(
-    keyword: ScenarioHookKeyword,
-    options: IHookOptions,
-    fn: IHookBody
+  public defineCaseHook(
+    keyword: CaseHookKeyword,
+    options: ICaseHookOptions,
+    fn: ICaseHookBody
   ) {
-    this.preliminaryHooks.push(
-      parseHookArguments(
-        options,
-        fn,
-        keyword,
-        maybeRetrievePositionFromSourceMap(this.experimentalSourceMap)
-      )
-    );
+    this.preliminaryHooks.push({
+      node: parseMaybeTags(options.tags),
+      implementation: fn,
+      keyword: keyword,
+      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      ...options,
+    });
   }
 
-  public defineBefore(options: IHookOptions, fn: IHookBody) {
-    this.defineHook("Before", options, fn);
+  public defineBefore(options: ICaseHookOptions, fn: ICaseHookBody) {
+    this.defineCaseHook("Before", options, fn);
   }
 
-  public defineAfter(options: IHookOptions, fn: IHookBody) {
-    this.defineHook("After", options, fn);
+  public defineAfter(options: ICaseHookOptions, fn: ICaseHookBody) {
+    this.defineCaseHook("After", options, fn);
   }
 
   public defineStepHook(
     keyword: StepHookKeyword,
-    options: IHookOptions,
+    options: ICaseHookOptions,
     fn: IStepHookBody
   ) {
-    this.stepHooks.push(
-      parseHookArguments(
-        options,
-        fn,
-        keyword,
-        maybeRetrievePositionFromSourceMap(this.experimentalSourceMap)
-      )
-    );
+    this.stepHooks.push({
+      node: parseMaybeTags(options.tags),
+      implementation: fn,
+      keyword: keyword,
+      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      ...options,
+    });
   }
 
-  public defineBeforeStep(options: IHookOptions, fn: IStepHookBody) {
+  public defineBeforeStep(options: ICaseHookOptions, fn: IStepHookBody) {
     this.defineStepHook("BeforeStep", options, fn);
   }
 
-  public defineAfterStep(options: IHookOptions, fn: IStepHookBody) {
+  public defineAfterStep(options: ICaseHookOptions, fn: IStepHookBody) {
     this.defineStepHook("AfterStep", options, fn);
   }
 
-  public defineBeforeAll(fn: IHookBody) {
-    this.defineHook("BeforeAll", {}, fn);
+  public defineRunHook(keyword: RunHookKeyword, fn: IRunHookBody) {
+    this.runHooks.push({
+      implementation: fn,
+      keyword: keyword,
+      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+    });
   }
 
-  public defineAfterAll(fn: IHookBody) {
-    this.defineHook("AfterAll", {}, fn);
+  public defineBeforeAll(fn: IRunHookBody) {
+    this.defineRunHook("BeforeAll", fn);
+  }
+
+  public defineAfterAll(fn: IRunHookBody) {
+    this.defineRunHook("AfterAll", fn);
   }
 
   public getMatchingStepDefinitions(text: string) {
@@ -273,21 +284,25 @@ export class Registry {
     return stepDefinition.implementation.apply(world, args);
   }
 
-  public resolveHooks(keyword: ScenarioHookKeyword, tags: string[]) {
-    return this.hooks.filter(
+  public resolveCaseHooks(keyword: CaseHookKeyword, tags: string[]) {
+    return this.caseHooks.filter(
       (hook) => hook.keyword === keyword && hook.node.evaluate(tags)
     );
   }
 
   public resolveBeforeHooks(tags: string[]) {
-    return this.resolveHooks("Before", tags);
+    return this.resolveCaseHooks("Before", tags);
   }
 
   public resolveAfterHooks(tags: string[]) {
-    return this.resolveHooks("After", tags).reverse();
+    return this.resolveCaseHooks("After", tags).reverse();
   }
 
-  public runHook(world: Mocha.Context, hook: IHook, options?: IHookParameter) {
+  public runCaseHook(
+    world: Mocha.Context,
+    hook: ICaseHook,
+    options: ICaseHookParameter
+  ) {
     return hook.implementation.call(world, options);
   }
 
@@ -305,19 +320,28 @@ export class Registry {
     return this.resolveStepHooks("AfterStep", tags).reverse();
   }
 
-  public resolveBeforeAllHooks() {
-    return this.resolveHooks("BeforeAll", []);
-  }
-
-  public resolveAfterAllHooks() {
-    return this.resolveHooks("AfterAll", []);
-  }
   public runStepHook(
     world: Mocha.Context,
     hook: IStepHook,
     options: IStepHookParameter
   ) {
     return hook.implementation.call(world, options);
+  }
+
+  public resolveRunHooks(keyword: RunHookKeyword) {
+    return this.runHooks.filter((hook) => hook.keyword === keyword);
+  }
+
+  public resolveBeforeAllHooks() {
+    return this.resolveRunHooks("BeforeAll");
+  }
+
+  public resolveAfterAllHooks() {
+    return this.resolveRunHooks("AfterAll").reverse();
+  }
+
+  public runRunHook(world: Mocha.Context, hook: IRunHook) {
+    return hook.implementation.call(world);
   }
 }
 

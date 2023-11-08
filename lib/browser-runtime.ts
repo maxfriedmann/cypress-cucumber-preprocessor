@@ -19,7 +19,7 @@ import DataTable from "./data_table";
 import {
   assignRegistry,
   freeRegistry,
-  IHook,
+  ICaseHook,
   MissingDefinitionError,
   Registry,
 } from "./registry";
@@ -63,11 +63,7 @@ import { runStepWithLogGroup } from "./helpers/cypress";
 
 import { getTags } from "./helpers/environment";
 
-import {
-  IHookOptions,
-  IHookParameter,
-  IStepHookParameter,
-} from "./public-member-types";
+import { ICaseHookParameter, IStepHookParameter } from "./public-member-types";
 
 type Node = ReturnType<typeof parse>;
 
@@ -98,7 +94,7 @@ const sourceReference: messages.SourceReference = {
 };
 
 interface IStep {
-  hook?: IHook;
+  hook?: ICaseHook;
   pickleStep?: messages.PickleStep;
 }
 
@@ -283,7 +279,10 @@ function getTestStepId(options: {
 function createStepDescription({
   name,
   tags,
-}: IHookOptions): string | undefined {
+}: {
+  name?: string;
+  tags?: string;
+}): string | undefined {
   if (name == null && tags == null) {
     return;
   } else if (name == null) {
@@ -310,7 +309,7 @@ function createFeature(context: CompositionContext, feature: messages.Feature) {
     });
 
     after(function () {
-      afterAllHandler.call(this, context);
+      afterHandler.call(this, context);
     });
 
     afterEach(function () {
@@ -488,14 +487,14 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
           return cy.wrap(start, { log: false });
         })
           .then((start) => {
-            const options: IHookParameter = {
+            const options: ICaseHookParameter = {
               pickle,
               gherkinDocument,
               testCaseStartedId,
             };
 
             runStepWithLogGroup({
-              fn: () => registry.runHook(this, hook, options),
+              fn: () => registry.runCaseHook(this, hook, options),
               keyword: hook.keyword,
               text: createStepDescription(hook),
             });
@@ -775,16 +774,16 @@ function beforeHandler(this: Mocha.Context, context: CompositionContext) {
       "Missing preprocessor event handlers (this usally means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)"
     );
   }
-  // Handle BeforeAll hook
+
   const { registry } = context;
-  const beforeAllHooks = registry.resolveBeforeAllHooks();
-  for (const beforeAllHook of beforeAllHooks) {
-    const hook = beforeAllHook;
+
+  for (const hook of registry.resolveBeforeAllHooks()) {
     runStepWithLogGroup({
-      fn: () => registry.runHook(this, hook),
+      fn: () => registry.runRunHook(this, hook),
       keyword: "BeforeAll",
     });
   }
+
   taskSpecEnvelopes(context);
 }
 
@@ -1039,13 +1038,12 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
   });
 }
 
-function afterAllHandler(this: Mocha.Context, context: CompositionContext) {
+function afterHandler(this: Mocha.Context, context: CompositionContext) {
   const { registry } = context;
-  const afterAllHooks = registry.resolveAfterAllHooks();
-  for (const afterAllHook of afterAllHooks) {
-    const hook = afterAllHook;
+
+  for (const hook of registry.resolveAfterAllHooks()) {
     runStepWithLogGroup({
-      fn: () => registry.runHook(this, hook),
+      fn: () => registry.runRunHook(this, hook),
       keyword: "AfterAll",
     });
   }
@@ -1103,7 +1101,8 @@ export default function createTests(
       const tags = collectTagNames(pickle.tags);
       const beforeHooks = registry.resolveBeforeHooks(tags);
       const afterHooks = registry.resolveAfterHooks(tags);
-      const hooksToStep = (hook: IHook): messages.TestStep => {
+
+      const hooksToStep = (hook: ICaseHook): messages.TestStep => {
         return {
           id: createTestStepId({
             testStepIds,
@@ -1168,7 +1167,7 @@ export default function createTests(
     });
   }
 
-  for (const hook of registry.hooks) {
+  for (const hook of registry.caseHooks) {
     specEnvelopes.push({
       hook: {
         id: hook.id,
