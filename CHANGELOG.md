@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Mock and imitate Cypress globals during diagnostics / dry run, fixes [#1120](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1120).
+
 ## v19.1.0
 
 - Add `BeforeAll(..)` and `AfterAll(..)` hooks, fixes [#758](https://github.com/badeball/cypress-cucumber-preprocessor/issues/758).
