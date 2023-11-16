@@ -161,9 +161,17 @@ export async function diagnose(configuration: {
         );
       }
 
-      registry = withRegistry(true, () => {
-        (globalThis as any).Cypress = {};
+      const cypressMockGlobals = {
+        Cypress: {
+          env() {},
+          on() {},
+          config() {},
+        },
+      };
 
+      Object.assign(globalThis, cypressMockGlobals);
+
+      registry = withRegistry(true, () => {
         try {
           require(outputFileName);
         } catch (e: unknown) {
