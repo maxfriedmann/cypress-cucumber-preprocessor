@@ -136,6 +136,10 @@ export async function addCucumberPreprocessorPlugin(
     const testFiles = getTestFiles(
       config as unknown as ICypressConfiguration
     ).filter((testFile) => {
+      if (!testFile.endsWith(".feature")) {
+        return node.evaluate([]);
+      }
+
       const content = fs.readFileSync(testFile).toString("utf-8");
 
       const options = {
