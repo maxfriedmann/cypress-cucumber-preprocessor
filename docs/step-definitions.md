@@ -28,7 +28,7 @@ From Cucumber you might be familiar with the fact that step definitons *aren't* 
 
 This is *not* true for the preprocessor and represents the only place where the two experiences (Cucumber vs. Cypress + this preprocessor) deviates significantly. However, the preprocessor don't magically understand your intention in regards to this.
 
-**Pairing** dictates which step definitions will be available in which feature files. Furthermore, hooks specified in paired files are the hooks which will take effect. Pairing is entirely configured through the `stepDefintions` property. Below are some examples to further explain this concept.
+**Pairing** dictates which step definitions will be available in which feature files. Furthermore, hooks specified in paired files are the hooks which will take effect. Pairing is entirely configured through the `stepDefinitions` property. Below are some examples to further explain this concept.
 
 A prerequisite for understanding this process is some knowledge of glob / search patterns. Explaining this however is out of the scope is this page. Internally, [glob](https://github.com/isaacs/node-glob) is used.
 
