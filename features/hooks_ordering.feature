@@ -45,10 +45,10 @@ Feature: hooks ordering
         expect(counter++, "Expected beforeEach() to be called after before()").to.equal(1)
       })
       Before({ order: 2 }, function() {
-        expect(counter++, "Expected Before() to be called after beforeEach()").to.equal(3)
+        expect(counter++, "Expected Before() - order 2 to be called after Before () - order 1").to.equal(3)
       })
       Before({ order: 1 }, function() {
-        expect(counter++, "Expected Before() to be called after beforeEach()").to.equal(2)
+        expect(counter++, "Expected Before() - order 1 to be called after beforeEach()").to.equal(2)
       })
       Given("a background step", function() {
         expect(counter++, "Expected a background step to be called after Before()").to.equal(4)
