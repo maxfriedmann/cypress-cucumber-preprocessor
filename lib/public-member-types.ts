@@ -13,6 +13,7 @@ export interface IRunHookBody {
 export interface ICaseHookOptions {
   name?: string;
   tags?: string;
+  order?: number;
 }
 
 export interface ICaseHookParameter {

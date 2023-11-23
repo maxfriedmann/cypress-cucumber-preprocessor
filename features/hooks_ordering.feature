@@ -44,44 +44,47 @@ Feature: hooks ordering
       beforeEach(function() {
         expect(counter++, "Expected beforeEach() to be called after before()").to.equal(1)
       })
-      Before(function() {
+      Before({ order: 2 }, function() {
+        expect(counter++, "Expected Before() to be called after beforeEach()").to.equal(3)
+      })
+      Before({ order: 1 }, function() {
         expect(counter++, "Expected Before() to be called after beforeEach()").to.equal(2)
       })
       Given("a background step", function() {
-        expect(counter++, "Expected a background step to be called after Before()").to.equal(3)
+        expect(counter++, "Expected a background step to be called after Before()").to.equal(4)
       })
       BeforeStep(function ({ pickleStep }) {
         if (pickleStep.text === "an ordinary step") {
-          expect(counter++, "Expected BeforeStep() to be called before ordinary steps").to.equal(4)
+          expect(counter++, "Expected BeforeStep() to be called before ordinary steps").to.equal(5)
         }
       })
       Given("an ordinary step", function() {
-        expect(counter++, "Expected an ordinary step to be called after a background step").to.equal(5)
+        expect(counter++, "Expected an ordinary step to be called after a background step").to.equal(6)
+      })
+      AfterStep(function ({ pickleStep }) {
+        if (pickleStep.text === "an ordinary step") {
+          expect(counter++, "Expected AfterStep() to be called after ordinary steps").to.equal(8)
+        }
       })
       AfterStep(function ({ pickleStep }) {
         if (pickleStep.text === "an ordinary step") {
           expect(counter++, "Expected AfterStep() to be called after ordinary steps").to.equal(7)
         }
       })
-      AfterStep(function ({ pickleStep }) {
-        if (pickleStep.text === "an ordinary step") {
-          expect(counter++, "Expected AfterStep() to be called after ordinary steps").to.equal(6)
-        }
+      After(function() {
+        expect(counter++, "Expected After() to be called in reverse order of definition").to.equal(10)
       })
       After(function() {
-        expect(counter++, "Expected After() to be called in reverse order of definition").to.equal(9)
-      })
-      After(function() {
-        expect(counter++, "Expected After() to be called after ordinary steps").to.equal(8)
+        expect(counter++, "Expected After() to be called after ordinary steps").to.equal(9)
       })
       afterEach(function() {
-        expect(counter++, "Expected afterEach() to be called after After()").to.equal(10)
+        expect(counter++, "Expected afterEach() to be called after After()").to.equal(11)
       })
       AfterAll(function() {
-        expect(counter++, "Expected AfterAll() to be called after afterEach()").to.equal(11)
+        expect(counter++, "Expected AfterAll() to be called after afterEach()").to.equal(12)
       })
       after(function() {
-        expect(counter++, "Expected after() to be called after AfterAll()").to.equal(12)
+        expect(counter++, "Expected after() to be called after AfterAll()").to.equal(13)
       })
       """
     When I run cypress

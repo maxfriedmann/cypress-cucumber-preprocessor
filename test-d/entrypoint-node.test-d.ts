@@ -156,7 +156,7 @@ Before({}, function () {
   expectType<Mocha.Context>(this);
 });
 
-Before({ tags: "foo", name: "bar" }, function () {
+Before({ tags: "foo", name: "bar", order: 1 }, function () {
   expectType<Mocha.Context>(this);
 });
 

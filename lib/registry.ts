@@ -65,6 +65,7 @@ export interface ICaseHook {
   position?: Position;
   tags?: string;
   name?: string;
+  order?: number;
 }
 
 export interface IStepHook {
@@ -291,7 +292,18 @@ export class Registry {
   }
 
   public resolveBeforeHooks(tags: string[]) {
-    return this.resolveCaseHooks("Before", tags);
+    return this.resolveCaseHooks("Before", tags).sort(
+      (a: ICaseHook, b: ICaseHook) => {
+        // If order is not specified, the hook will be executed at the end
+        if (a.order === undefined) {
+          a.order = Number.MAX_SAFE_INTEGER;
+        }
+        if (b.order === undefined) {
+          b.order = Number.MAX_SAFE_INTEGER;
+        }
+        return a.order - b.order;
+      }
+    );
   }
 
   public resolveAfterHooks(tags: string[]) {
