@@ -22,6 +22,7 @@ import {
   ICaseHookParameter,
   IParameterTypeDefinition,
   IRunHookBody,
+  IRunHookOptions,
   IStepDefinitionBody,
   IStepHookBody,
   IStepHookParameter,
@@ -51,9 +52,12 @@ export type StepHookKeyword = "BeforeStep" | "AfterStep";
 
 type Node = ReturnType<typeof parse>;
 
+export const DEFAULT_HOOK_ORDER = 10000;
+
 export interface IRunHook {
   implementation: IRunHookBody;
   keyword: RunHookKeyword;
+  order: number;
   position?: Position;
 }
 
@@ -62,16 +66,17 @@ export interface ICaseHook {
   node: Node;
   implementation: ICaseHookBody;
   keyword: CaseHookKeyword;
+  order: number;
   position?: Position;
   tags?: string;
   name?: string;
-  order?: number;
 }
 
 export interface IStepHook {
   node: Node;
   implementation: IStepHookBody;
   keyword: StepHookKeyword;
+  order: number;
   position?: Position;
   tags?: string;
   name?: string;
@@ -173,12 +178,14 @@ export class Registry {
     options: ICaseHookOptions,
     fn: ICaseHookBody
   ) {
+    const { order, ...remainingOptions } = options;
     this.preliminaryHooks.push({
       node: parseMaybeTags(options.tags),
       implementation: fn,
       keyword: keyword,
       position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
-      ...options,
+      order: order ?? DEFAULT_HOOK_ORDER,
+      ...remainingOptions,
     });
   }
 
@@ -195,12 +202,14 @@ export class Registry {
     options: ICaseHookOptions,
     fn: IStepHookBody
   ) {
+    const { order, ...remainingOptions } = options;
     this.stepHooks.push({
       node: parseMaybeTags(options.tags),
       implementation: fn,
       keyword: keyword,
       position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
-      ...options,
+      order: order ?? DEFAULT_HOOK_ORDER,
+      ...remainingOptions,
     });
   }
 
@@ -212,20 +221,25 @@ export class Registry {
     this.defineStepHook("AfterStep", options, fn);
   }
 
-  public defineRunHook(keyword: RunHookKeyword, fn: IRunHookBody) {
+  public defineRunHook(
+    keyword: RunHookKeyword,
+    options: IRunHookOptions,
+    fn: IRunHookBody
+  ) {
     this.runHooks.push({
       implementation: fn,
       keyword: keyword,
       position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      order: options.order ?? DEFAULT_HOOK_ORDER,
     });
   }
 
-  public defineBeforeAll(fn: IRunHookBody) {
-    this.defineRunHook("BeforeAll", fn);
+  public defineBeforeAll(options: IRunHookOptions, fn: IRunHookBody) {
+    this.defineRunHook("BeforeAll", options, fn);
   }
 
-  public defineAfterAll(fn: IRunHookBody) {
-    this.defineRunHook("AfterAll", fn);
+  public defineAfterAll(options: IRunHookOptions, fn: IRunHookBody) {
+    this.defineRunHook("AfterAll", options, fn);
   }
 
   public getMatchingStepDefinitions(text: string) {
@@ -286,24 +300,15 @@ export class Registry {
   }
 
   public resolveCaseHooks(keyword: CaseHookKeyword, tags: string[]) {
-    return this.caseHooks.filter(
-      (hook) => hook.keyword === keyword && hook.node.evaluate(tags)
-    );
+    return this.caseHooks
+      .filter((hook) => hook.keyword === keyword && hook.node.evaluate(tags))
+      .sort((a, b) => {
+        return a.order - b.order;
+      });
   }
 
   public resolveBeforeHooks(tags: string[]) {
-    return this.resolveCaseHooks("Before", tags).sort(
-      (a: ICaseHook, b: ICaseHook) => {
-        // If order is not specified, the hook will be executed at the end
-        if (a.order === undefined) {
-          a.order = Number.MAX_SAFE_INTEGER;
-        }
-        if (b.order === undefined) {
-          b.order = Number.MAX_SAFE_INTEGER;
-        }
-        return a.order - b.order;
-      }
-    );
+    return this.resolveCaseHooks("Before", tags);
   }
 
   public resolveAfterHooks(tags: string[]) {
@@ -319,9 +324,11 @@ export class Registry {
   }
 
   public resolveStepHooks(keyword: StepHookKeyword, tags: string[]) {
-    return this.stepHooks.filter(
-      (hook) => hook.keyword === keyword && hook.node.evaluate(tags)
-    );
+    return this.stepHooks
+      .filter((hook) => hook.keyword === keyword && hook.node.evaluate(tags))
+      .sort((a, b) => {
+        return a.order - b.order;
+      });
   }
 
   public resolveBeforeStepHooks(tags: string[]) {
@@ -341,7 +348,11 @@ export class Registry {
   }
 
   public resolveRunHooks(keyword: RunHookKeyword) {
-    return this.runHooks.filter((hook) => hook.keyword === keyword);
+    return this.runHooks
+      .filter((hook) => hook.keyword === keyword)
+      .sort((a, b) => {
+        return a.order - b.order;
+      });
   }
 
   public resolveBeforeAllHooks() {

@@ -5,6 +5,7 @@ import {
   ICaseHookOptions,
   IParameterTypeDefinition,
   IRunHookBody,
+  IRunHookOptions,
   IStepDefinitionBody,
   IStepHookBody,
   IStepHookOptions,
@@ -121,16 +122,24 @@ export function AfterStep(
   throw createUnimplemented();
 }
 
+export function BeforeAll(options: IRunHookOptions, fn: IRunHookBody): void;
+export function BeforeAll(fn: IRunHookBody): void;
 export function BeforeAll(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fn: IRunHookBody
+  optionsOrFn: IRunHookBody | IRunHookOptions,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  maybeFn?: IRunHookBody
 ) {
   throw createUnimplemented();
 }
 
+export function AfterAll(options: IRunHookOptions, fn: IRunHookBody): void;
+export function AfterAll(fn: IRunHookBody): void;
 export function AfterAll(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  fn: IRunHookBody
+  optionsOrFn: IRunHookBody | IRunHookOptions,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  maybeFn?: IRunHookBody
 ) {
   throw createUnimplemented();
 }

@@ -10,6 +10,10 @@ export interface IRunHookBody {
   (this: Mocha.Context): void;
 }
 
+export interface IRunHookOptions {
+  order?: number;
+}
+
 export interface ICaseHookOptions {
   name?: string;
   tags?: string;
@@ -29,6 +33,7 @@ export interface ICaseHookBody {
 export interface IStepHookOptions {
   name?: string;
   tags?: string;
+  order?: number;
 }
 
 export interface IStepHookParameter {
