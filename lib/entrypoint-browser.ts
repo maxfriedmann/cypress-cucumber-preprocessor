@@ -156,7 +156,7 @@ function defineAfterAll(
   } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
     getRegistry().defineAfterAll(optionsOrFn, maybeFn);
   } else {
-    throw new Error("Unexpected argument for BeforeAll hook");
+    throw new Error("Unexpected argument for AfterAll hook");
   }
 }
 
