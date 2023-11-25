@@ -30,6 +30,7 @@ import {
   ICaseHookOptions,
   IParameterTypeDefinition,
   IRunHookBody,
+  IRunHookOptions,
   IStepDefinitionBody,
   IStepHookBody,
   IStepHookOptions,
@@ -129,17 +130,31 @@ function defineAfterStep(
   }
 }
 
-function defineBeforeAll(fn: IRunHookBody) {
-  if (typeof fn === "function") {
-    getRegistry().defineBeforeAll(fn);
+function defineBeforeAll(options: IRunHookOptions, fn: IRunHookBody): void;
+function defineBeforeAll(fn: IRunHookBody): void;
+function defineBeforeAll(
+  optionsOrFn: IRunHookBody | IRunHookOptions,
+  maybeFn?: IRunHookBody
+) {
+  if (typeof optionsOrFn === "function") {
+    getRegistry().defineBeforeAll({}, optionsOrFn);
+  } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
+    getRegistry().defineBeforeAll(optionsOrFn, maybeFn);
   } else {
     throw new Error("Unexpected argument for BeforeAll hook");
   }
 }
 
-function defineAfterAll(fn: IRunHookBody) {
-  if (typeof fn === "function") {
-    getRegistry().defineAfterAll(fn);
+function defineAfterAll(options: IRunHookOptions, fn: IRunHookBody): void;
+function defineAfterAll(fn: IRunHookBody): void;
+function defineAfterAll(
+  optionsOrFn: IRunHookBody | IRunHookOptions,
+  maybeFn?: IRunHookBody
+) {
+  if (typeof optionsOrFn === "function") {
+    getRegistry().defineAfterAll({}, optionsOrFn);
+  } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
+    getRegistry().defineAfterAll(optionsOrFn, maybeFn);
   } else {
     throw new Error("Unexpected argument for AfterAll hook");
   }

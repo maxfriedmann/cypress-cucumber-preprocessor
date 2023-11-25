@@ -35,10 +35,10 @@ Configuration values for specific types of testing (e2e / component) can be conf
 // .cypress-cucumber-preprocessorrc.json
 {
   "e2e": {
-    "stepDefintions": "cypress/e2e/[filepath].{js,mjs,ts,tsx}"
+    "stepDefinitions": "cypress/e2e/[filepath].{js,mjs,ts,tsx}"
   },
   "component": {
-    "stepDefintions": "src/[filepath].{js,mjs,ts,tsx}"
+    "stepDefinitions": "src/[filepath].{js,mjs,ts,tsx}"
   }
 }
 ```
