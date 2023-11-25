@@ -6,12 +6,12 @@ export interface IParameterTypeDefinition<T, C extends Mocha.Context> {
   transformer: (this: C, ...match: string[]) => T;
 }
 
-export interface IRunHookBody {
-  (this: Mocha.Context): void;
-}
-
 export interface IRunHookOptions {
   order?: number;
+}
+
+export interface IRunHookBody {
+  (this: Mocha.Context): void;
 }
 
 export interface ICaseHookOptions {

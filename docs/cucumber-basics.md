@@ -13,6 +13,7 @@
   - [Run hooks](#run-hooks)
   - [Scenario hooks](#scenario-hooks)
   - [Step hooks](#step-hooks)
+  - [Hook ordering](#hook-ordering)
   - [Named hooks](#named-hooks)
 
 # Step definitions
@@ -219,6 +220,18 @@ BeforeStep(function ({ pickle, pickleStep, gherkinDocument, testCaseStartedId, t
 ```
 
 [^1]: This discrepancy between the preprocessor and cucumber-js is currently considered to be unsolvable, as explained [here](https://github.com/badeball/cypress-cucumber-preprocessor/issues/824#issuecomment-1561492281).
+
+## Hook ordering
+
+You can specify an explicit order for hooks if you need to. The default order is 10000. Before-type hooks are executed in ascending order, while After-type hooks are executed in descending order.
+
+```ts
+import { Before, BeforeStep, After, AfterStep } from "@badeball/cypress-cucumber-preprocessor";
+
+BeforeAll({ order: 10 }, function () {});
+Before({ order: 10 }, function () {});
+BeforeStep({ order: 10 }, function () {});
+```
 
 ## Named hooks
 

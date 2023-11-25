@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Add order option to all hooks, fixes [#481](https://github.com/badeball/cypress-cucumber-preprocessor/issues/481).
+
 ## v19.1.1
 
 - Mock and imitate Cypress globals during diagnostics / dry run, fixes [#1120](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1120).
