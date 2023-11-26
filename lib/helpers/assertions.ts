@@ -2,6 +2,10 @@ import { createError } from "./error";
 
 import { isString } from "./type-guards";
 
+export function assertNever(value: never): never {
+  throw new Error("Illegal value: " + value);
+}
+
 export function fail(message: string) {
   throw createError(message);
 }

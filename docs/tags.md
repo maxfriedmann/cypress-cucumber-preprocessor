@@ -41,6 +41,14 @@ Tags are inherited by child elements. Tags that are placed above a `Feature` wil
 
 Normally when running a subset of scenarios using `cypress run --env tags=@foo`, you could potentially encounter files containing no matching scenarios. These can be pre-filtered away by setting `filterSpecs` to `true`, thus saving you execution time.
 
+### Tag filters and non-Cucumber specs
+
+If you are mixing Cucumber and non-Cucumber specs, you can control how non-Cucumber specs are filtered when using `filterSpecs`  and tag expressions. Filtering non-Cucumber specs (which doesn't contain tags) is not straight forward and there's not a single behavior that's more intuitive than others. Hence there's a `filterSpecsMixedMode` option. Valid options are:
+
+- "**hide**" (default): non-Cucumber specs are hidden regardless of your tag expression
+- "**show**": non-Cucumber specs are shown regardless of your tag expression
+- "**empty-set**": non-Cucumber specs are filtered as if having empty set of tags, meaning that positive expressions (`tags=@foo`) will discard these specs, while negative expressions (`tags='not @foo'`) will select them
+
 ## Omit filtered tests
 
 By default, all filtered tests are made *pending* using `it.skip` method. If you want to completely omit them, set `omitFiltered` to `true`.

@@ -7,6 +7,7 @@ import assert from "assert";
 
 import {
   COMPILED_REPORTER_ENTRYPOINT,
+  FilterSpecsMixedMode,
   IBaseUserConfiguration,
   IPreprocessorConfiguration,
   IUserConfiguration,
@@ -631,6 +632,117 @@ describe("resolve()", () => {
               expectedValue: true,
             }));
         });
+      });
+
+      describe("filterSpecsMixedMode", () => {
+        const getValueFn = (
+          configuration: IPreprocessorConfiguration
+        ): FilterSpecsMixedMode => configuration.filterSpecsMixedMode;
+
+        const setValueFn = (
+          configuration: IBaseUserConfiguration,
+          value: FilterSpecsMixedMode
+        ) => (configuration.filterSpecsMixedMode = value);
+
+        it("default", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: {},
+            configuration: {},
+            expectedValue: "hide",
+          }));
+
+        it("override by explicit, type-unspecific configuration", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: {},
+            configuration: createUserConfiguration({
+              setValueFn,
+              value: "show",
+            }),
+            expectedValue: "show",
+          }));
+
+        it("override by explicit, type-specific configuration", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: {},
+            configuration: {
+              [testingType]: createUserConfiguration({
+                setValueFn,
+                value: "show",
+              }),
+            },
+            expectedValue: "show",
+          }));
+
+        it("override by environment", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: { filterSpecsMixedMode: "show" },
+            configuration: {},
+            expectedValue: "show",
+          }));
+
+        it("precedence (environment over explicit, type-unspecific)", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: { filterSpecsMixedMode: "empty-set" },
+            configuration: createUserConfiguration({
+              setValueFn,
+              value: "show",
+            }),
+            expectedValue: "empty-set",
+          }));
+
+        it("precedence (environment over explicit, type-specific)", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: { filterSpecsMixedMode: "empty-set" },
+            configuration: {
+              [testingType]: createUserConfiguration({
+                setValueFn,
+                value: "show",
+              }),
+            },
+            expectedValue: "empty-set",
+          }));
+
+        it("precedence (explicit, type-specific over type-unspecific)", () =>
+          test({
+            testingType,
+            getValueFn,
+            environment: {},
+            configuration: {
+              [testingType]: createUserConfiguration({
+                setValueFn,
+                value: "empty-set",
+              }),
+              ...createUserConfiguration({ setValueFn, value: "show" }),
+            },
+            expectedValue: "empty-set",
+          }));
+
+        it("should fail when configured using non-recognized mode", () =>
+          assert.rejects(
+            () =>
+              resolve(
+                Object.assign(
+                  { testingType: testingType },
+                  DUMMY_POST10_CONFIG
+                ),
+                {},
+                "cypress/e2e",
+                () => ({ filterSpecsMixedMode: "foobar" })
+              ),
+            'Unrecognize filterSpecsMixedMode: foobar (valid options are "hide", "show" and "empty-set")'
+          ));
       });
 
       describe("filterSpecs", () => {

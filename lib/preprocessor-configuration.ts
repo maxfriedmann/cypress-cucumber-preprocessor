@@ -25,6 +25,12 @@ function isPlainObject(value: any): value is object {
   return value?.constructor === Object;
 }
 
+function isFilterSpecsMixedMode(value: any): value is FilterSpecsMixedMode {
+  const availablesModes = ["hide", "show", "empty-set"];
+
+  return typeof value === "string" && availablesModes.indexOf(value) !== -1;
+}
+
 function validateUserConfigurationEntry(
   key: string,
   value: Record<string, unknown>
@@ -161,6 +167,16 @@ function validateUserConfigurationEntry(
         enabled: value.enabled,
       };
       return { [key]: prettyConfig };
+    }
+    case "filterSpecsMixedMode": {
+      if (!isFilterSpecsMixedMode(value)) {
+        throw new Error(
+          `Unrecognize filterSpecsMixedMode: ${util.inspect(
+            value
+          )} (valid options are "hide", "show" and "empty-set")`
+        );
+      }
+      return { [key]: value };
     }
     case "filterSpecs": {
       if (!isBoolean(value)) {
@@ -321,6 +337,20 @@ function validateEnvironmentOverrides(
     }
   }
 
+  if (hasOwnProperty(environment, "filterSpecsMixedMode")) {
+    const { filterSpecsMixedMode } = environment;
+
+    if (isFilterSpecsMixedMode(filterSpecsMixedMode)) {
+      overrides.filterSpecsMixedMode = filterSpecsMixedMode;
+    } else {
+      throw new Error(
+        `Unrecognize filterSpecsMixedMode: ${util.inspect(
+          filterSpecsMixedMode
+        )} (valid options are "hide", "show" and "empty-set")`
+      );
+    }
+  }
+
   if (hasOwnProperty(environment, "filterSpecs")) {
     const { filterSpecs } = environment;
 
@@ -368,6 +398,8 @@ function stringToMaybeBoolean(value: string): boolean | undefined {
   }
 }
 
+export type FilterSpecsMixedMode = "hide" | "show" | "empty-set";
+
 interface IEnvironmentOverrides {
   stepDefinitions?: string | string[];
   messagesEnabled?: boolean;
@@ -377,6 +409,7 @@ interface IEnvironmentOverrides {
   htmlEnabled?: boolean;
   htmlOutput?: string;
   prettyEnabled?: boolean;
+  filterSpecsMixedMode?: FilterSpecsMixedMode;
   filterSpecs?: boolean;
   omitFiltered?: boolean;
 }
@@ -398,6 +431,7 @@ export interface IBaseUserConfiguration {
   pretty?: {
     enabled: boolean;
   };
+  filterSpecsMixedMode?: FilterSpecsMixedMode;
   filterSpecs?: boolean;
   omitFiltered?: boolean;
 }
@@ -424,6 +458,7 @@ export interface IPreprocessorConfiguration {
   readonly pretty: {
     enabled: boolean;
   };
+  readonly filterSpecsMixedMode: FilterSpecsMixedMode;
   readonly filterSpecs: boolean;
   readonly omitFiltered: boolean;
   readonly implicitIntegrationFolder: string;
@@ -509,6 +544,12 @@ export function combineIntoConfiguration(
       false,
   };
 
+  const filterSpecsMixedMode: IPreprocessorConfiguration["filterSpecsMixedMode"] =
+    overrides.filterSpecsMixedMode ??
+    specific?.filterSpecsMixedMode ??
+    unspecific.filterSpecsMixedMode ??
+    "hide";
+
   const filterSpecs: IPreprocessorConfiguration["filterSpecs"] =
     overrides.filterSpecs ??
     specific?.filterSpecs ??
@@ -527,6 +568,7 @@ export function combineIntoConfiguration(
     json,
     html,
     pretty,
+    filterSpecsMixedMode,
     filterSpecs,
     omitFiltered,
     implicitIntegrationFolder,

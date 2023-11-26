@@ -74,21 +74,22 @@ Then("it should appear as if both tests were skipped", function () {
   );
 });
 
+const ranTestExpr = (spec: string) =>
+  new RegExp("Running:\\s+" + rescape(spec));
+
+Then("it should appear to have ran spec {string}", function (spec) {
+  assert.match(this.lastRun.stdout, ranTestExpr(spec));
+});
+
 Then("it should appear to not have ran spec {string}", function (spec) {
-  assert.doesNotMatch(
-    this.lastRun.stdout,
-    new RegExp("Running:\\s+" + rescape(spec))
-  );
+  assert.doesNotMatch(this.lastRun.stdout, ranTestExpr(spec));
 });
 
 Then(
   "it should appear to have ran spec {string} and {string}",
   function (a, b) {
     for (const spec of [a, b]) {
-      assert.match(
-        this.lastRun.stdout,
-        new RegExp("Running:\\s+" + rescape(spec))
-      );
+      assert.match(this.lastRun.stdout, ranTestExpr(spec));
     }
   }
 );

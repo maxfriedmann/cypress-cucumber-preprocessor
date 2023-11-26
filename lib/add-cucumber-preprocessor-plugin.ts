@@ -45,6 +45,8 @@ import { getTags } from "./helpers/environment";
 
 import { memoize } from "./helpers/memoize";
 
+import { assertNever } from "./helpers/assertions";
+
 const resolve = memoize(origResolve);
 
 export type AddOptions = {
@@ -137,7 +139,16 @@ export async function addCucumberPreprocessorPlugin(
       config as unknown as ICypressConfiguration
     ).filter((testFile) => {
       if (!testFile.endsWith(".feature")) {
-        return node.evaluate([]);
+        switch (preprocessor.filterSpecsMixedMode) {
+          case "hide":
+            return false;
+          case "show":
+            return true;
+          case "empty-set":
+            return node.evaluate([]);
+          default:
+            assertNever(preprocessor.filterSpecsMixedMode);
+        }
       }
 
       const content = fs.readFileSync(testFile).toString("utf-8");

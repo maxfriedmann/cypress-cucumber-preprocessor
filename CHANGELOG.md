@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 - Add order option to all hooks, fixes [#481](https://github.com/badeball/cypress-cucumber-preprocessor/issues/481).
 
+- Add a [`filterSpecsMixedMode`](docs/tags.md#tag-filters-and-non-cucumber-specs) option, fixes [#1125](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1125).
+
+  - This essentially reverts 0b2702b from v19.1.1 and re-introduces original behavior of discarding non-feature specs by default and introduces an option to control this behavior.
+
 ## v19.1.1
 
 - Mock and imitate Cypress globals during diagnostics / dry run, fixes [#1120](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1120).
