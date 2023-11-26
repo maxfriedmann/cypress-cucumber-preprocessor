@@ -741,7 +741,10 @@ describe("resolve()", () => {
                 "cypress/e2e",
                 () => ({ filterSpecsMixedMode: "foobar" })
               ),
-            'Unrecognize filterSpecsMixedMode: foobar (valid options are "hide", "show" and "empty-set")'
+            {
+              message:
+                'Unrecognize filterSpecsMixedMode: \'foobar\' (valid options are "hide", "show" and "empty-set")',
+            }
           ));
       });
 
