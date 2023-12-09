@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Emit meta information (lib version, node version, os, ci) in meesage reports, fixes [#1133](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1133).
+
+  - This is in line with how cucumber-js behaves.
+
 ## v19.2.0
 
 - Add order option to all hooks, fixes [#481](https://github.com/badeball/cypress-cucumber-preprocessor/issues/481).

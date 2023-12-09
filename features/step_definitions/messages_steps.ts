@@ -63,6 +63,10 @@ function prepareMessagesReport(messages: any) {
         node.uri = node.uri.replace(/\\/g, "/");
       }
 
+      if (hasOwnProperty(node, "meta")) {
+        node.meta = "meta";
+      }
+
       for (const idProperty of idProperties) {
         if (hasOwnProperty(node, idProperty)) {
           node[idProperty] = "id";

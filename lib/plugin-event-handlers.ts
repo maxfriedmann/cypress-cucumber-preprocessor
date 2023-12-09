@@ -1,5 +1,7 @@
 import syncFs, { promises as fs, constants as fsConstants } from "fs";
 
+import os from "os";
+
 import path from "path";
 
 import { pipeline } from "stream/promises";
@@ -13,6 +15,8 @@ import chalk from "chalk";
 import { NdjsonToMessageStream } from "@cucumber/message-streams";
 
 import * as messages from "@cucumber/messages";
+
+import detectCiEnvironment from "@cucumber/ci-environment";
 
 import split from "split";
 
@@ -48,6 +52,8 @@ import {
 } from "./helpers/formatters";
 
 import { useColors } from "./helpers/colors";
+
+import { version as packageVersion } from "./version";
 
 const resolve = memoize(origResolve);
 
@@ -169,6 +175,29 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
 
   await fs.rm(messagesPath, { force: true });
 
+  // Copied from https://github.com/cucumber/cucumber-js/blob/v10.0.1/src/cli/helpers.ts#L104-L122.
+  const meta: messages.Envelope = {
+    meta: {
+      protocolVersion: messages.version,
+      implementation: {
+        version: packageVersion,
+        name: "@badeball/cypress-cucumber-preprocessor",
+      },
+      cpu: {
+        name: os.arch(),
+      },
+      os: {
+        name: os.platform(),
+        version: os.release(),
+      },
+      runtime: {
+        name: "node.js",
+        version: process.versions.node,
+      },
+      ci: detectCiEnvironment(process.env),
+    },
+  };
+
   const testRunStarted: messages.Envelope = {
     testRunStarted: {
       timestamp: createTimestamp(),
@@ -177,7 +206,10 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
 
   await fs.mkdir(path.dirname(messagesPath), { recursive: true });
 
-  await fs.writeFile(messagesPath, JSON.stringify(testRunStarted) + "\n");
+  await fs.writeFile(
+    messagesPath,
+    JSON.stringify(meta) + "\n" + JSON.stringify(testRunStarted) + "\n"
+  );
 }
 
 export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
