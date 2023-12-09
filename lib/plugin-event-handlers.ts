@@ -57,6 +57,8 @@ import { notNull } from "./helpers/type-guards";
 
 import { version as packageVersion } from "./version";
 
+import { IStepHookParameter } from "./public-member-types";
+
 const resolve = memoize(origResolve);
 
 interface PrettyDisabled {
@@ -626,10 +628,13 @@ export function testStepStartedHandler(
 
 export type Attach = (data: string | Buffer, mediaType?: string) => void;
 
-export type OnAfterStep = (options: {
-  wasLastStep: boolean;
-  attach: Attach;
-}) => Promise<void> | void;
+export type OnAfterStep = (
+  options: {
+    wasLastStep: boolean;
+    attach: Attach;
+    result: messages.TestStepResult;
+  } & IStepHookParameter
+) => Promise<void> | void;
 
 export async function testStepFinishedHandler(
   config: Cypress.PluginConfigOptions,
@@ -689,13 +694,31 @@ export async function testStepFinishedHandler(
       "Expected to find a pickle"
     );
 
-    const wasLastStep =
-      pickle.steps[pickle.steps.length - 1].id === pickleStepId;
+    const pickleStep = assertAndReturn(
+      pickle.steps.find((step) => step.id === pickleStepId),
+      "Expected to find a pickleStep"
+    );
+
+    const gherkinDocument = assertAndReturn(
+      state.messages
+        .map((message) => message.gherkinDocument)
+        .filter(notNull)
+        .find((gherkinDocument) => gherkinDocument.uri === pickle.uri),
+      "Expected to find a gherkinDocument"
+    );
+
+    const wasLastStep = pickle.steps[pickle.steps.length - 1] === pickleStep;
 
     const attachments: ITaskCreateStringAttachment[] = [];
 
     await options.onAfterStep?.({
       wasLastStep,
+      result: testStepFinished.testStepResult,
+      pickle,
+      pickleStep,
+      gherkinDocument,
+      testCaseStartedId,
+      testStepId,
       attach(data, mediaType) {
         if (typeof data === "string") {
           mediaType = mediaType ?? "text/plain";

@@ -16,6 +16,8 @@ Other changes:
 
   - This is in line with how cucumber-js behaves.
 
+- The above-mentioned `onAfterStep` hook, is now invoked with a bunch of relevant data, relates to [#1089](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1089).
+
 ## v19.2.0
 
 - Add order option to all hooks, fixes [#481](https://github.com/badeball/cypress-cucumber-preprocessor/issues/481).

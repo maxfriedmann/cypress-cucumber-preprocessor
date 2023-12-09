@@ -113,3 +113,11 @@ await addCucumberPreprocessorPlugin(on, config, {
   }
 });
 ```
+
+The hook is furthermore invoked with a bunch of other, relevant data, similar to `AfterStep(..)`, with the addition of a `result` property.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ pickle, pickleStep, gherkinDocument, testCaseStartedId, testStepId, result }) {}
+});
+```
