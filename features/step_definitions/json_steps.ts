@@ -170,6 +170,34 @@ Then(
   }
 );
 
+Then(
+  "there should be one attachment containing {string}",
+  async function (content) {
+    const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
+
+    const jsonFile = await fs.readFile(absolutejsonPath);
+
+    const actualJsonOutput = JSON.parse(jsonFile.toString());
+
+    const embeddings: { data: string; mime_type: string }[] = actualJsonOutput
+      .flatMap((feature: any) => feature.elements)
+      .flatMap((element: any) => element.steps)
+      .flatMap((step: any) => step.embeddings ?? []);
+
+    if (embeddings.length !== 1) {
+      throw new Error(
+        "Expected to find one embeddings in JSON, but found " +
+          embeddings.length
+      );
+    }
+
+    assert.strictEqual(
+      Buffer.from(embeddings[0].data, "base64").toString(),
+      content
+    );
+  }
+);
+
 Then("the JSON report should contain a spec", async function () {
   const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 

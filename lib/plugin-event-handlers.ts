@@ -675,48 +675,65 @@ export async function testStepFinishedHandler(
     "Expected to find a testCase"
   );
 
-  const wasLastStep =
-    testCase.testSteps[testCase.testSteps.length - 1].id === testStepId;
+  const { pickleStepId, hookId } = assertAndReturn(
+    testCase.testSteps.find((testStep) => testStep.id === testStepId),
+    "Expected to find a testStep"
+  );
 
-  const attachments: ITaskCreateStringAttachment[] = [];
+  if (pickleStepId != null) {
+    const pickle = assertAndReturn(
+      state.messages
+        .map((message) => message.pickle)
+        .filter(notNull)
+        .find((pickle) => pickle.id === pickleId),
+      "Expected to find a pickle"
+    );
 
-  await options.onAfterStep?.({
-    wasLastStep,
-    attach(data, mediaType) {
-      if (typeof data === "string") {
-        mediaType = mediaType ?? "text/plain";
+    const wasLastStep =
+      pickle.steps[pickle.steps.length - 1].id === pickleStepId;
 
-        if (mediaType.startsWith("base64:")) {
+    const attachments: ITaskCreateStringAttachment[] = [];
+
+    await options.onAfterStep?.({
+      wasLastStep,
+      attach(data, mediaType) {
+        if (typeof data === "string") {
+          mediaType = mediaType ?? "text/plain";
+
+          if (mediaType.startsWith("base64:")) {
+            attachments.push({
+              data,
+              mediaType: mediaType.replace("base64:", ""),
+              encoding: messages.AttachmentContentEncoding.BASE64,
+            });
+          } else {
+            attachments.push({
+              data,
+              mediaType: mediaType ?? "text/plain",
+              encoding: messages.AttachmentContentEncoding.IDENTITY,
+            });
+          }
+        } else if (data instanceof Buffer) {
+          if (typeof mediaType !== "string") {
+            throw Error("Buffer attachments must specify a media type");
+          }
+
           attachments.push({
-            data,
-            mediaType: mediaType.replace("base64:", ""),
+            data: data.toString("base64"),
+            mediaType,
             encoding: messages.AttachmentContentEncoding.BASE64,
           });
         } else {
-          attachments.push({
-            data,
-            mediaType: mediaType ?? "text/plain",
-            encoding: messages.AttachmentContentEncoding.IDENTITY,
-          });
+          throw Error("Invalid attachment data: must be a Buffer or string");
         }
-      } else if (data instanceof Buffer) {
-        if (typeof mediaType !== "string") {
-          throw Error("Buffer attachments must specify a media type");
-        }
+      },
+    });
 
-        attachments.push({
-          data: data.toString("base64"),
-          mediaType,
-          encoding: messages.AttachmentContentEncoding.BASE64,
-        });
-      } else {
-        throw Error("Invalid attachment data: must be a Buffer or string");
-      }
-    },
-  });
-
-  for (const attachment of attachments) {
-    await createStringAttachmentHandler(config, attachment);
+    for (const attachment of attachments) {
+      await createStringAttachmentHandler(config, attachment);
+    }
+  } else {
+    assert(hookId != null, "Expected a hookId in absence of pickleStepId");
   }
 
   state = {

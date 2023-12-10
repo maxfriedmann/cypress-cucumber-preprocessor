@@ -282,34 +282,36 @@ Feature: attachments
       Then it passes
       And there should be two attachments containing false and true, respectively
 
-    Scenario: Before hooks
+    Scenario: with a scenario hook (Before)
       Given a file named "cypress/e2e/a.feature" with:
         """
         Feature: a feature
           Scenario: a scenario
+            Given a step
         """
       And a file named "cypress/support/step_definitions/steps.js" with:
         """
-        const { Before } = require("@badeball/cypress-cucumber-preprocessor");
+        const { Before, Given } = require("@badeball/cypress-cucumber-preprocessor");
         Before(function() {});
-        Before(function() {});
+        Given("a step", function() {});
         """
       When I run cypress
       Then it passes
-      And there should be two attachments containing false and true, respectively
+      And there should be one attachment containing "true"
 
-    Scenario: After hooks
+    Scenario: with a scenario hook (After)
       Given a file named "cypress/e2e/a.feature" with:
         """
         Feature: a feature
           Scenario: a scenario
+            Given a step
         """
       And a file named "cypress/support/step_definitions/steps.js" with:
         """
-        const { After } = require("@badeball/cypress-cucumber-preprocessor");
+        const { After, Given } = require("@badeball/cypress-cucumber-preprocessor");
         After(function() {});
-        After(function() {});
+        Given("a step", function() {});
         """
       When I run cypress
       Then it passes
-      And there should be two attachments containing false and true, respectively
+      And there should be one attachment containing "true"
