@@ -13,3 +13,11 @@ HTML reports are powered by [`@cucumber/html-formatter`](https://github.com/cucu
 ```
 
 The report is outputted to `cucumber-report.html` in the project directory, but can be configured through the `html.output` property.
+
+## Screenshots
+
+Screenshots are automatically added to HTML reports, including that of failed tests (unless you have disabled `screenshotOnRunFailure`).
+
+## Attachments
+
+Attachments can also be added to HTML reports through an API. This API is further explained in [JSON report](json-report.md), but applies to HTML reports as well.

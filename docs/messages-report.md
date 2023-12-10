@@ -15,3 +15,11 @@ Messages reports can be enabled using the `messages.enabled` property. The prepr
 ```
 
 The report is outputted to `cucumber-messages.ndjson` in the project directory, but can be configured through the `messages.output` property.
+
+## Screenshots
+
+Screenshots are automatically added to messages reports, including that of failed tests (unless you have disabled `screenshotOnRunFailure`).
+
+## Attachments
+
+Attachments can also be added to messages reports through an API. This API is further explained in [JSON report](json-report.md), but applies to messages reports as well.
