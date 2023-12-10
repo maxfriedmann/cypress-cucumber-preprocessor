@@ -43,7 +43,7 @@ import debug from "./helpers/debug";
 
 import { createError } from "./helpers/error";
 
-import { assertIsString } from "./helpers/assertions";
+import { assert, assertAndReturn, assertIsString } from "./helpers/assertions";
 
 import {
   createHtmlStream,
@@ -52,6 +52,8 @@ import {
 } from "./helpers/formatters";
 
 import { useColors } from "./helpers/colors";
+
+import { notNull } from "./helpers/type-guards";
 
 import { version as packageVersion } from "./version";
 
@@ -632,7 +634,7 @@ export type OnAfterStep = (options: {
 export async function testStepFinishedHandler(
   config: Cypress.PluginConfigOptions,
   options: { onAfterStep?: OnAfterStep },
-  { wasLastStep, ...testStepFinished }: ITaskTestStepFinished
+  testStepFinished: ITaskTestStepFinished
 ) {
   debug("testStepFinishedHandler()");
 
@@ -654,6 +656,27 @@ export async function testStepFinishedHandler(
       testStepFinished,
     });
   }
+
+  const { testCaseStartedId, testStepId } = testStepFinished;
+
+  const { testCaseId: pickleId } = assertAndReturn(
+    state.messages
+      .map((message) => message.testCaseStarted)
+      .filter(notNull)
+      .find((testCaseStarted) => testCaseStarted.id === testCaseStartedId),
+    "Expected to find a testCaseStarted"
+  );
+
+  const testCase = assertAndReturn(
+    state.messages
+      .map((message) => message.testCase)
+      .filter(notNull)
+      .find((testCase) => testCase.id === pickleId),
+    "Expected to find a testCase"
+  );
+
+  const wasLastStep =
+    testCase.testSteps[testCase.testSteps.length - 1].id === testStepId;
 
   const attachments: ITaskCreateStringAttachment[] = [];
 

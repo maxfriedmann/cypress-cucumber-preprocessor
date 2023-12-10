@@ -194,16 +194,12 @@ function taskTestStepStarted(
 
 function taskTestStepFinished(
   context: CompositionContext,
-  testStepfinished: messages.TestStepFinished,
-  wasLastStep: boolean
+  testStepfinished: messages.TestStepFinished
 ) {
   if (shouldPropagateMessages(context)) {
     cy.task(
       TASK_TEST_STEP_FINISHED,
-      {
-        ...testStepfinished,
-        wasLastStep,
-      } satisfies ITaskTestStepFinished,
+      testStepfinished satisfies ITaskTestStepFinished,
       {
         log: false,
       }
@@ -292,10 +288,6 @@ function createStepDescription({
   } else {
     return `${name} (${tags})`;
   }
-}
-
-function isLastEl<T>(col: T[], el: T): boolean {
-  return col[col.length - 1] === el;
 }
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
@@ -504,19 +496,15 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
           .then((start) => {
             const end = createTimestamp();
 
-            taskTestStepFinished(
-              context,
-              {
-                testStepId,
-                testCaseStartedId,
-                testStepResult: {
-                  status: messages.TestStepResultStatus.PASSED,
-                  duration: duration(start, end),
-                },
-                timestamp: end,
+            taskTestStepFinished(context, {
+              testStepId,
+              testCaseStartedId,
+              testStepResult: {
+                status: messages.TestStepResultStatus.PASSED,
+                duration: duration(start, end),
               },
-              isLastEl(steps, step)
-            );
+              timestamp: end,
+            });
 
             remainingSteps.shift();
           });
@@ -638,33 +626,25 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
 
             if (result === "pending" || result === "skipped") {
               if (result === "pending") {
-                taskTestStepFinished(
-                  context,
-                  {
-                    testStepId,
-                    testCaseStartedId,
-                    testStepResult: {
-                      status: messages.TestStepResultStatus.PENDING,
-                      duration: duration(start, end),
-                    },
-                    timestamp: end,
+                taskTestStepFinished(context, {
+                  testStepId,
+                  testCaseStartedId,
+                  testStepResult: {
+                    status: messages.TestStepResultStatus.PENDING,
+                    duration: duration(start, end),
                   },
-                  isLastEl(steps, step)
-                );
+                  timestamp: end,
+                });
               } else {
-                taskTestStepFinished(
-                  context,
-                  {
-                    testStepId,
-                    testCaseStartedId,
-                    testStepResult: {
-                      status: messages.TestStepResultStatus.SKIPPED,
-                      duration: duration(start, end),
-                    },
-                    timestamp: end,
+                taskTestStepFinished(context, {
+                  testStepId,
+                  testCaseStartedId,
+                  testStepResult: {
+                    status: messages.TestStepResultStatus.SKIPPED,
+                    duration: duration(start, end),
                   },
-                  isLastEl(steps, step)
-                );
+                  timestamp: end,
+                });
               }
 
               remainingSteps.shift();
@@ -687,22 +667,18 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   timestamp: createTimestamp(),
                 });
 
-                taskTestStepFinished(
-                  context,
-                  {
-                    testStepId,
-                    testCaseStartedId,
-                    testStepResult: {
-                      status: messages.TestStepResultStatus.SKIPPED,
-                      duration: {
-                        seconds: 0,
-                        nanos: 0,
-                      },
+                taskTestStepFinished(context, {
+                  testStepId,
+                  testCaseStartedId,
+                  testStepResult: {
+                    status: messages.TestStepResultStatus.SKIPPED,
+                    duration: {
+                      seconds: 0,
+                      nanos: 0,
                     },
-                    timestamp: createTimestamp(),
                   },
-                  isLastEl(remainingSteps, skippedStep)
-                );
+                  timestamp: createTimestamp(),
+                });
               }
 
               for (let i = 0, count = remainingSteps.length; i < count; i++) {
@@ -711,19 +687,15 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
 
               cy.then(() => this.skip());
             } else {
-              taskTestStepFinished(
-                context,
-                {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.PASSED,
-                    duration: duration(start, end),
-                  },
-                  timestamp: end,
+              taskTestStepFinished(context, {
+                testStepId,
+                testCaseStartedId,
+                testStepResult: {
+                  status: messages.TestStepResultStatus.PASSED,
+                  duration: duration(start, end),
                 },
-                isLastEl(steps, step)
-              );
+                timestamp: end,
+              });
 
               remainingSteps.shift();
             }
@@ -862,11 +834,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
             timestamp: endTimestamp,
           };
 
-      taskTestStepFinished(
-        context,
-        failedTestStepFinished,
-        remainingSteps.length === 0
-      );
+      taskTestStepFinished(context, failedTestStepFinished);
 
       for (const skippedStep of remainingSteps) {
         const hookIdOrPickleStepId = assertAndReturn(
@@ -886,22 +854,18 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           timestamp: endTimestamp,
         });
 
-        taskTestStepFinished(
-          context,
-          {
-            testStepId,
-            testCaseStartedId,
-            testStepResult: {
-              status: messages.TestStepResultStatus.SKIPPED,
-              duration: {
-                seconds: 0,
-                nanos: 0,
-              },
+        taskTestStepFinished(context, {
+          testStepId,
+          testCaseStartedId,
+          testStepResult: {
+            status: messages.TestStepResultStatus.SKIPPED,
+            duration: {
+              seconds: 0,
+              nanos: 0,
             },
-            timestamp: endTimestamp,
           },
-          isLastEl(remainingSteps, skippedStep)
-        );
+          timestamp: endTimestamp,
+        });
       }
     } else if (this.currentTest?.state === "pending") {
       if (currentStepStartedAt) {
@@ -921,19 +885,15 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           hookIdOrPickleStepId,
         });
 
-        taskTestStepFinished(
-          context,
-          {
-            testStepId,
-            testCaseStartedId,
-            testStepResult: {
-              status: messages.TestStepResultStatus.SKIPPED,
-              duration: duration(currentStepStartedAt, endTimestamp),
-            },
-            timestamp: endTimestamp,
+        taskTestStepFinished(context, {
+          testStepId,
+          testCaseStartedId,
+          testStepResult: {
+            status: messages.TestStepResultStatus.SKIPPED,
+            duration: duration(currentStepStartedAt, endTimestamp),
           },
-          remainingSteps.length === 0
-        );
+          timestamp: endTimestamp,
+        });
       }
 
       for (const remainingStep of remainingSteps) {
@@ -954,22 +914,18 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           timestamp: endTimestamp,
         });
 
-        taskTestStepFinished(
-          context,
-          {
-            testStepId,
-            testCaseStartedId,
-            testStepResult: {
-              status: messages.TestStepResultStatus.SKIPPED,
-              duration: {
-                seconds: 0,
-                nanos: 0,
-              },
+        taskTestStepFinished(context, {
+          testStepId,
+          testCaseStartedId,
+          testStepResult: {
+            status: messages.TestStepResultStatus.SKIPPED,
+            duration: {
+              seconds: 0,
+              nanos: 0,
             },
-            timestamp: endTimestamp,
           },
-          isLastEl(remainingSteps, remainingStep)
-        );
+          timestamp: endTimestamp,
+        });
       }
     } else {
       for (const remainingStep of remainingSteps) {
@@ -990,22 +946,18 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           timestamp: endTimestamp,
         });
 
-        taskTestStepFinished(
-          context,
-          {
-            testStepId,
-            testCaseStartedId,
-            testStepResult: {
-              status: messages.TestStepResultStatus.UNKNOWN,
-              duration: {
-                seconds: 0,
-                nanos: 0,
-              },
+        taskTestStepFinished(context, {
+          testStepId,
+          testCaseStartedId,
+          testStepResult: {
+            status: messages.TestStepResultStatus.UNKNOWN,
+            duration: {
+              seconds: 0,
+              nanos: 0,
             },
-            timestamp: endTimestamp,
           },
-          isLastEl(remainingSteps, remainingStep)
-        );
+          timestamp: endTimestamp,
+        });
       }
     }
   }
