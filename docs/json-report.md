@@ -66,7 +66,7 @@ Similar to the browser API explained above, attachments can also be added using 
 
 ```ts
 await addCucumberPreprocessorPlugin(on, config, {
-  onAfterStep({ wasLastStep, attach }) {
+  onAfterStep({ attach }) {
     attach("foobar");
   }
 });
@@ -76,7 +76,7 @@ By default, text is saved with a MIME type of text/plain. You can also specify a
 
 ```ts
 await addCucumberPreprocessorPlugin(on, config, {
-  onAfterStep({ wasLastStep, attach }) {
+  onAfterStep({ attach }) {
     attach('{ "name": "foobar" }', "application/json");
   }
 });
@@ -86,7 +86,7 @@ Images and other binary data can be attached using a Buffer. The data will be ba
 
 ```ts
 await addCucumberPreprocessorPlugin(on, config, {
-  onAfterStep({ wasLastStep, attach }) {
+  onAfterStep({ attach }) {
     attach(Buffer.from("foobar"), "text/plain");
   }
 });
@@ -96,20 +96,8 @@ If you've already got a base64-encoded string, you can prefix your mime type wit
 
 ```ts
 await addCucumberPreprocessorPlugin(on, config, {
-  onAfterStep({ wasLastStep, attach }) {
+  onAfterStep({ attach }) {
     attach("Zm9vYmFy", "base64:text/plain");
-  }
-});
-```
-
-A `wasLastStep` option is available if you need to attach something at the end of the test.
-
-```ts
-await addCucumberPreprocessorPlugin(on, config, {
-  onAfterStep({ wasLastStep, attach }) {
-    if (wasLastStep) {
-      attach("foobar");
-    }
   }
 });
 ```
@@ -119,5 +107,20 @@ The hook is furthermore invoked with a bunch of other, relevant data, similar to
 ```ts
 await addCucumberPreprocessorPlugin(on, config, {
   onAfterStep({ pickle, pickleStep, gherkinDocument, testCaseStartedId, testStepId, result }) {}
+});
+```
+
+This information can, among other things, be used to determine if a step was the last step, like shown below.
+
+```ts
+await addCucumberPreprocessorPlugin(on, config, {
+  onAfterStep({ attach, pickle, pickleStep }) {
+    const wasLastStep =
+      pickle.steps[pickle.steps.length - 1] === pickleStep;
+
+    if (wasLastStep) {
+      attach("foobar");
+    }
+  }
 });
 ```

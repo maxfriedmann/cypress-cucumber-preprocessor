@@ -22,7 +22,7 @@ Feature: attachments
 
         module.exports = async (on, config) => {
           await addCucumberPreprocessorPlugin(on, config, {
-            onAfterStep({ wasLastStep, attach }) {
+            onAfterStep({ attach }) {
               attach("foobar");
             }
           });
@@ -59,7 +59,7 @@ Feature: attachments
 
         module.exports = async (on, config) => {
           await addCucumberPreprocessorPlugin(on, config, {
-            onAfterStep({ wasLastStep, attach }) {
+            onAfterStep({ attach }) {
               attach(Buffer.from("foobar"), "text/plain");
             }
           });
@@ -96,7 +96,7 @@ Feature: attachments
 
         module.exports = async (on, config) => {
           await addCucumberPreprocessorPlugin(on, config, {
-            onAfterStep({ wasLastStep, attach }) {
+            onAfterStep({ attach }) {
               attach(Buffer.from("foobar").toString("base64"), "base64:text/plain");
             }
           });
@@ -252,195 +252,3 @@ Feature: attachments
       When I run cypress
       Then it fails
       And there should be one attachment containing "FAILED"
-
-  Rule: it should correctly propogate a `wasLastStep` property regardless of test path
-
-    Background:
-      Given a file named "setupNodeEvents.js" with:
-        """
-        const createBundler = require("@bahmutov/cypress-esbuild-preprocessor");
-        const { addCucumberPreprocessorPlugin } = require("@badeball/cypress-cucumber-preprocessor");
-        const { createEsbuildPlugin } = require("@badeball/cypress-cucumber-preprocessor/esbuild");
-
-        module.exports = async (on, config) => {
-          await addCucumberPreprocessorPlugin(on, config, {
-            onAfterStep({ wasLastStep, attach }) {
-              attach(String(wasLastStep));
-            }
-          });
-          on(
-            "file:preprocessor",
-            createBundler({
-              plugins: [createEsbuildPlugin(config)]
-            })
-          );
-          return config;
-        };
-        """
-
-    Scenario: passing steps
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a step
-            And another step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Given("a/another step", function() {});
-        """
-      When I run cypress
-      Then it passes
-      And there should be two attachments containing false and true, respectively
-
-    Scenario: skipped step
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a skipped step
-            And another step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Given("a skipped step", function() {
-          return "skipped";
-        });
-        Given("another step", function() {});
-        """
-      When I run cypress
-      Then it passes
-      And there should be two attachments containing false and true, respectively
-
-    Scenario: pending step
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a pending step
-            And another step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Given("a pending step", function() {
-          return "pending";
-        });
-        Given("another step", function() {});
-        """
-      When I run cypress
-      Then it passes
-      And there should be two attachments containing false and true, respectively
-
-    Scenario: failing step
-      Given additional Cypress configuration
-        """
-        {
-          "screenshotOnRunFailure": false
-        }
-        """
-      And a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a failing step
-            And another step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Given("a failing step", function() {
-          throw "some error";
-        });
-        Given("another step", function() {});
-        """
-      When I run cypress
-      Then it fails
-      And there should be two attachments containing false and true, respectively
-
-    Scenario: skipped test (from step)
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a skipping step
-            And another step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Given("a skipping step", function() {
-          this.skip();
-        });
-        Given("another step", function() {});
-        """
-      When I run cypress
-      Then it passes
-      And there should be two attachments containing false and true, respectively
-
-    Scenario: rescued error
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a failing step
-            And another step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Given("a failing step", function() {
-          throw "some error";
-        });
-        Given("another step", function() {});
-        """
-      And a file named "cypress/support/e2e.js" with:
-        """
-        Cypress.on("fail", (err) => {
-          if (err.message.includes("some error")) {
-            return;
-          }
-
-          throw err;
-        })
-        """
-      When I run cypress
-      Then it passes
-      And there should be two attachments containing false and true, respectively
-
-    Scenario: with a scenario hook (Before)
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { Before, Given } = require("@badeball/cypress-cucumber-preprocessor");
-        Before(function() {});
-        Given("a step", function() {});
-        """
-      When I run cypress
-      Then it passes
-      And there should be one attachment containing "true"
-
-    Scenario: with a scenario hook (After)
-      Given a file named "cypress/e2e/a.feature" with:
-        """
-        Feature: a feature
-          Scenario: a scenario
-            Given a step
-        """
-      And a file named "cypress/support/step_definitions/steps.js" with:
-        """
-        const { After, Given } = require("@badeball/cypress-cucumber-preprocessor");
-        After(function() {});
-        Given("a step", function() {});
-        """
-      When I run cypress
-      Then it passes
-      And there should be one attachment containing "true"

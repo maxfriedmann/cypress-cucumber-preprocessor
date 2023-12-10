@@ -10,6 +10,10 @@ Breaking changes:
 
   - It now more closely mimic the behavior of `AfterStep(..)`, which it was supposed to.
 
+- The above-mentioned `onAfterStep` hook, is no longer invoked with a `wasLastStep` property.
+
+  - This is now easily determined by using other properties, as reflected in the docs.
+
 Other changes:
 
 - Emit meta information (lib version, node version, os, ci) in meesage reports, fixes [#1133](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1133).
