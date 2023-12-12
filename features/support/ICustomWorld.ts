@@ -1,3 +1,8 @@
+export interface ExtraOptions {
+  extraArgs?: string[];
+  extraEnv?: Record<string, string>;
+}
+
 export default interface ICustomWorld {
   tmpDir: string;
   verifiedLastRunError: boolean | undefined;
@@ -10,13 +15,7 @@ export default interface ICustomWorld {
       }
     | undefined;
 
-  runCypress(
-    extraArgs?: string[],
-    extraEnv?: Record<string, string>
-  ): Promise<void>;
+  runCypress(options?: ExtraOptions): Promise<void>;
 
-  runDiagnostics(
-    extraArgs?: string[],
-    extraEnv?: Record<string, string>
-  ): Promise<void>;
+  runDiagnostics(options?: ExtraOptions): Promise<void>;
 }

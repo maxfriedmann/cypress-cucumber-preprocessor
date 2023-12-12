@@ -38,9 +38,9 @@ When(
     );
 
     // Drop 1st arg, which is the path of node.
-    const [, ...args] = JSON.parse(stdout);
+    const [, ...extraArgs] = JSON.parse(stdout);
 
-    await this.runCypress(args);
+    await this.runCypress({ extraArgs });
   }
 );
 
@@ -48,7 +48,7 @@ When(
   "I run cypress with environment variables",
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld, table) {
-    await this.runCypress([], Object.fromEntries(table.rows()));
+    await this.runCypress({ extraEnv: Object.fromEntries(table.rows()) });
   }
 );
 

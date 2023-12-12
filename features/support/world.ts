@@ -4,7 +4,7 @@ import childProcess from "child_process";
 import { PassThrough, Readable } from "stream";
 import { WritableStreamBuffer } from "stream-buffers";
 import { bin } from "../../package.json";
-import ICustomWorld from "./ICustomWorld";
+import ICustomWorld, { ExtraOptions } from "./ICustomWorld";
 
 const projectPath = path.join(__dirname, "..", "..");
 
@@ -33,7 +33,7 @@ export default class CustomWorld implements ICustomWorld {
       }
     | undefined;
 
-  runCypress(extraArgs: string[] = [], extraEnv: Record<string, string> = {}) {
+  runCypress({ extraArgs = [], extraEnv = {} }: ExtraOptions = {}) {
     return this.runCommand({
       cmd: path.join(
         projectPath,
@@ -49,10 +49,7 @@ export default class CustomWorld implements ICustomWorld {
     });
   }
 
-  runDiagnostics(
-    extraArgs: string[] = [],
-    extraEnv: Record<string, string> = {}
-  ) {
+  runDiagnostics({ extraArgs = [], extraEnv = {} }: ExtraOptions = {}) {
     return this.runCommand({
       cmd: "node",
       args: [
