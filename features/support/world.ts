@@ -33,7 +33,11 @@ export default class CustomWorld implements ICustomWorld {
       }
     | undefined;
 
-  runCypress({ extraArgs = [], extraEnv = {} }: ExtraOptions = {}) {
+  runCypress({
+    extraArgs = [],
+    extraEnv = {},
+    expectedExitCode,
+  }: ExtraOptions = {}) {
     return this.runCommand({
       cmd: path.join(
         projectPath,
@@ -46,10 +50,15 @@ export default class CustomWorld implements ICustomWorld {
         NO_COLOR: "1",
         ...extraEnv,
       },
+      expectedExitCode,
     });
   }
 
-  runDiagnostics({ extraArgs = [], extraEnv = {} }: ExtraOptions = {}) {
+  runDiagnostics({
+    extraArgs = [],
+    extraEnv = {},
+    expectedExitCode,
+  }: ExtraOptions = {}) {
     return this.runCommand({
       cmd: "node",
       args: [
@@ -57,6 +66,7 @@ export default class CustomWorld implements ICustomWorld {
         ...extraArgs,
       ],
       extraEnv,
+      expectedExitCode,
     });
   }
 
@@ -64,10 +74,12 @@ export default class CustomWorld implements ICustomWorld {
     cmd,
     args = [],
     extraEnv = {},
+    expectedExitCode,
   }: {
     cmd: string;
     args: string[];
     extraEnv: Record<string, string>;
+    expectedExitCode?: number;
   }) {
     const child = childProcess.spawn(cmd, args, {
       stdio: ["ignore", "pipe", "pipe"],
@@ -97,7 +109,21 @@ export default class CustomWorld implements ICustomWorld {
     const stderr = stderrBuffer.getContentsAsString() || "";
     const output = outputBuffer.getContentsAsString() || "";
 
-    this.verifiedLastRunError = false;
+    if (expectedExitCode != null) {
+      if (exitCode !== expectedExitCode) {
+        if (exitCode === 0) {
+          throw new Error(`Last run passed unexpectedly. Output:\n\n${output}`);
+        } else {
+          throw new Error(
+            `Last run errored unexpectedly. Output:\n\n${output}`
+          );
+        }
+      } else {
+        this.verifiedLastRunError = true;
+      }
+    } else {
+      this.verifiedLastRunError = false;
+    }
 
     this.lastRun = {
       stdout,

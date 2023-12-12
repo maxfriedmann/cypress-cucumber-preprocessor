@@ -1,6 +1,7 @@
 export interface ExtraOptions {
   extraArgs?: string[];
   extraEnv?: Record<string, string>;
+  expectedExitCode?: number;
 }
 
 export default interface ICustomWorld {
