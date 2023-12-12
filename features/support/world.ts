@@ -21,71 +21,49 @@ function combine(...streams: Readable[]) {
 }
 
 class World {
-  async runCypress(this: IWorld, extraArgs = [], extraEnv = {}) {
-    const child = childProcess.spawn(
-      path.join(
+  runCypress(this: IWorld, extraArgs = [], extraEnv = {}) {
+    return this.runCommand({
+      cmd: path.join(
         projectPath,
         "node_modules",
         ".bin",
         isWin ? "cypress.cmd" : "cypress"
       ),
-      ["run", ...extraArgs],
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-        cwd: this.tmpDir,
-        env: {
-          ...process.env,
-          NO_COLOR: "1",
-          ...extraEnv,
-        },
-      }
-    );
-
-    const combined = combine(child.stdout, child.stderr);
-
-    if (process.env.DEBUG) {
-      child.stdout.pipe(process.stdout);
-      child.stderr.pipe(process.stderr);
-    }
-
-    const stdoutBuffer = child.stdout.pipe(new WritableStreamBuffer());
-    const stderrBuffer = child.stderr.pipe(new WritableStreamBuffer());
-    const outputBuffer = combined.pipe(new WritableStreamBuffer());
-
-    const exitCode = await new Promise<number>((resolve) => {
-      child.on("close", resolve);
+      args: ["run", ...extraArgs],
+      extraEnv: {
+        NO_COLOR: "1",
+        ...extraEnv,
+      },
     });
-
-    const stdout = stdoutBuffer.getContentsAsString() || "";
-    const stderr = stderrBuffer.getContentsAsString() || "";
-    const output = outputBuffer.getContentsAsString() || "";
-
-    this.verifiedLastRunError = false;
-
-    this.lastRun = {
-      stdout,
-      stderr,
-      output,
-      exitCode,
-    };
   }
 
-  async runDiagnostics(this: IWorld, extraArgs = [], extraEnv = {}) {
-    const child = childProcess.spawn(
-      "node",
-      [
+  runDiagnostics(this: IWorld, extraArgs = [], extraEnv = {}) {
+    return this.runCommand({
+      cmd: "node",
+      args: [
         path.join(projectPath, bin["cypress-cucumber-diagnostics"]),
         ...extraArgs,
       ],
-      {
-        stdio: ["ignore", "pipe", "pipe"],
-        cwd: this.tmpDir,
-        env: {
-          ...process.env,
-          ...extraEnv,
-        },
-      }
-    );
+      extraEnv,
+    });
+  }
+
+  async runCommand(
+    this: IWorld,
+    {
+      cmd,
+      args = [],
+      extraEnv = {},
+    }: { cmd: string; args: string[]; extraEnv: Record<string, string> }
+  ) {
+    const child = childProcess.spawn(cmd, args, {
+      stdio: ["ignore", "pipe", "pipe"],
+      cwd: this.tmpDir,
+      env: {
+        ...process.env,
+        ...extraEnv,
+      },
+    });
 
     const combined = combine(child.stdout, child.stderr);
 
