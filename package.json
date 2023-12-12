@@ -22,7 +22,8 @@
   "bin": {
     "cypress-cucumber-diagnostics": "dist/bin/diagnostics.js",
     "cucumber-html-formatter": "dist/bin/cucumber-html-formatter.js",
-    "cucumber-json-formatter": "dist/bin/cucumber-json-formatter.js"
+    "cucumber-json-formatter": "dist/bin/cucumber-json-formatter.js",
+    "cucumber-merge-messages": "dist/bin/cucumber-merge-messages.js"
   },
   "main": "dist/entrypoint-node.js",
   "types": "dist/entrypoint-node.d.ts",

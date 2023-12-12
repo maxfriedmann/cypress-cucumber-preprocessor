@@ -70,6 +70,22 @@ export default class CustomWorld implements ICustomWorld {
     });
   }
 
+  runMergeMessages({
+    extraArgs = [],
+    extraEnv = {},
+    expectedExitCode,
+  }: ExtraOptions) {
+    return this.runCommand({
+      cmd: "node",
+      args: [
+        path.join(projectPath, bin["cucumber-merge-messages"]),
+        ...extraArgs,
+      ],
+      extraEnv,
+      expectedExitCode,
+    });
+  }
+
   async runCommand({
     cmd,
     args = [],

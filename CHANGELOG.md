@@ -22,6 +22,10 @@ Other changes:
 
 - The above-mentioned `onAfterStep` hook, is now invoked with a bunch of relevant data, relates to [#1089](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1089).
 
+- Add a tool for [merging messages reports](docs/merging-reports.md), fixes [#1137](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1137).
+
+  - This is first and foremost created to support merging related reports obtained through parallelization using Cypress Cloud.
+
 ## v19.2.0
 
 - Add order option to all hooks, fixes [#481](https://github.com/badeball/cypress-cucumber-preprocessor/issues/481).

@@ -19,4 +19,6 @@ export default interface ICustomWorld {
   runCypress(options?: ExtraOptions): Promise<void>;
 
   runDiagnostics(options?: ExtraOptions): Promise<void>;
+
+  runMergeMessages(options?: ExtraOptions): Promise<void>;
 }

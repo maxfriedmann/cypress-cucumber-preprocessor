@@ -1,8 +1,11 @@
+import fs from "fs/promises";
 import util from "util";
+import path from "path";
 import { When, Then } from "@cucumber/cucumber";
 import assert from "assert";
 import childProcess from "child_process";
 import stripAnsi from "strip-ansi";
+import * as glob from "glob";
 import ICustomWorld from "../support/ICustomWorld";
 import { assertAndReturn } from "../support/helpers";
 
@@ -20,6 +23,18 @@ function execAsync(
   });
 }
 
+async function parseArgs(unparsedArgs: string): Promise<string[]> {
+  // Use user's preferred shell to split args.
+  const { stdout } = await execAsync(
+    `node -p "JSON.stringify(process.argv)" -- ${unparsedArgs}`
+  );
+
+  // Drop 1st arg, which is the path of node.
+  const [, ...extraArgs] = JSON.parse(stdout);
+
+  return extraArgs;
+}
+
 When(
   "I run cypress",
   { timeout: 60 * 1000 },
@@ -32,15 +47,22 @@ When(
   "I run cypress with {string}",
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld, unparsedArgs) {
-    // Use user's preferred shell to split args.
-    const { stdout } = await execAsync(
-      `node -p "JSON.stringify(process.argv)" -- ${unparsedArgs}`
-    );
+    await this.runCypress({ extraArgs: await parseArgs(unparsedArgs) });
+  }
+);
 
-    // Drop 1st arg, which is the path of node.
-    const [, ...extraArgs] = JSON.parse(stdout);
-
-    await this.runCypress({ extraArgs });
+When(
+  "I run cypress with {string} \\(expecting exit code {int})",
+  { timeout: 60 * 1000 },
+  async function (
+    this: ICustomWorld,
+    unparsedArgs: string,
+    expectedExitCode: number
+  ) {
+    await this.runCypress({
+      extraArgs: await parseArgs(unparsedArgs),
+      expectedExitCode,
+    });
   }
 );
 
@@ -57,6 +79,25 @@ When(
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld) {
     await this.runDiagnostics();
+  }
+);
+
+When(
+  "I merge the messages reports",
+  { timeout: 60 * 1000 },
+  async function (this: ICustomWorld) {
+    const extraArgs = (
+      await glob.glob("*.ndjson", { cwd: this.tmpDir })
+    ).sort();
+
+    await this.runMergeMessages({
+      extraArgs,
+      expectedExitCode: 0,
+    });
+
+    const absoluteFilePath = path.join(this.tmpDir, "cucumber-messages.ndjson");
+
+    await fs.writeFile(absoluteFilePath, expectLastRun(this).output);
   }
 );
 

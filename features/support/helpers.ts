@@ -14,3 +14,94 @@ export function assertAndReturn<T>(
   assert(value, msg);
   return value;
 }
+
+function isObject(object: any): object is object {
+  return typeof object === "object" && object != null;
+}
+
+// eslint-disable-next-line @typescript-eslint/ban-types
+function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+  obj: X,
+  prop: Y
+): obj is X & Record<Y, unknown> {
+  return Object.prototype.hasOwnProperty.call(obj, prop);
+}
+
+function* traverseTree(object: any): Generator<object, void, any> {
+  if (!isObject(object)) {
+    throw new Error(`Expected object, got ${typeof object}`);
+  }
+
+  yield object;
+
+  for (const property of Object.values(object)) {
+    if (isObject(property)) {
+      yield* traverseTree(property);
+    }
+  }
+}
+
+export function prepareMessagesReport(messages: any) {
+  const idProperties = [
+    "id",
+    "hookId",
+    "testStepId",
+    "testCaseId",
+    "testCaseStartedId",
+    "pickleId",
+    "pickleStepId",
+  ] as const;
+
+  const idCollectionProperties = ["astNodeIds", "stepDefinitionIds"] as const;
+
+  for (const message of messages) {
+    for (const node of traverseTree(message)) {
+      if (hasOwnProperty(node, "duration")) {
+        node.duration = 0;
+      }
+
+      if (hasOwnProperty(node, "timestamp")) {
+        node.timestamp = {
+          seconds: 0,
+          nanos: 0,
+        };
+      }
+
+      if (hasOwnProperty(node, "uri") && typeof node.uri === "string") {
+        node.uri = node.uri.replace(/\\/g, "/");
+      }
+
+      if (hasOwnProperty(node, "meta")) {
+        node.meta = "meta";
+      }
+
+      for (const idProperty of idProperties) {
+        if (hasOwnProperty(node, idProperty)) {
+          node[idProperty] = "id";
+        }
+      }
+
+      for (const idCollectionProperty of idCollectionProperties) {
+        if (hasOwnProperty(node, idCollectionProperty)) {
+          node[idCollectionProperty] = (node[idCollectionProperty] as any).map(
+            () => "id"
+          );
+        }
+      }
+    }
+  }
+
+  return messages;
+}
+
+export function stringToNdJson(content: string) {
+  return content
+    .toString()
+    .trim()
+    .split("\n")
+    .map((line: any) => JSON.parse(line));
+}
+
+export function ndJsonToString(ndjson: any) {
+  return ndjson.map((o: any) => JSON.stringify(o)).join("\n") + "\n";
+}
