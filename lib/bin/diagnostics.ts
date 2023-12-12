@@ -3,5 +3,8 @@
 import { execute } from "../diagnostics";
 
 execute({ argv: process.argv, env: process.env, cwd: process.cwd() }).catch(
-  console.error
+  (err) => {
+    console.error(err.stack);
+    process.exitCode = 1;
+  }
 );
