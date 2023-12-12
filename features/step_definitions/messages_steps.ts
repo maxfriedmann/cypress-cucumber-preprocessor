@@ -6,6 +6,7 @@ import assert from "assert";
 import { toByteArray } from "base64-js";
 import { PNG } from "pngjs";
 import { assertAndReturn } from "../support/helpers";
+import ICustomWorld from "../support/ICustomWorld";
 
 function isObject(object: any): object is object {
   return typeof object === "object" && object != null;
@@ -121,7 +122,7 @@ function notEmpty<TValue>(value: TValue | null | undefined): value is TValue {
 
 Then(
   "the messages should only contain a single {string} and a single {string}",
-  async function (a, b) {
+  async function (this: ICustomWorld, a, b) {
     const absoluteMessagesPath = path.join(
       this.tmpDir,
       "cucumber-messages.ndjson"
@@ -146,7 +147,7 @@ Then(
   }
 );
 
-Then("there should be a messages report", async function () {
+Then("there should be a messages report", async function (this: ICustomWorld) {
   await assert.doesNotReject(
     () => fs.access(path.join(this.tmpDir, "cucumber-messages.ndjson")),
     "Expected there to be a messages file"
@@ -155,7 +156,7 @@ Then("there should be a messages report", async function () {
 
 Then(
   "there should be a messages similar to {string}",
-  async function (fixturePath) {
+  async function (this: ICustomWorld, fixturePath) {
     const ndjson = await readMessagesReport(this.tmpDir);
 
     const absoluteExpectedJsonpath = path.join(
@@ -178,7 +179,7 @@ Then(
 
 Then(
   "the messages report should contain an image attachment for what appears to be a screenshot",
-  async function () {
+  async function (this: ICustomWorld) {
     const messages = await readMessagesReport(this.tmpDir);
 
     const attachments: messages.Attachment[] = messages
@@ -222,21 +223,24 @@ Then(
   }
 );
 
-Then("the messages report shouldn't contain any specs", async function () {
-  const messages = await readMessagesReport(this.tmpDir);
+Then(
+  "the messages report shouldn't contain any specs",
+  async function (this: ICustomWorld) {
+    const messages = await readMessagesReport(this.tmpDir);
 
-  for (const message of messages) {
-    if (message.gherkinDocument) {
-      throw new Error(
-        `Expected to find no specs, but found a gherkin document`
-      );
+    for (const message of messages) {
+      if (message.gherkinDocument) {
+        throw new Error(
+          `Expected to find no specs, but found a gherkin document`
+        );
+      }
     }
   }
-});
+);
 
 Then(
   "the message report should contain a non-zero duration of the step",
-  async function () {
+  async function (this: ICustomWorld) {
     const messages = await readMessagesReport(this.tmpDir, {
       normalize: false,
     });
@@ -274,7 +278,7 @@ Then(
 
 Then(
   "the message report should contain a hook named {string}",
-  async function (name) {
+  async function (this: ICustomWorld, name) {
     const messages = await readMessagesReport(this.tmpDir);
 
     const hook = assertAndReturn(

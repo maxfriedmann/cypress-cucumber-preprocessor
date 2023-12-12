@@ -2,10 +2,11 @@ import assert from "assert";
 import { Given } from "@cucumber/cucumber";
 import path from "path";
 import { writeFile } from "../support/helpers";
+import ICustomWorld from "../support/ICustomWorld";
 
 Given(
   "two {string} hooks, last with order: {string}, asserting {string} execution",
-  async function (hookType, orderOption, expectedOrder) {
+  async function (this: ICustomWorld, hookType, orderOption, expectedOrder) {
     const availableHooks = [
       "Before",
       "After",

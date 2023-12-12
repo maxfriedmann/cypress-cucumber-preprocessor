@@ -1,9 +1,10 @@
-import { setWorldConstructor, IWorld } from "@cucumber/cucumber";
+import { setWorldConstructor } from "@cucumber/cucumber";
 import path from "path";
 import childProcess from "child_process";
 import { PassThrough, Readable } from "stream";
 import { WritableStreamBuffer } from "stream-buffers";
 import { bin } from "../../package.json";
+import ICustomWorld from "./ICustomWorld";
 
 const projectPath = path.join(__dirname, "..", "..");
 
@@ -20,8 +21,19 @@ function combine(...streams: Readable[]) {
   }, new PassThrough());
 }
 
-class World {
-  runCypress(this: IWorld, extraArgs = [], extraEnv = {}) {
+export default class CustomWorld implements ICustomWorld {
+  tmpDir!: string;
+  verifiedLastRunError: boolean | undefined;
+  lastRun:
+    | {
+        stdout: string;
+        stderr: string;
+        output: string;
+        exitCode: number;
+      }
+    | undefined;
+
+  runCypress(extraArgs: string[] = [], extraEnv: Record<string, string> = {}) {
     return this.runCommand({
       cmd: path.join(
         projectPath,
@@ -37,7 +49,10 @@ class World {
     });
   }
 
-  runDiagnostics(this: IWorld, extraArgs = [], extraEnv = {}) {
+  runDiagnostics(
+    extraArgs: string[] = [],
+    extraEnv: Record<string, string> = {}
+  ) {
     return this.runCommand({
       cmd: "node",
       args: [
@@ -48,14 +63,15 @@ class World {
     });
   }
 
-  async runCommand(
-    this: IWorld,
-    {
-      cmd,
-      args = [],
-      extraEnv = {},
-    }: { cmd: string; args: string[]; extraEnv: Record<string, string> }
-  ) {
+  async runCommand({
+    cmd,
+    args = [],
+    extraEnv = {},
+  }: {
+    cmd: string;
+    args: string[];
+    extraEnv: Record<string, string>;
+  }) {
     const child = childProcess.spawn(cmd, args, {
       stdio: ["ignore", "pipe", "pipe"],
       cwd: this.tmpDir,
@@ -95,4 +111,4 @@ class World {
   }
 }
 
-setWorldConstructor(World);
+setWorldConstructor(CustomWorld);

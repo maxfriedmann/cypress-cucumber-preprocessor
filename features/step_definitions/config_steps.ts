@@ -2,6 +2,7 @@ import { Given } from "@cucumber/cucumber";
 import path from "path";
 import { promises as fs } from "fs";
 import { insertValuesInConfigFile } from "../support/configFileUpdater";
+import ICustomWorld from "../support/ICustomWorld";
 
 async function updateJsonConfiguration(
   absoluteConfigPath: string,
@@ -24,18 +25,24 @@ async function updateJsonConfiguration(
   );
 }
 
-Given("additional preprocessor configuration", async function (jsonContent) {
-  const absoluteConfigPath = path.join(
-    this.tmpDir,
-    ".cypress-cucumber-preprocessorrc"
-  );
+Given(
+  "additional preprocessor configuration",
+  async function (this: ICustomWorld, jsonContent) {
+    const absoluteConfigPath = path.join(
+      this.tmpDir,
+      ".cypress-cucumber-preprocessorrc"
+    );
 
-  await updateJsonConfiguration(absoluteConfigPath, JSON.parse(jsonContent));
-});
+    await updateJsonConfiguration(absoluteConfigPath, JSON.parse(jsonContent));
+  }
+);
 
-Given("additional Cypress configuration", async function (jsonContent) {
-  await insertValuesInConfigFile(
-    path.join(this.tmpDir, "cypress.config.js"),
-    JSON.parse(jsonContent)
-  );
-});
+Given(
+  "additional Cypress configuration",
+  async function (this: ICustomWorld, jsonContent) {
+    await insertValuesInConfigFile(
+      path.join(this.tmpDir, "cypress.config.js"),
+      JSON.parse(jsonContent)
+    );
+  }
+);

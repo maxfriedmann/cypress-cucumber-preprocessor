@@ -3,6 +3,7 @@ import path from "path";
 import { promises as fs } from "fs";
 import assert from "assert";
 import { PNG } from "pngjs";
+import ICustomWorld from "../support/ICustomWorld";
 
 function isObject(object: any): object is object {
   return typeof object === "object" && object != null;
@@ -42,7 +43,7 @@ function prepareJsonReport(tree: any) {
   return tree;
 }
 
-Then("there should be no JSON output", async function () {
+Then("there should be no JSON output", async function (this: ICustomWorld) {
   await assert.rejects(
     () => fs.readFile(path.join(this.tmpDir, "cucumber-report.json")),
     {
@@ -54,7 +55,7 @@ Then("there should be no JSON output", async function () {
 
 Then(
   "there should be a JSON output similar to {string}",
-  async function (fixturePath) {
+  async function (this: ICustomWorld, fixturePath) {
     const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
     const json = await fs.readFile(absolutejsonPath);
@@ -83,7 +84,7 @@ Then(
 
 Then(
   "the JSON report should contain an image attachment for what appears to be a screenshot",
-  async function () {
+  async function (this: ICustomWorld) {
     const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
     const jsonFile = await fs.readFile(absolutejsonPath);
@@ -135,7 +136,7 @@ Then(
 
 Then(
   "there should be two attachments containing false and true, respectively",
-  async function () {
+  async function (this: ICustomWorld) {
     const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
     const jsonFile = await fs.readFile(absolutejsonPath);
@@ -172,7 +173,7 @@ Then(
 
 Then(
   "there should be one attachment containing {string}",
-  async function (content) {
+  async function (this: ICustomWorld, content) {
     const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
     const jsonFile = await fs.readFile(absolutejsonPath);
@@ -198,46 +199,55 @@ Then(
   }
 );
 
-Then("the JSON report should contain a spec", async function () {
-  const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
+Then(
+  "the JSON report should contain a spec",
+  async function (this: ICustomWorld) {
+    const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
-  const jsonFile = await fs.readFile(absolutejsonPath);
+    const jsonFile = await fs.readFile(absolutejsonPath);
 
-  const actualJsonOutput = JSON.parse(jsonFile.toString());
+    const actualJsonOutput = JSON.parse(jsonFile.toString());
 
-  if (actualJsonOutput.length !== 1) {
-    throw new Error(
-      `Expected to find a single spec, but found ${actualJsonOutput.length}`
-    );
+    if (actualJsonOutput.length !== 1) {
+      throw new Error(
+        `Expected to find a single spec, but found ${actualJsonOutput.length}`
+      );
+    }
   }
-});
+);
 
-Then("the JSON report shouldn't contain any specs", async function () {
-  const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
+Then(
+  "the JSON report shouldn't contain any specs",
+  async function (this: ICustomWorld) {
+    const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
-  const jsonFile = await fs.readFile(absolutejsonPath);
+    const jsonFile = await fs.readFile(absolutejsonPath);
 
-  const actualJsonOutput = JSON.parse(jsonFile.toString());
+    const actualJsonOutput = JSON.parse(jsonFile.toString());
 
-  if (actualJsonOutput.length > 0) {
-    throw new Error(
-      `Expected to find zero specs, but found ${actualJsonOutput.length}`
-    );
+    if (actualJsonOutput.length > 0) {
+      throw new Error(
+        `Expected to find zero specs, but found ${actualJsonOutput.length}`
+      );
+    }
   }
-});
+);
 
-Then("the JSON report should contain {int} tests", async function (n: number) {
-  const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
+Then(
+  "the JSON report should contain {int} tests",
+  async function (this: ICustomWorld, n: number) {
+    const absolutejsonPath = path.join(this.tmpDir, "cucumber-report.json");
 
-  const jsonFile = await fs.readFile(absolutejsonPath);
+    const jsonFile = await fs.readFile(absolutejsonPath);
 
-  const actualJsonOutput = JSON.parse(jsonFile.toString());
+    const actualJsonOutput = JSON.parse(jsonFile.toString());
 
-  const elements = actualJsonOutput.flatMap((spec: any) => spec.elements);
+    const elements = actualJsonOutput.flatMap((spec: any) => spec.elements);
 
-  if (elements.length !== n) {
-    throw new Error(
-      `Expected to find ${n} tests, but found ${elements.length}`
-    );
+    if (elements.length !== n) {
+      throw new Error(
+        `Expected to find ${n} tests, but found ${elements.length}`
+      );
+    }
   }
-});
+);
