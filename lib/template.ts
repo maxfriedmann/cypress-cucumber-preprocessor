@@ -141,8 +141,7 @@ export async function compile(
     data,
     gherkinDocument,
     pickles,
-    preprocessor.pretty.enabled,
-    preprocessor.messages.enabled,
+    preprocessor.isTrackingState,
     preprocessor.omitFiltered,
     {
       stepDefinitions,

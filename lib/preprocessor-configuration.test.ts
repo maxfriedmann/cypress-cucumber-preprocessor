@@ -9,6 +9,7 @@ import {
   COMPILED_REPORTER_ENTRYPOINT,
   FilterSpecsMixedMode,
   IBaseUserConfiguration,
+  ICypressRuntimeConfiguration,
   IPreprocessorConfiguration,
   IUserConfiguration,
   resolve,
@@ -30,7 +31,7 @@ async function test<T>(options: {
   testingType: TestingType;
   environment: Record<string, unknown>;
   configuration: IUserConfiguration;
-  cypressConfiguration?: Partial<ICypressConfiguration>;
+  cypressConfiguration?: Partial<ICypressRuntimeConfiguration>;
   expectedValue: T;
   getValueFn: GetValueFn<T>;
 }) {
@@ -467,38 +468,6 @@ describe("resolve()", () => {
             getValueFn,
             setValueFn,
           });
-
-          it("overriden by json.enabled", () =>
-            test({
-              testingType,
-              getValueFn,
-              environment: {},
-              configuration: {
-                messages: {
-                  enabled: false,
-                },
-                json: {
-                  enabled: true,
-                },
-              },
-              expectedValue: true,
-            }));
-
-          it("overriden by html.enabled", () =>
-            test({
-              testingType,
-              getValueFn,
-              environment: {},
-              configuration: {
-                messages: {
-                  enabled: false,
-                },
-                html: {
-                  enabled: true,
-                },
-              },
-              expectedValue: true,
-            }));
         });
 
         describe("output", () => {
@@ -783,6 +752,195 @@ describe("resolve()", () => {
           environmentKey: "omitFiltered",
           getValueFn,
           setValueFn,
+        });
+      });
+
+      describe("isTrackingState", () => {
+        const getValueFn = (
+          configuration: IPreprocessorConfiguration
+        ): boolean => configuration.isTrackingState;
+
+        context("with isTextTerminal = true", () => {
+          const cypressConfiguration = { isTextTerminal: true };
+
+          it("default", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {},
+              cypressConfiguration,
+              expectedValue: false,
+            }));
+
+          it("enabled by messages.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                messages: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: true,
+            }));
+
+          it("enabled by json.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                json: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: true,
+            }));
+
+          it("enabled by html.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                html: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: true,
+            }));
+
+          it("enabled by pretty.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                pretty: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: true,
+            }));
+
+          it("enabled by pretty-reporter", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {},
+              cypressConfiguration: {
+                ...cypressConfiguration,
+                reporter: "/foo/bar/" + COMPILED_REPORTER_ENTRYPOINT,
+              },
+              expectedValue: true,
+            }));
+
+          it("enabled despite !messages.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                messages: {
+                  enabled: false,
+                },
+                json: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: true,
+            }));
+        });
+
+        context("with isTextTerminal = false", () => {
+          const cypressConfiguration = { isTextTerminal: false };
+
+          it("default", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {},
+              cypressConfiguration,
+              expectedValue: false,
+            }));
+
+          it("disabled despite messages.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                messages: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: false,
+            }));
+
+          it("disabled despite json.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                json: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: false,
+            }));
+
+          it("disabled despite html.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                html: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: false,
+            }));
+
+          it("disabled despite pretty.enabled", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {
+                pretty: {
+                  enabled: true,
+                },
+              },
+              cypressConfiguration,
+              expectedValue: false,
+            }));
+
+          it("disabled despite pretty-reporter", () =>
+            test({
+              testingType,
+              getValueFn,
+              environment: {},
+              configuration: {},
+              cypressConfiguration: {
+                ...cypressConfiguration,
+                reporter: "/foo/bar/" + COMPILED_REPORTER_ENTRYPOINT,
+              },
+              expectedValue: false,
+            }));
         });
       });
     });

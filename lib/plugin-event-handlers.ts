@@ -167,13 +167,9 @@ const createStateError = (stateHandler: string, currentState: State["state"]) =>
 export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
   debug("beforeRunHandler()");
 
-  if (!config.isTextTerminal) {
-    return;
-  }
-
   const preprocessor = await resolve(config, config.env, "/");
 
-  if (!preprocessor.messages.enabled) {
+  if (!preprocessor.isTrackingState) {
     return;
   }
 
@@ -224,17 +220,9 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
 export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
   debug("afterRunHandler()");
 
-  if (!config.isTextTerminal) {
-    return;
-  }
-
   const preprocessor = await resolve(config, config.env, "/");
 
-  if (
-    !preprocessor.messages.enabled &&
-    !preprocessor.json.enabled &&
-    !preprocessor.html.enabled
-  ) {
+  if (!preprocessor.isTrackingState) {
     return;
   }
 
@@ -249,7 +237,11 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
     return;
   }
 
-  if (preprocessor.messages.enabled) {
+  if (
+    preprocessor.messages.enabled ||
+    preprocessor.json.enabled ||
+    preprocessor.html.enabled
+  ) {
     const testRunFinished: messages.Envelope = {
       testRunFinished: {
         /**
@@ -324,13 +316,13 @@ export async function beforeSpecHandler(
 ) {
   debug("beforeSpecHandler()");
 
-  if (!config.isTextTerminal || !isFeature(spec)) {
+  if (!isFeature(spec)) {
     return;
   }
 
   const preprocessor = await resolve(config, config.env, "/");
 
-  if (!preprocessor.messages.enabled && !preprocessor.pretty.enabled) {
+  if (!preprocessor.isTrackingState) {
     return;
   }
 
@@ -381,7 +373,7 @@ export async function afterSpecHandler(
 ) {
   debug("afterSpecHandler()");
 
-  if (!config.isTextTerminal || !isFeature(spec)) {
+  if (!isFeature(spec)) {
     return;
   }
 
@@ -392,8 +384,13 @@ export async function afterSpecHandler(
     preprocessor.messages.output
   );
 
+  const reportingEnabled =
+    preprocessor.messages.enabled ||
+    preprocessor.json.enabled ||
+    preprocessor.html.enabled;
+
   // `results` is undefined when running via `cypress open`.
-  if (preprocessor.messages.enabled && results) {
+  if (reportingEnabled && results) {
     const wasRemainingSkipped = results.tests.some((test) =>
       test.displayError?.match(HOOK_FAILURE_EXPR)
     );
@@ -431,13 +428,9 @@ export async function afterScreenshotHandler(
 ) {
   debug("afterScreenshotHandler()");
 
-  if (!config.isTextTerminal) {
-    return details;
-  }
-
   const preprocessor = await resolve(config, config.env, "/");
 
-  if (!preprocessor.messages.enabled) {
+  if (!preprocessor.isTrackingState) {
     return details;
   }
 
@@ -477,10 +470,6 @@ export async function specEnvelopesHandler(
   data: ITaskSpecEnvelopes
 ) {
   debug("specEnvelopesHandler()");
-
-  if (!config.isTextTerminal) {
-    return true;
-  }
 
   switch (state.state) {
     case "before-spec":
@@ -557,10 +546,6 @@ export function testCaseStartedHandler(
 ) {
   debug("testCaseStartedHandler()");
 
-  if (!config.isTextTerminal) {
-    return true;
-  }
-
   switch (state.state) {
     case "received-envelopes":
     case "test-finished":
@@ -590,10 +575,6 @@ export function testStepStartedHandler(
   data: ITaskTestStepStarted
 ) {
   debug("testStepStartedHandler()");
-
-  if (!config.isTextTerminal) {
-    return true;
-  }
 
   switch (state.state) {
     case "test-started":
@@ -638,10 +619,6 @@ export async function testStepFinishedHandler(
   testStepFinished: ITaskTestStepFinished
 ) {
   debug("testStepFinishedHandler()");
-
-  if (!config.isTextTerminal) {
-    return true;
-  }
 
   switch (state.state) {
     case "step-started":
@@ -766,10 +743,6 @@ export function testCaseFinishedHandler(
 ) {
   debug("testCaseFinishedHandler()");
 
-  if (!config.isTextTerminal) {
-    return true;
-  }
-
   switch (state.state) {
     case "test-started":
     case "step-finished":
@@ -799,13 +772,9 @@ export async function createStringAttachmentHandler(
 ) {
   debug("createStringAttachmentHandler()");
 
-  if (!config.isTextTerminal) {
-    return true;
-  }
-
   const preprocessor = await resolve(config, config.env, "/");
 
-  if (!preprocessor.messages.enabled) {
+  if (!preprocessor.isTrackingState) {
     return true;
   }
 

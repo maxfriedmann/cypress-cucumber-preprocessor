@@ -398,6 +398,10 @@ function stringToMaybeBoolean(value: string): boolean | undefined {
   }
 }
 
+export type ICypressRuntimeConfiguration = ICypressConfiguration & {
+  isTextTerminal?: boolean;
+};
+
 export type FilterSpecsMixedMode = "hide" | "show" | "empty-set";
 
 interface IEnvironmentOverrides {
@@ -462,6 +466,7 @@ export interface IPreprocessorConfiguration {
   readonly filterSpecs: boolean;
   readonly omitFiltered: boolean;
   readonly implicitIntegrationFolder: string;
+  readonly isTrackingState: boolean;
 }
 
 const DEFAULT_STEP_DEFINITIONS = [
@@ -476,7 +481,7 @@ export const COMPILED_REPORTER_ENTRYPOINT =
 export function combineIntoConfiguration(
   configuration: IUserConfiguration,
   overrides: IEnvironmentOverrides,
-  cypress: ICypressConfiguration,
+  cypress: ICypressRuntimeConfiguration,
   implicitIntegrationFolder: string
 ): IPreprocessorConfiguration {
   const defaultStepDefinitions = DEFAULT_STEP_DEFINITIONS.map((pattern) =>
@@ -523,12 +528,10 @@ export function combineIntoConfiguration(
 
   const messages: IPreprocessorConfiguration["messages"] = {
     enabled:
-      json.enabled ||
-      html.enabled ||
-      (overrides.messagesEnabled ??
-        specific?.messages?.enabled ??
-        unspecific.messages?.enabled ??
-        false),
+      overrides.messagesEnabled ??
+      specific?.messages?.enabled ??
+      unspecific.messages?.enabled ??
+      false,
     output:
       overrides.messagesOutput ??
       specific?.messages?.output ??
@@ -536,12 +539,22 @@ export function combineIntoConfiguration(
       "cucumber-messages.ndjson",
   };
 
+  const usingPrettyReporter = cypress.reporter.endsWith(
+    COMPILED_REPORTER_ENTRYPOINT
+  );
+
+  if (usingPrettyReporter) {
+    debug(
+      "detected use of @badeball/cypress-cucumber-preprocessor/pretty-reporter, enabling pretty output"
+    );
+  }
+
   const pretty: IPreprocessorConfiguration["pretty"] = {
     enabled:
       overrides.prettyEnabled ??
       specific?.pretty?.enabled ??
       unspecific.pretty?.enabled ??
-      false,
+      usingPrettyReporter,
   };
 
   const filterSpecsMixedMode: IPreprocessorConfiguration["filterSpecsMixedMode"] =
@@ -562,6 +575,14 @@ export function combineIntoConfiguration(
     unspecific.omitFiltered ??
     false;
 
+  const isTrackingState =
+    (cypress.isTextTerminal ?? false) &&
+    (messages.enabled ||
+      json.enabled ||
+      html.enabled ||
+      pretty.enabled ||
+      usingPrettyReporter);
+
   return {
     stepDefinitions,
     messages,
@@ -572,6 +593,7 @@ export function combineIntoConfiguration(
     filterSpecs,
     omitFiltered,
     implicitIntegrationFolder,
+    isTrackingState,
   };
 }
 
@@ -588,7 +610,7 @@ export type ConfigurationFileResolver = (
 ) => unknown | Promise<unknown>;
 
 export async function resolve(
-  cypressConfig: ICypressConfiguration,
+  cypressConfig: ICypressRuntimeConfiguration,
   environment: Record<string, unknown>,
   implicitIntegrationFolder: string,
   configurationFileResolver: ConfigurationFileResolver = cosmiconfigResolver
@@ -621,14 +643,6 @@ export async function resolve(
     cypressConfig,
     implicitIntegrationFolder
   );
-
-  if (cypressConfig.reporter.endsWith(COMPILED_REPORTER_ENTRYPOINT)) {
-    debug(
-      "detected use of @badeball/cypress-cucumber-preprocessor/pretty-reporter, enabling pretty output"
-    );
-
-    configuration.pretty.enabled = true;
-  }
 
   debug(`resolved configuration ${util.inspect(configuration)}`);
 

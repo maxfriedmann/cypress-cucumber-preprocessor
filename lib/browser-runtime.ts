@@ -79,8 +79,7 @@ interface CompositionContext {
   specEnvelopes: messages.Envelope[];
   testFilter: Node;
   omitFiltered: boolean;
-  prettyEnabled: boolean;
-  messagesEnabled: boolean;
+  isTrackingState: boolean;
   stepDefinitionHints: {
     stepDefinitions: string | string[];
     stepDefinitionPatterns: string[];
@@ -131,12 +130,8 @@ function retrieveInternalSuiteProperties():
   return Cypress.env(INTERNAL_SUITE_PROPERTIES);
 }
 
-function shouldPropagateMessages(context: CompositionContext) {
-  return context.prettyEnabled || context.messagesEnabled;
-}
-
 function taskSpecEnvelopes(context: CompositionContext) {
-  if (shouldPropagateMessages(context)) {
+  if (context.isTrackingState) {
     cy.task(
       TASK_SPEC_ENVELOPES,
       { messages: context.specEnvelopes } satisfies ITaskSpecEnvelopes,
@@ -151,7 +146,7 @@ function taskTestCaseStarted(
   context: CompositionContext,
   testCaseStarted: messages.TestCaseStarted
 ) {
-  if (shouldPropagateMessages(context)) {
+  if (context.isTrackingState) {
     cy.task(
       TASK_TEST_CASE_STARTED,
       testCaseStarted satisfies ITaskTestCaseStarted,
@@ -166,7 +161,7 @@ function taskTestCaseFinished(
   context: CompositionContext,
   testCasefinished: messages.TestCaseFinished
 ) {
-  if (shouldPropagateMessages(context)) {
+  if (context.isTrackingState) {
     cy.task(
       TASK_TEST_CASE_FINISHED,
       testCasefinished satisfies ITaskTestCaseFinished,
@@ -181,7 +176,7 @@ function taskTestStepStarted(
   context: CompositionContext,
   testStepStarted: messages.TestStepStarted
 ) {
-  if (shouldPropagateMessages(context)) {
+  if (context.isTrackingState) {
     cy.task(
       TASK_TEST_STEP_STARTED,
       testStepStarted satisfies ITaskTestStepStarted,
@@ -196,7 +191,7 @@ function taskTestStepFinished(
   context: CompositionContext,
   testStepfinished: messages.TestStepFinished
 ) {
-  if (shouldPropagateMessages(context)) {
+  if (context.isTrackingState) {
     cy.task(
       TASK_TEST_STEP_FINISHED,
       testStepfinished satisfies ITaskTestStepFinished,
@@ -1006,8 +1001,7 @@ export default function createTests(
   source: string,
   gherkinDocument: messages.GherkinDocument,
   pickles: messages.Pickle[],
-  prettyEnabled: boolean,
-  messagesEnabled: boolean,
+  isTrackingState: boolean,
   omitFiltered: boolean,
   stepDefinitionHints: {
     stepDefinitions: string | string[];
@@ -1151,8 +1145,7 @@ export default function createTests(
     specEnvelopes,
     testFilter,
     omitFiltered,
-    prettyEnabled,
-    messagesEnabled,
+    isTrackingState,
     stepDefinitionHints,
   };
 
