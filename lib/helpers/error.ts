@@ -1,4 +1,5 @@
-const homepage = "https://github.com/badeball/cypress-cucumber-preprocessor";
+export const homepage =
+  "https://github.com/badeball/cypress-cucumber-preprocessor";
 
 export class CypressCucumberError extends Error {}
 

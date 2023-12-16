@@ -41,7 +41,7 @@ import { memoize } from "./helpers/memoize";
 
 import debug from "./helpers/debug";
 
-import { createError } from "./helpers/error";
+import { CypressCucumberError, createError, homepage } from "./helpers/error";
 
 import { assert, assertAndReturn, assertIsString } from "./helpers/assertions";
 
@@ -158,6 +158,11 @@ const createPrettyStream = () => {
 
   return stream.compose(line, indent, log);
 };
+
+const createStateError = (stateHandler: string, currentState: State["state"]) =>
+  new CypressCucumberError(
+    `Unexpected state in ${stateHandler}: ${currentState}. This almost always means that you or some other plugin, are overwriting this plugin's event handlers. For more information & workarounds, see https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md (if neither workaround work, please report at ${homepage})`
+  );
 
 export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
   debug("beforeRunHandler()");
@@ -365,9 +370,7 @@ export async function beforeSpecHandler(
     case "step-started":
       break;
     default:
-      throw createError(
-        "Unexpected state in beforeSpecHandler: " + state.state
-      );
+      throw createStateError("beforeSpecHandler", state.state);
   }
 }
 
@@ -530,9 +533,7 @@ export async function specEnvelopesHandler(
       }
       return true;
     default:
-      throw createError(
-        "Unexpected state in specEnvelopesHandler: " + state.state
-      );
+      throw createStateError("specEnvelopesHandler", state.state);
   }
 
   if (state.pretty.enabled) {
@@ -565,9 +566,7 @@ export function testCaseStartedHandler(
     case "test-finished":
       break;
     default:
-      throw createError(
-        "Unexpected state in testCaseStartedHandler: " + state.state
-      );
+      throw createStateError("testCaseStartedHandler", state.state);
   }
 
   if (state.pretty.enabled) {
@@ -604,9 +603,7 @@ export function testStepStartedHandler(
     case "step-started":
       break;
     default:
-      throw createError(
-        "Unexpected state in testStepStartedHandler: " + state.state
-      );
+      throw createStateError("testStepStartedHandler", state.state);
   }
 
   if (state.pretty.enabled) {
@@ -650,9 +647,7 @@ export async function testStepFinishedHandler(
     case "step-started":
       break;
     default:
-      throw createError(
-        "Unexpected state in testStepFinishedHandler: " + state.state
-      );
+      throw createStateError("testStepFinishedHandler", state.state);
   }
 
   if (state.pretty.enabled) {
@@ -780,9 +775,7 @@ export function testCaseFinishedHandler(
     case "step-finished":
       break;
     default:
-      throw createError(
-        "Unexpected state in testCaseFinishedHandler: " + state.state
-      );
+      throw createStateError("testCaseFinishedHandler", state.state);
   }
 
   if (state.pretty.enabled) {
@@ -820,9 +813,7 @@ export async function createStringAttachmentHandler(
     case "step-started":
       break;
     default:
-      throw createError(
-        "Unexpected state in createStringAttachmentHandler: " + state.state
-      );
+      throw createStateError("createStringAttachmentHandler", state.state);
   }
 
   const message: messages.Envelope = {
