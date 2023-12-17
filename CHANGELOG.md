@@ -14,6 +14,8 @@ Breaking changes:
 
   - This is now easily determined by using other properties, as reflected in the docs.
 
+- Messages reports are no longer implicitly enabled and written to disk when enabling JSON or HTML reports, fixes [#1140](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1140).
+
 Other changes:
 
 - Emit meta information (lib version, node version, os, ci) in meesage reports, fixes [#1133](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1133).

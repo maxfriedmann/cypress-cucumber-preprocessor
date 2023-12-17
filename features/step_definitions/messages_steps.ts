@@ -61,6 +61,16 @@ Then(
   }
 );
 
+Then("there should be no messages report", async function (this: ICustomWorld) {
+  await assert.rejects(
+    () => fs.readFile(path.join(this.tmpDir, "cucumber-messages.ndjson")),
+    {
+      code: "ENOENT",
+    },
+    "Expected there to be no messages report"
+  );
+});
+
 Then("there should be a messages report", async function (this: ICustomWorld) {
   await assert.doesNotReject(
     () => fs.access(path.join(this.tmpDir, "cucumber-messages.ndjson")),

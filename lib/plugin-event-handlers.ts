@@ -1,4 +1,4 @@
-import syncFs, { promises as fs, constants as fsConstants } from "fs";
+import syncFs, { promises as fs } from "fs";
 
 import os from "os";
 
@@ -11,8 +11,6 @@ import stream from "stream";
 import { EventEmitter } from "events";
 
 import chalk from "chalk";
-
-import { NdjsonToMessageStream } from "@cucumber/message-streams";
 
 import * as messages from "@cucumber/messages";
 
@@ -73,32 +71,51 @@ interface PrettyEnabled {
 
 type PrettyState = PrettyDisabled | PrettyEnabled;
 
-interface StateInitial {
-  state: "initial";
+interface StateUninitialized {
+  state: "uninitialized";
+}
+
+interface StateBeforeRun {
+  state: "before-run";
+  messages: {
+    accumulation: messages.Envelope[];
+  };
 }
 
 interface StateBeforeSpec {
   state: "before-spec";
   pretty: PrettyState;
+  messages: {
+    accumulation: messages.Envelope[];
+  };
 }
 
 interface StateReceivedSpecEnvelopes {
   state: "received-envelopes";
   pretty: PrettyState;
-  messages: messages.Envelope[];
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
 }
 
 interface StateTestStarted {
   state: "test-started";
   pretty: PrettyState;
-  messages: messages.Envelope[];
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
   testCaseStartedId: string;
 }
 
 interface StateStepStarted {
   state: "step-started";
   pretty: PrettyState;
-  messages: messages.Envelope[];
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
   testCaseStartedId: string;
   testStepStartedId: string;
 }
@@ -106,32 +123,50 @@ interface StateStepStarted {
 interface StateStepFinished {
   state: "step-finished";
   pretty: PrettyState;
-  messages: messages.Envelope[];
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
   testCaseStartedId: string;
 }
 
 interface StateTestFinished {
   state: "test-finished";
   pretty: PrettyState;
-  messages: messages.Envelope[];
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
 }
 
 interface StateAfterSpec {
   state: "after-spec";
+  messages: {
+    accumulation: messages.Envelope[];
+  };
+}
+
+interface StateAfterRun {
+  state: "after-run";
+  messages: {
+    accumulation: messages.Envelope[];
+  };
 }
 
 type State =
-  | StateInitial
+  | StateUninitialized
+  | StateBeforeRun
   | StateBeforeSpec
   | StateReceivedSpecEnvelopes
   | StateTestStarted
   | StateStepStarted
   | StateStepFinished
   | StateTestFinished
-  | StateAfterSpec;
+  | StateAfterSpec
+  | StateAfterRun;
 
 let state: State = {
-  state: "initial",
+  state: "uninitialized",
 };
 
 const isFeature = (spec: Cypress.Spec) => spec.name.endsWith(".feature");
@@ -173,12 +208,12 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
     return;
   }
 
-  const messagesPath = ensureIsAbsolute(
-    config.projectRoot,
-    preprocessor.messages.output
-  );
-
-  await fs.rm(messagesPath, { force: true });
+  switch (state.state) {
+    case "uninitialized":
+      break;
+    default:
+      throw createError("Unexpected state in beforeRunHandler: " + state.state);
+  }
 
   // Copied from https://github.com/cucumber/cucumber-js/blob/v10.0.1/src/cli/helpers.ts#L104-L122.
   const meta: messages.Envelope = {
@@ -209,12 +244,12 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
     },
   };
 
-  await fs.mkdir(path.dirname(messagesPath), { recursive: true });
-
-  await fs.writeFile(
-    messagesPath,
-    JSON.stringify(meta) + "\n" + JSON.stringify(testRunStarted) + "\n"
-  );
+  state = {
+    state: "before-run",
+    messages: {
+      accumulation: [meta, testRunStarted],
+    },
+  };
 }
 
 export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
@@ -226,35 +261,45 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
     return;
   }
 
-  const messagesPath = ensureIsAbsolute(
-    config.projectRoot,
-    preprocessor.messages.output
-  );
-
-  try {
-    await fs.access(messagesPath, fsConstants.F_OK);
-  } catch {
-    return;
+  switch (state.state) {
+    case "after-spec": // This is the normal case.
+    case "before-run": // This can happen when running only non-feature specs.
+      break;
+    default:
+      throw createError("Unexpected state in afterRunHandler: " + state.state);
   }
 
-  if (
-    preprocessor.messages.enabled ||
-    preprocessor.json.enabled ||
-    preprocessor.html.enabled
-  ) {
-    const testRunFinished: messages.Envelope = {
-      testRunFinished: {
-        /**
-         * We're missing a "success" attribute here, but cucumber-js doesn't output it, so I won't.
-         * Mostly because I don't want to look into the semantics of it right now.
-         */
-        timestamp: createTimestamp(),
-      } as messages.TestRunFinished,
-    };
+  const testRunFinished: messages.Envelope = {
+    testRunFinished: {
+      /**
+       * We're missing a "success" attribute here, but cucumber-js doesn't output it, so I won't.
+       * Mostly because I don't want to look into the semantics of it right now.
+       */
+      timestamp: createTimestamp(),
+    } as messages.TestRunFinished,
+  };
 
-    await fs.writeFile(messagesPath, JSON.stringify(testRunFinished) + "\n", {
-      flag: "a",
-    });
+  state = {
+    state: "after-run",
+    messages: {
+      accumulation: state.messages.accumulation.concat(testRunFinished),
+    },
+  };
+
+  if (preprocessor.messages.enabled) {
+    const messagesPath = ensureIsAbsolute(
+      config.projectRoot,
+      preprocessor.messages.output
+    );
+
+    await fs.mkdir(path.dirname(messagesPath), { recursive: true });
+
+    await fs.writeFile(
+      messagesPath,
+      state.messages.accumulation
+        .map((message) => JSON.stringify(message))
+        .join("\n") + "\n"
+    );
   }
 
   if (preprocessor.json.enabled) {
@@ -265,19 +310,16 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
 
     await fs.mkdir(path.dirname(jsonPath), { recursive: true });
 
-    const messages = (await fs.readFile(messagesPath))
-      .toString()
-      .trim()
-      .split("\n")
-      .map((line) => JSON.parse(line));
-
     let jsonOutput: string | undefined;
 
-    const eventBroadcaster = createJsonFormatter(messages, (chunk) => {
-      jsonOutput = chunk;
-    });
+    const eventBroadcaster = createJsonFormatter(
+      state.messages.accumulation,
+      (chunk) => {
+        jsonOutput = chunk;
+      }
+    );
 
-    for (const message of messages) {
+    for (const message of state.messages.accumulation) {
       eventBroadcaster.emit("envelope", message);
     }
 
@@ -297,13 +339,10 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
 
     await fs.mkdir(path.dirname(htmlPath), { recursive: true });
 
-    const input = syncFs.createReadStream(messagesPath);
-
     const output = syncFs.createWriteStream(htmlPath);
 
     await pipeline(
-      input,
-      new NdjsonToMessageStream(),
+      stream.Readable.from(state.messages.accumulation),
       createHtmlStream(),
       output
     );
@@ -327,7 +366,7 @@ export async function beforeSpecHandler(
   }
 
   switch (state.state) {
-    case "initial":
+    case "before-run":
     case "after-spec":
       {
         if (preprocessor.pretty.enabled) {
@@ -344,6 +383,7 @@ export async function beforeSpecHandler(
               broadcaster: eventBroadcaster,
               writable,
             },
+            messages: state.messages,
           };
         } else {
           state = {
@@ -351,6 +391,7 @@ export async function beforeSpecHandler(
             pretty: {
               enabled: false,
             },
+            messages: state.messages,
           };
         }
       }
@@ -379,47 +420,64 @@ export async function afterSpecHandler(
 
   const preprocessor = await resolve(config, config.env, "/");
 
-  const messagesPath = ensureIsAbsolute(
-    config.projectRoot,
-    preprocessor.messages.output
-  );
+  if (!preprocessor.isTrackingState) {
+    return;
+  }
 
-  const reportingEnabled =
-    preprocessor.messages.enabled ||
-    preprocessor.json.enabled ||
-    preprocessor.html.enabled;
-
-  // `results` is undefined when running via `cypress open`.
-  if (reportingEnabled && results) {
-    const wasRemainingSkipped = results.tests.some((test) =>
-      test.displayError?.match(HOOK_FAILURE_EXPR)
-    );
-
-    if (wasRemainingSkipped) {
-      console.log(
-        chalk.yellow(
-          `  Hook failures can't be represented in any reports (messages / json / html), thus none is created for ${spec.relative}.`
-        )
-      );
-    } else if ("messages" in state) {
-      await fs.writeFile(
-        messagesPath,
-        state.messages.map((message) => JSON.stringify(message)).join("\n") +
-          "\n",
-        {
-          flag: "a",
-        }
-      );
-    }
+  switch (state.state) {
+    case "test-finished": // This is the normal case.
+    case "before-spec": // This can happen if a spec doesn't contain any tests.
+    case "received-envelopes": // This can happen in case of a failing beforeEach hook.
+      break;
+    default:
+      throw createError("Unexpected state in afterSpecHandler: " + state.state);
   }
 
   if ("pretty" in state && state.pretty.enabled) {
     await end(state.pretty.writable);
   }
 
-  state = {
-    state: "after-spec",
-  };
+  // `results` is undefined when running via `cypress open`.
+  // However, `isTrackingState` is never true in open-mode, thus this should be defined.
+  assert(results, "Expected results to be defined");
+
+  const wasRemainingSkipped = results.tests.some((test) =>
+    test.displayError?.match(HOOK_FAILURE_EXPR)
+  );
+
+  if (wasRemainingSkipped) {
+    console.log(
+      chalk.yellow(
+        `  Hook failures can't be represented in any reports (messages / json / html), thus none is created for ${spec.relative}.`
+      )
+    );
+
+    state = {
+      state: "after-spec",
+      messages: {
+        accumulation: state.messages.accumulation,
+      },
+    };
+  } else {
+    // IE. the spec didn't contain any tests.
+    if (state.state === "before-spec") {
+      state = {
+        state: "after-spec",
+        messages: {
+          accumulation: state.messages.accumulation,
+        },
+      };
+    } else {
+      state = {
+        state: "after-spec",
+        messages: {
+          accumulation: state.messages.accumulation.concat(
+            state.messages.current
+          ),
+        },
+      };
+    }
+  }
 }
 
 export async function afterScreenshotHandler(
@@ -460,7 +518,7 @@ export async function afterScreenshotHandler(
     },
   };
 
-  state.messages.push(message);
+  state.messages.current.push(message);
 
   return details;
 }
@@ -479,7 +537,7 @@ export async function specEnvelopesHandler(
     // as if nothing happened.
     case "step-started":
       {
-        const iTestCaseStarted = state.messages.findLastIndex(
+        const iTestCaseStarted = state.messages.current.findLastIndex(
           (message) => !!message.testCaseStarted
         );
 
@@ -517,7 +575,10 @@ export async function specEnvelopesHandler(
         state = {
           state: "received-envelopes",
           pretty,
-          messages: state.messages.slice(0, iTestCaseStarted),
+          messages: {
+            accumulation: state.messages.accumulation,
+            current: state.messages.current.slice(0, iTestCaseStarted),
+          },
         };
       }
       return true;
@@ -534,7 +595,10 @@ export async function specEnvelopesHandler(
   state = {
     state: "received-envelopes",
     pretty: state.pretty,
-    messages: data.messages,
+    messages: {
+      accumulation: state.messages.accumulation,
+      current: data.messages,
+    },
   };
 
   return true;
@@ -563,7 +627,10 @@ export function testCaseStartedHandler(
   state = {
     state: "test-started",
     pretty: state.pretty,
-    messages: state.messages.concat({ testCaseStarted: data }),
+    messages: {
+      accumulation: state.messages.accumulation,
+      current: state.messages.current.concat({ testCaseStarted: data }),
+    },
     testCaseStartedId: data.id,
   };
 
@@ -596,7 +663,10 @@ export function testStepStartedHandler(
   state = {
     state: "step-started",
     pretty: state.pretty,
-    messages: state.messages.concat({ testStepStarted: data }),
+    messages: {
+      accumulation: state.messages.accumulation,
+      current: state.messages.current.concat({ testStepStarted: data }),
+    },
     testCaseStartedId: state.testCaseStartedId,
     testStepStartedId: data.testStepId,
   };
@@ -636,7 +706,7 @@ export async function testStepFinishedHandler(
   const { testCaseStartedId, testStepId } = testStepFinished;
 
   const { testCaseId: pickleId } = assertAndReturn(
-    state.messages
+    state.messages.current
       .map((message) => message.testCaseStarted)
       .filter(notNull)
       .find((testCaseStarted) => testCaseStarted.id === testCaseStartedId),
@@ -644,7 +714,7 @@ export async function testStepFinishedHandler(
   );
 
   const testCase = assertAndReturn(
-    state.messages
+    state.messages.current
       .map((message) => message.testCase)
       .filter(notNull)
       .find((testCase) => testCase.id === pickleId),
@@ -658,7 +728,7 @@ export async function testStepFinishedHandler(
 
   if (pickleStepId != null) {
     const pickle = assertAndReturn(
-      state.messages
+      state.messages.current
         .map((message) => message.pickle)
         .filter(notNull)
         .find((pickle) => pickle.id === pickleId),
@@ -671,7 +741,7 @@ export async function testStepFinishedHandler(
     );
 
     const gherkinDocument = assertAndReturn(
-      state.messages
+      state.messages.current
         .map((message) => message.gherkinDocument)
         .filter(notNull)
         .find((gherkinDocument) => gherkinDocument.uri === pickle.uri),
@@ -730,7 +800,10 @@ export async function testStepFinishedHandler(
   state = {
     state: "step-finished",
     pretty: state.pretty,
-    messages: state.messages.concat({ testStepFinished }),
+    messages: {
+      accumulation: state.messages.accumulation,
+      current: state.messages.current.concat({ testStepFinished }),
+    },
     testCaseStartedId: state.testCaseStartedId,
   };
 
@@ -760,7 +833,10 @@ export function testCaseFinishedHandler(
   state = {
     state: "test-finished",
     pretty: state.pretty,
-    messages: state.messages.concat({ testCaseFinished: data }),
+    messages: {
+      accumulation: state.messages.accumulation,
+      current: state.messages.current.concat({ testCaseFinished: data }),
+    },
   };
 
   return true;
@@ -795,7 +871,7 @@ export async function createStringAttachmentHandler(
     },
   };
 
-  state.messages.push(message);
+  state.messages.current.push(message);
 
   return true;
 }
