@@ -32,7 +32,7 @@ Guidelines for bug reports:
 2. **Use the GitHub issue search** &mdash; check if the issue has already been
    reported.
 
-3. **Isolate the problem** &mdash; create a [reduced test
+3. **:bangbang:Isolate the problem:bangbang:** &mdash; create a [reduced test
    case](#reduced-test-case).
 
 4. **Don't exclusively post screenshots** &mdash; screenshots are only allowed
