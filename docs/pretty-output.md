@@ -2,8 +2,6 @@
 
 # Pretty output
 
-> :warning:	This feature is especially experimental, it's subject to change anytime and is not considered under semver.
-
 Pretty output is an alternative Cypress reporter which will print steps as they are executed, like shown below.
 
 <p align="center">

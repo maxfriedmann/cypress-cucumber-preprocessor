@@ -15,8 +15,6 @@ This supports some of the same flags as Cypress, including
 
 The intention here being that whatever flags you use to run `cypress run` can also be consumed by the executable to give appropriate diagnostics.
 
-> :warning:	This feature is especially experimental, it's subject to change anytime and is not considered under semver.
-
 ## Limitations
 
 In order to obtain structured information about step definitions, these files are resolved and evaluated in a Node environment. This environment differs from the normal Cypress environment in that it's not a browser environment and Cypress globals are mocked and imitated to some degree.
