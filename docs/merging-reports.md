@@ -9,19 +9,19 @@
 Different messages reports can be combined into a single messages report using the following executable. This behaves like `cat`, it reads file arguments and outputs a combined report to stdout.
 
 ```
-$ npx cucumber-merge-messages *.ndsjon
+$ npx cucumber-merge-messages *.ndjson
 ```
 
 Alternatively you can redirect the output to a new file.
 
 ```
-$ npx cucumber-merge-messages *.ndsjon > combined-cucumber-messages.ndjson
+$ npx cucumber-merge-messages *.ndjson > combined-cucumber-messages.ndjson
 ```
 
 Only *messages reports* can be merged. JSON and HTML reports are both products of messages and if you require either, then you can use the [JSON formatter](json-formatter.md) or [HTML formatter](html-formatter.md) to create one from the other, like shown below.
 
 ```
-$ npx cucumber-merge-messages *.ndsjon > combined-cucumber-messages.ndjson
+$ npx cucumber-merge-messages *.ndjson > combined-cucumber-messages.ndjson
 $ npx cucumber-json-formatter < combined-cucumber-messages.ndjson > cucumber-report.json
 $ npx cucumber-html-formatter < combined-cucumber-messages.ndjson > cucumber-report.html
 ```
@@ -47,7 +47,7 @@ cypress:
 combine:
   stage: report
   script:
-    - npx cucumber-merge-messages *.ndsjon > cucumber-messages.ndjson
+    - npx cucumber-merge-messages *.ndjson > cucumber-messages.ndjson
     - npx cucumber-json-formatter < cucumber-messages.ndjson > cucumber-report.json
     - npx cucumber-html-formatter < cucumber-messages.ndjson > cucumber-report.html
   artifacts:
@@ -56,4 +56,3 @@ combine:
       - cucumber-report.json
       - cucumber-report.html
 ```
-
