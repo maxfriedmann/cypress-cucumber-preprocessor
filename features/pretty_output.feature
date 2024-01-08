@@ -32,6 +32,68 @@ Feature: pretty output
             Given a step
       """
 
+    Scenario: multiple, passing scenarios
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature name
+          Scenario: a scenario name
+            Given a step
+          Scenario: another scenario name
+            Given another step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a/another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature name # cypress/e2e/a.feature:1
+
+          Scenario: a scenario name # cypress/e2e/a.feature:2
+            Given a step
+
+          Scenario: another scenario name # cypress/e2e/a.feature:4
+            Given another step
+      """
+
+    Scenario: multiple, passing features
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature name
+          Scenario: a scenario name
+            Given a step
+        """
+      Given a file named "cypress/e2e/b.feature" with:
+        """
+        Feature: another feature name
+          Scenario: another scenario name
+            Given another step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a/another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature name # cypress/e2e/a.feature:1
+
+          Scenario: a scenario name # cypress/e2e/a.feature:2
+            Given a step
+      """
+      And the output should contain
+      """
+        Feature: another feature name # cypress/e2e/b.feature:1
+
+          Scenario: another scenario name # cypress/e2e/b.feature:2
+            Given another step
+      """
+
     Scenario: scenario with rule
       Given a file named "cypress/e2e/a.feature" with:
         """
