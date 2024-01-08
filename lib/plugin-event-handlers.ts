@@ -77,6 +77,7 @@ interface StateUninitialized {
 
 interface StateBeforeRun {
   state: "before-run";
+  pretty: PrettyState;
   messages: {
     accumulation: messages.Envelope[];
   };
@@ -141,6 +142,7 @@ interface StateTestFinished {
 
 interface StateAfterSpec {
   state: "after-spec";
+  pretty: PrettyState;
   messages: {
     accumulation: messages.Envelope[];
   };
@@ -244,8 +246,29 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
     },
   };
 
+  let pretty: PrettyState;
+
+  if (preprocessor.pretty.enabled) {
+    const writable = createPrettyStream();
+
+    const eventBroadcaster = createPrettyFormatter(useColors(), (chunk) =>
+      writable.write(chunk)
+    );
+
+    pretty = {
+      enabled: true,
+      broadcaster: eventBroadcaster,
+      writable,
+    };
+  } else {
+    pretty = {
+      enabled: false,
+    };
+  }
+
   state = {
     state: "before-run",
+    pretty,
     messages: {
       accumulation: [meta, testRunStarted],
     },
@@ -278,6 +301,10 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
       timestamp: createTimestamp(),
     } as messages.TestRunFinished,
   };
+
+  if (state.pretty.enabled) {
+    await end(state.pretty.writable);
+  }
 
   state = {
     state: "after-run",
@@ -368,33 +395,11 @@ export async function beforeSpecHandler(
   switch (state.state) {
     case "before-run":
     case "after-spec":
-      {
-        if (preprocessor.pretty.enabled) {
-          const writable = createPrettyStream();
-
-          const eventBroadcaster = createPrettyFormatter(useColors(), (chunk) =>
-            writable.write(chunk)
-          );
-
-          state = {
-            state: "before-spec",
-            pretty: {
-              enabled: true,
-              broadcaster: eventBroadcaster,
-              writable,
-            },
-            messages: state.messages,
-          };
-        } else {
-          state = {
-            state: "before-spec",
-            pretty: {
-              enabled: false,
-            },
-            messages: state.messages,
-          };
-        }
-      }
+      state = {
+        state: "before-spec",
+        pretty: state.pretty,
+        messages: state.messages,
+      };
       break;
     // This happens in case of visting a new domain, ref. https://github.com/cypress-io/cypress/issues/26300.
     // In this case, we want to disgard messages obtained in the current test and allow execution to continue
@@ -433,10 +438,6 @@ export async function afterSpecHandler(
       throw createError("Unexpected state in afterSpecHandler: " + state.state);
   }
 
-  if ("pretty" in state && state.pretty.enabled) {
-    await end(state.pretty.writable);
-  }
-
   // `results` is undefined when running via `cypress open`.
   // However, `isTrackingState` is never true in open-mode, thus this should be defined.
   assert(results, "Expected results to be defined");
@@ -454,22 +455,26 @@ export async function afterSpecHandler(
 
     state = {
       state: "after-spec",
+      pretty: state.pretty,
       messages: {
         accumulation: state.messages.accumulation,
       },
     };
   } else {
-    // IE. the spec didn't contain any tests.
     if (state.state === "before-spec") {
+      // IE. the spec didn't contain any tests.
       state = {
         state: "after-spec",
+        pretty: state.pretty,
         messages: {
           accumulation: state.messages.accumulation,
         },
       };
     } else {
+      // The spec did contain tests.
       state = {
         state: "after-spec",
+        pretty: state.pretty,
         messages: {
           accumulation: state.messages.accumulation.concat(
             state.messages.current
