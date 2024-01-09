@@ -491,3 +491,117 @@ Feature: JSON formatter
         Hook failures can't be represented in any reports (messages / json / html), thus none is created for cypress/e2e/a.feature.
         """
       And the JSON report shouldn't contain any specs
+
+  @network
+  Rule: it should handle reloads gracefully in a multitude of scenarios
+
+    Background:
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario
+            Given a step
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario
+            Given another step
+        """
+
+    Scenario: base case
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a JSON output similar to "fixtures/multiple-scenarios-reloaded.json"
+
+    Scenario: reloading within steps
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        Given("a step", function() {
+          cy.visit("https://duckduckgo.com/");
+        });
+
+        Given("another step", function() {
+          cy.visit("https://google.com/");
+        });
+        """
+      When I run cypress
+      Then it passes
+      And there should be a JSON output similar to "fixtures/multiple-scenarios-reloaded.json"
+
+    Scenario: reloading in before()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        before(() => {
+          cy.visit("https://duckduckgo.com/");
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a JSON output similar to "fixtures/multiple-scenarios-reloaded.json"
+
+    Scenario: reloading in after()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        after(() => {
+          cy.visit("https://duckduckgo.com/");
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a JSON output similar to "fixtures/multiple-scenarios-reloaded.json"
+
+    Scenario: reloading in beforeEach()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        beforeEach(() => {
+          cy.visit(Cypress.env("origin"));
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a JSON output similar to "fixtures/multiple-scenarios-reloaded.json"
+
+    Scenario: reloading in afterEach()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        afterEach(() => {
+          cy.visit(Cypress.env("origin"));
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a JSON output similar to "fixtures/multiple-scenarios-reloaded.json"

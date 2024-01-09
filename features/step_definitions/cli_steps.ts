@@ -228,14 +228,21 @@ Then(
   }
 );
 
+const normalizeOutput = (world: ICustomWorld) =>
+  stripAnsi(expectLastRun(world).stdout)
+    .replaceAll("\\", "/")
+    .replaceAll("×", "✖");
+
 Then("the output should contain", function (this: ICustomWorld, content) {
-  assert.match(
-    stripAnsi(expectLastRun(this).stdout)
-      .replaceAll("\\", "/")
-      .replaceAll("×", "✖"),
-    new RegExp(rescape(content))
-  );
+  assert.match(normalizeOutput(this), new RegExp(rescape(content)));
 });
+
+Then(
+  "the output should not contain {string}",
+  function (this: ICustomWorld, content) {
+    assert.doesNotMatch(normalizeOutput(this), new RegExp(rescape(content)));
+  }
+);
 
 Then(
   "it should appear to have skipped the scenario {string}",

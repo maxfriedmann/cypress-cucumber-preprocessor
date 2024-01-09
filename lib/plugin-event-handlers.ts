@@ -155,6 +155,25 @@ interface StateAfterRun {
   };
 }
 
+interface StateHasReloaded {
+  state: "has-reloaded";
+  pretty: PrettyState;
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
+}
+
+interface StateHasReloadedAndReceivedSpecEnvelopes {
+  state: "has-reloaded-received-envelopes";
+  pretty: PrettyState;
+  specEnvelopes: messages.Envelope[];
+  messages: {
+    accumulation: messages.Envelope[];
+    current: messages.Envelope[];
+  };
+}
+
 type State =
   | StateUninitialized
   | StateBeforeRun
@@ -165,7 +184,9 @@ type State =
   | StateStepFinished
   | StateTestFinished
   | StateAfterSpec
-  | StateAfterRun;
+  | StateAfterRun
+  | StateHasReloaded
+  | StateHasReloadedAndReceivedSpecEnvelopes;
 
 let state: State = {
   state: "uninitialized",
@@ -177,7 +198,7 @@ const end = (stream: stream.Writable) =>
   new Promise<void>((resolve) => stream.end(resolve));
 
 const createPrettyStream = () => {
-  const line = split();
+  const line = split(null, null, { trailing: false });
 
   const indent = new stream.Transform({
     objectMode: true,
@@ -392,6 +413,27 @@ export async function beforeSpecHandler(
     return;
   }
 
+  /**
+   * Ideally this would only run when current state is either "before-run" or "after-spec". However,
+   * reload-behavior means that this is not necessarily true. Reloading can occur in the following
+   * scenarios:
+   *
+   * - before()
+   * - beforeEach()
+   * - in a step
+   * - afterEach()
+   * - after()
+   *
+   * If it happens in the three latter scenarios, the current / previous test will be re-run by
+   * Cypress under a new domain. In these cases, messages associated with the latest test will have
+   * to be discarded and a "Reloading.." message will appear *if* pretty output is enabled. If that
+   * is the case, then the pretty reporter instance will also have re-instantiated and primed with
+   * envelopes associated with the current spec.
+   *
+   * To make matters worse, it's impossible in this handler to determine of a reload occurs due to
+   * a beforeEach hook or an afterEach hook. In the latter case, messages must be discarded. This is
+   * however not true for the former case.
+   */
   switch (state.state) {
     case "before-run":
     case "after-spec":
@@ -401,11 +443,18 @@ export async function beforeSpecHandler(
         messages: state.messages,
       };
       break;
-    // This happens in case of visting a new domain, ref. https://github.com/cypress-io/cypress/issues/26300.
-    // In this case, we want to disgard messages obtained in the current test and allow execution to continue
-    // as if nothing happened.
+    // This will be the case for reloads occuring in a before(), in which case we do nothing,
+    // because "received-envelopes" would anyway be the next natural state.
     case "before-spec":
-    case "step-started":
+      break;
+    case "received-envelopes": // This will be the case for reloading occuring in a beforeEach().
+    case "step-started": // This will be the case for reloading occuring in a step.
+    case "test-finished": // This will be the case for reloading occuring in any after-ish hook (and possibly beforeEach).
+      state = {
+        state: "has-reloaded",
+        pretty: state.pretty,
+        messages: state.messages,
+      };
       break;
     default:
       throw createStateError("beforeSpecHandler", state.state);
@@ -537,55 +586,14 @@ export async function specEnvelopesHandler(
   switch (state.state) {
     case "before-spec":
       break;
-    // This happens in case of visting a new domain, ref. https://github.com/cypress-io/cypress/issues/26300.
-    // In this case, we want to disgard messages obtained in the current test and allow execution to continue
-    // as if nothing happened.
-    case "step-started":
-      {
-        const iTestCaseStarted = state.messages.current.findLastIndex(
-          (message) => !!message.testCaseStarted
-        );
+    case "has-reloaded":
+      state = {
+        state: "has-reloaded-received-envelopes",
+        specEnvelopes: data.messages,
+        pretty: state.pretty,
+        messages: state.messages,
+      };
 
-        if (iTestCaseStarted === -1) {
-          throw createError("Expected to find a testCaseStarted envelope");
-        }
-
-        let pretty: PrettyState;
-
-        if (state.pretty.enabled) {
-          await end(state.pretty.writable);
-
-          console.log("  Reloading..");
-          console.log();
-
-          const writable = createPrettyStream();
-
-          const eventBroadcaster = createPrettyFormatter(useColors(), (chunk) =>
-            writable.write(chunk)
-          );
-
-          for (const message of data.messages) {
-            eventBroadcaster.emit("envelope", message);
-          }
-
-          pretty = {
-            enabled: true,
-            writable,
-            broadcaster: eventBroadcaster,
-          };
-        } else {
-          pretty = state.pretty;
-        }
-
-        state = {
-          state: "received-envelopes",
-          pretty,
-          messages: {
-            accumulation: state.messages.accumulation,
-            current: state.messages.current.slice(0, iTestCaseStarted),
-          },
-        };
-      }
       return true;
     default:
       throw createStateError("specEnvelopesHandler", state.state);
@@ -609,7 +617,7 @@ export async function specEnvelopesHandler(
   return true;
 }
 
-export function testCaseStartedHandler(
+export async function testCaseStartedHandler(
   config: Cypress.PluginConfigOptions,
   data: ITaskTestCaseStarted
 ) {
@@ -618,6 +626,58 @@ export function testCaseStartedHandler(
   switch (state.state) {
     case "received-envelopes":
     case "test-finished":
+      break;
+    case "has-reloaded-received-envelopes":
+      {
+        const iLastTestCaseStarted = state.messages.current.findLastIndex(
+          (message) => message.testCaseStarted
+        );
+
+        const lastTestCaseStarted =
+          iLastTestCaseStarted > -1
+            ? state.messages.current[iLastTestCaseStarted]
+            : undefined;
+
+        // A test is being re-run.
+        if (lastTestCaseStarted?.testCaseStarted!.id === data.id) {
+          if (state.pretty.enabled) {
+            await end(state.pretty.writable);
+
+            // Reloading occurred right within a step, so we output an extra newline.
+            if (
+              state.messages.current[state.messages.current.length - 1]
+                .testStepStarted != null
+            ) {
+              console.log();
+            }
+
+            console.log("  Reloading..");
+            console.log();
+
+            const writable = createPrettyStream();
+
+            const broadcaster = createPrettyFormatter(useColors(), (chunk) =>
+              writable.write(chunk)
+            );
+
+            for (const message of state.specEnvelopes) {
+              broadcaster.emit("envelope", message);
+            }
+
+            state.pretty = {
+              enabled: true,
+              writable,
+              broadcaster,
+            };
+          }
+
+          // Discard messages of previous test, which is being re-run.
+          state.messages.current = state.messages.current.slice(
+            0,
+            iLastTestCaseStarted
+          );
+        }
+      }
       break;
     default:
       throw createStateError("testCaseStartedHandler", state.state);

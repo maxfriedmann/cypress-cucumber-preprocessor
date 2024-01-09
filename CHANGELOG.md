@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Handle more corner cases related to reload-behavior, fixes [#1142](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1142).
+
 ## v20.0.0
 
 Breaking changes:

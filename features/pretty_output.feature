@@ -437,3 +437,205 @@ Feature: pretty output
           Scenario: a scenario # cypress/e2e/a.feature:2
             Given a step
       """
+
+  @network
+  Rule: it should handle reloads gracefully in a multitude of scenarios
+
+    Reloading occurs when visiting or configuring baseUrl to a new domain, either different from the
+    preconfigured value or because no value was configured to begin with. This forces Cypress to
+    reload the window, re-fire before:spec event and re-run the current test.
+
+    Background:
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario
+            Given a step
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario
+            Given another step
+        """
+
+    Scenario: base case
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario # cypress/e2e/a.feature:3
+            Given a step
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+      """
+
+    Scenario: reloading within steps
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        Given("a step", function() {
+          cy.visit("https://duckduckgo.com/");
+        });
+
+        Given("another step", function() {
+          cy.visit("https://google.com/");
+        });
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario # cypress/e2e/a.feature:3
+            Given a step
+
+        Reloading..
+
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario # cypress/e2e/a.feature:3
+            Given a step
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+
+        Reloading..
+
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+      """
+
+    Scenario: reloading in before()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        before(() => {
+          cy.visit("https://duckduckgo.com/");
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should not contain "Reloading.."
+
+    Scenario: reloading in after()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        after(() => {
+          cy.visit("https://duckduckgo.com/");
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario # cypress/e2e/a.feature:3
+            Given a step
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+
+        Reloading..
+
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+      """
+
+    Scenario: reloading in beforeEach()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        beforeEach(() => {
+          cy.visit(Cypress.env("origin"));
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should not contain "Reloading.."
+
+    Scenario: reloading in afterEach()
+      Given a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+
+        afterEach(() => {
+          cy.visit(Cypress.env("origin"));
+        });
+
+        Given("a step", function() {});
+
+        Given("another step", function() {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario # cypress/e2e/a.feature:3
+            Given a step
+
+        Reloading..
+
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://duckduckgo.com/")
+          Scenario: a scenario # cypress/e2e/a.feature:3
+            Given a step
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+
+        Reloading..
+
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @env(origin="https://google.com/")
+          Scenario: another scenario # cypress/e2e/a.feature:7
+            Given another step
+      """

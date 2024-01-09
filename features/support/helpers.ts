@@ -50,6 +50,7 @@ export function prepareMessagesReport(messages: any) {
     "testCaseStartedId",
     "pickleId",
     "pickleStepId",
+    "astNodeId",
   ] as const;
 
   const idCollectionProperties = ["astNodeIds", "stepDefinitionIds"] as const;
