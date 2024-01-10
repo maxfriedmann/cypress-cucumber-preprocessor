@@ -82,8 +82,6 @@ Then(
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const actual = parseInt(dd.textContent!, 10);
 
-    console.log({ actual });
-
     assert.equal(actual, n);
   }
 );
