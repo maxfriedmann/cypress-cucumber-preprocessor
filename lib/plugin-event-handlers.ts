@@ -86,6 +86,7 @@ interface StateBeforeRun {
 interface StateBeforeSpec {
   state: "before-spec";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
   };
@@ -94,6 +95,7 @@ interface StateBeforeSpec {
 interface StateReceivedSpecEnvelopes {
   state: "received-envelopes";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
     current: messages.Envelope[];
@@ -103,6 +105,7 @@ interface StateReceivedSpecEnvelopes {
 interface StateTestStarted {
   state: "test-started";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
     current: messages.Envelope[];
@@ -113,6 +116,7 @@ interface StateTestStarted {
 interface StateStepStarted {
   state: "step-started";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
     current: messages.Envelope[];
@@ -124,6 +128,7 @@ interface StateStepStarted {
 interface StateStepFinished {
   state: "step-finished";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
     current: messages.Envelope[];
@@ -134,6 +139,7 @@ interface StateStepFinished {
 interface StateTestFinished {
   state: "test-finished";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
     current: messages.Envelope[];
@@ -158,6 +164,7 @@ interface StateAfterRun {
 interface StateHasReloaded {
   state: "has-reloaded";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   messages: {
     accumulation: messages.Envelope[];
     current: messages.Envelope[];
@@ -167,6 +174,7 @@ interface StateHasReloaded {
 interface StateHasReloadedAndReceivedSpecEnvelopes {
   state: "has-reloaded-received-envelopes";
   pretty: PrettyState;
+  spec: Cypress.Spec;
   specEnvelopes: messages.Envelope[];
   messages: {
     accumulation: messages.Envelope[];
@@ -439,23 +447,33 @@ export async function beforeSpecHandler(
     case "after-spec":
       state = {
         state: "before-spec",
+        spec,
         pretty: state.pretty,
         messages: state.messages,
       };
-      break;
-    // This will be the case for reloads occuring in a before(), in which case we do nothing,
-    // because "received-envelopes" would anyway be the next natural state.
-    case "before-spec":
-      break;
+      return;
+  }
+
+  // This will be the case for reloads occuring in a before(), in which case we do nothing,
+  // because "received-envelopes" would anyway be the next natural state.
+  if (state.state === "before-spec") {
+    return;
+  }
+
+  switch (state.state) {
     case "received-envelopes": // This will be the case for reloading occuring in a beforeEach().
     case "step-started": // This will be the case for reloading occuring in a step.
     case "test-finished": // This will be the case for reloading occuring in any after-ish hook (and possibly beforeEach).
-      state = {
-        state: "has-reloaded",
-        pretty: state.pretty,
-        messages: state.messages,
-      };
-      break;
+      if (state.spec.relative === spec.relative) {
+        state = {
+          state: "has-reloaded",
+          spec: spec,
+          pretty: state.pretty,
+          messages: state.messages,
+        };
+        return;
+      }
+    // eslint-disable-next-line no-fallthrough
     default:
       throw createStateError("beforeSpecHandler", state.state);
   }
@@ -589,6 +607,7 @@ export async function specEnvelopesHandler(
     case "has-reloaded":
       state = {
         state: "has-reloaded-received-envelopes",
+        spec: state.spec,
         specEnvelopes: data.messages,
         pretty: state.pretty,
         messages: state.messages,
@@ -607,6 +626,7 @@ export async function specEnvelopesHandler(
 
   state = {
     state: "received-envelopes",
+    spec: state.spec,
     pretty: state.pretty,
     messages: {
       accumulation: state.messages.accumulation,
@@ -691,6 +711,7 @@ export async function testCaseStartedHandler(
 
   state = {
     state: "test-started",
+    spec: state.spec,
     pretty: state.pretty,
     messages: {
       accumulation: state.messages.accumulation,
@@ -727,6 +748,7 @@ export function testStepStartedHandler(
 
   state = {
     state: "step-started",
+    spec: state.spec,
     pretty: state.pretty,
     messages: {
       accumulation: state.messages.accumulation,
@@ -864,6 +886,7 @@ export async function testStepFinishedHandler(
 
   state = {
     state: "step-finished",
+    spec: state.spec,
     pretty: state.pretty,
     messages: {
       accumulation: state.messages.accumulation,
@@ -897,6 +920,7 @@ export function testCaseFinishedHandler(
 
   state = {
     state: "test-finished",
+    spec: state.spec,
     pretty: state.pretty,
     messages: {
       accumulation: state.messages.accumulation,
