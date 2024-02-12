@@ -738,7 +738,7 @@ function shouldSkipPickle(testFilter: Node, pickle: messages.Pickle) {
 function beforeHandler(this: Mocha.Context, context: CompositionContext) {
   if (!retrieveInternalSuiteProperties()?.isEventHandlersAttached) {
     fail(
-      "Missing preprocessor event handlers (this usually means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)"
+      "Missing preprocessor event handlers (this usally means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)"
     );
   }
 
