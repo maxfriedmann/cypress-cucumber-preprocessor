@@ -34,19 +34,20 @@ import {
   HOOK_FAILURE_EXPR,
   INTERNAL_SPEC_PROPERTIES,
   INTERNAL_SUITE_PROPERTIES,
+  SUITE_CONFIGURATION_OPTIONS,
 } from "./constants";
 
 import {
   ITaskSpecEnvelopes,
-  ITaskTestCaseStarted,
   ITaskTestCaseFinished,
-  ITaskTestStepStarted,
+  ITaskTestCaseStarted,
   ITaskTestStepFinished,
+  ITaskTestStepStarted,
   TASK_SPEC_ENVELOPES,
-  TASK_TEST_CASE_STARTED,
   TASK_TEST_CASE_FINISHED,
-  TASK_TEST_STEP_STARTED,
+  TASK_TEST_CASE_STARTED,
   TASK_TEST_STEP_FINISHED,
+  TASK_TEST_STEP_STARTED,
 } from "./cypress-task-definitions";
 
 import { notNull } from "./helpers/type-guards";
@@ -286,7 +287,17 @@ function createStepDescription({
 }
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
-  describe(feature.name || "<unamed feature>", () => {
+  const suiteOptions = collectTagNames(feature.tags)
+    .filter(looksLikeOptions)
+    .map(tagToCypressOptions)
+    .filter((tag) => {
+      return Object.keys(tag).every((key) =>
+        SUITE_CONFIGURATION_OPTIONS.includes(key)
+      );
+    })
+    .reduce(Object.assign, {});
+
+  describe(feature.name || "<unamed feature>", suiteOptions, () => {
     before(function () {
       beforeHandler.call(this, context);
     });
@@ -423,6 +434,11 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
   const suiteOptions = tags
     .filter(looksLikeOptions)
     .map(tagToCypressOptions)
+    .filter((tag) =>
+      Object.keys(tag).every(
+        (key) => !SUITE_CONFIGURATION_OPTIONS.includes(key)
+      )
+    )
     .reduce(Object.assign, {});
 
   if (suiteOptions.env) {
