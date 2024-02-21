@@ -448,6 +448,92 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
       pickle,
     };
 
+    const onAfterStep = (options: {
+      testStepId: string;
+      start: messages.Timestamp;
+      result: any;
+    }) => {
+      const { testStepId, start, result } = options;
+
+      const end = createTimestamp();
+
+      if (result === "pending" || result === "skipped") {
+        if (result === "pending") {
+          taskTestStepFinished(context, {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.PENDING,
+              duration: duration(start, end),
+            },
+            timestamp: end,
+          });
+        } else {
+          taskTestStepFinished(context, {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.SKIPPED,
+              duration: duration(start, end),
+            },
+            timestamp: end,
+          });
+        }
+
+        remainingSteps.shift();
+
+        for (const skippedStep of remainingSteps) {
+          const hookIdOrPickleStepId = assertAndReturn(
+            skippedStep.hook?.id ?? skippedStep.pickleStep?.id,
+            "Expected a step to either be a hook or a pickleStep"
+          );
+
+          const testStepId = getTestStepId({
+            context,
+            pickleId: pickle.id,
+            hookIdOrPickleStepId,
+          });
+
+          taskTestStepStarted(context, {
+            testStepId,
+            testCaseStartedId,
+            timestamp: createTimestamp(),
+          });
+
+          taskTestStepFinished(context, {
+            testStepId,
+            testCaseStartedId,
+            testStepResult: {
+              status: messages.TestStepResultStatus.SKIPPED,
+              duration: {
+                seconds: 0,
+                nanos: 0,
+              },
+            },
+            timestamp: createTimestamp(),
+          });
+        }
+
+        for (let i = 0, count = remainingSteps.length; i < count; i++) {
+          remainingSteps.pop();
+        }
+
+        cy.then(() => this.skip());
+      } else {
+        taskTestStepFinished(context, {
+          testStepId,
+          testCaseStartedId,
+          testStepResult: {
+            status: messages.TestStepResultStatus.PASSED,
+            duration: duration(start, end),
+          },
+          timestamp: end,
+        });
+
+        remainingSteps.shift();
+      }
+    };
+
     for (const step of steps) {
       if (step.hook) {
         const hook = step.hook;
@@ -480,29 +566,17 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
               testCaseStartedId,
             };
 
-            runStepWithLogGroup({
+            return runStepWithLogGroup({
               fn: () => registry.runCaseHook(this, hook, options),
               keyword: hook.keyword,
               text: createStepDescription(hook),
+            }).then((result) => {
+              return { start, result };
             });
-
-            return cy.wrap(start, { log: false });
           })
-          .then((start) => {
-            const end = createTimestamp();
-
-            taskTestStepFinished(context, {
-              testStepId,
-              testCaseStartedId,
-              testStepResult: {
-                status: messages.TestStepResultStatus.PASSED,
-                duration: duration(start, end),
-              },
-              timestamp: end,
-            });
-
-            remainingSteps.shift();
-          });
+          .then(({ start, result }) =>
+            onAfterStep({ start, result, testStepId })
+          );
       } else if (step.pickleStep) {
         const pickleStep = step.pickleStep;
 
@@ -616,85 +690,9 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
               }
             });
           })
-          .then(({ start, result }) => {
-            const end = createTimestamp();
-
-            if (result === "pending" || result === "skipped") {
-              if (result === "pending") {
-                taskTestStepFinished(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.PENDING,
-                    duration: duration(start, end),
-                  },
-                  timestamp: end,
-                });
-              } else {
-                taskTestStepFinished(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.SKIPPED,
-                    duration: duration(start, end),
-                  },
-                  timestamp: end,
-                });
-              }
-
-              remainingSteps.shift();
-
-              for (const skippedStep of remainingSteps) {
-                const hookIdOrPickleStepId = assertAndReturn(
-                  skippedStep.hook?.id ?? skippedStep.pickleStep?.id,
-                  "Expected a step to either be a hook or a pickleStep"
-                );
-
-                const testStepId = getTestStepId({
-                  context,
-                  pickleId: pickle.id,
-                  hookIdOrPickleStepId,
-                });
-
-                taskTestStepStarted(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  timestamp: createTimestamp(),
-                });
-
-                taskTestStepFinished(context, {
-                  testStepId,
-                  testCaseStartedId,
-                  testStepResult: {
-                    status: messages.TestStepResultStatus.SKIPPED,
-                    duration: {
-                      seconds: 0,
-                      nanos: 0,
-                    },
-                  },
-                  timestamp: createTimestamp(),
-                });
-              }
-
-              for (let i = 0, count = remainingSteps.length; i < count; i++) {
-                remainingSteps.pop();
-              }
-
-              cy.then(() => this.skip());
-            } else {
-              taskTestStepFinished(context, {
-                testStepId,
-                testCaseStartedId,
-                testStepResult: {
-                  status: messages.TestStepResultStatus.PASSED,
-                  duration: duration(start, end),
-                },
-                timestamp: end,
-              });
-
-              remainingSteps.shift();
-            }
-          });
+          .then(({ start, result }) =>
+            onAfterStep({ start, result, testStepId })
+          );
       }
     }
   });
