@@ -12,6 +12,7 @@
 - [Hooks](#hooks)
   - [Run hooks](#run-hooks)
   - [Scenario hooks](#scenario-hooks)
+    - [Pending / skipped scenario hooks](#pending--skipped-scenario-hooks)
   - [Step hooks](#step-hooks)
   - [Hook ordering](#hook-ordering)
   - [Named hooks](#named-hooks)
@@ -187,6 +188,10 @@ Before(function ({ pickle, gherkinDocument, testCaseStartedId }) {
   // Scenario hooks are invoked with an object containing a bunch of relevant data.
 });
 ```
+
+### Pending / skipped scenario hooks
+
+Scenario hooks can be made pending or skipped similarly to steps, as explained above, by returning `"pending"` or `"skipped"`, respectively. Both will halt the execution and Cypress will report the test as "skipped".
 
 ## Step hooks
 
