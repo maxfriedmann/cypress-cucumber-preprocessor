@@ -1,6 +1,7 @@
-import path from "path";
-import { promises as fs } from "fs";
 import assert from "assert";
+import { version as cypressVersion } from "cypress/package.json";
+import { promises as fs } from "fs";
+import path from "path";
 
 export async function writeFile(filePath: string, fileContent: string) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -106,3 +107,11 @@ export function stringToNdJson(content: string) {
 export function ndJsonToString(ndjson: any) {
   return ndjson.map((o: any) => JSON.stringify(o)).join("\n") + "\n";
 }
+
+export function isPost12() {
+  return parseInt(cypressVersion.split(".")[0], 10) >= 12;
+}
+
+export function isPre12() {
+  return !isPost12();
+}	

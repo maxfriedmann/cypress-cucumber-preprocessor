@@ -1,3 +1,4 @@
+@cypress>=12
 Feature: suite only options
   Scenario: suite specific test isolation
     Given additional Cypress configuration

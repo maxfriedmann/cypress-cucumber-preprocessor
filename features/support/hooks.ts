@@ -1,8 +1,8 @@
 import { After, Before, formatterHelpers } from "@cucumber/cucumber";
-import path from "path";
 import assert from "assert";
 import { promises as fs } from "fs";
-import { writeFile } from "./helpers";
+import path from "path";
+import { isPre12, writeFile } from "./helpers";
 
 const projectPath = path.join(__dirname, "..", "..");
 
@@ -93,6 +93,12 @@ Before({ tags: "not @no-default-plugin" }, async function () {
         };
       `
   );
+});
+
+Before({ tags: "@cypress>=12" }, async function () {
+  if (isPre12()) {
+    return "skipped";
+  }
 });
 
 After(function () {
