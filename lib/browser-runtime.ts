@@ -357,7 +357,17 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
     }
   }
 
-  describe(rule.name || "<unamed rule>", () => {
+  const suiteOptions = collectTagNames(rule.tags)
+    .filter(looksLikeOptions)
+    .map(tagToCypressOptions)
+    .filter((tag) => {
+      return Object.keys(tag).every(
+        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+      );
+    })
+    .reduce(Object.assign, {});
+
+  describe(rule.name || "<unamed rule>", suiteOptions, () => {
     if (rule.children) {
       for (const child of rule.children) {
         if (child.scenario) {
