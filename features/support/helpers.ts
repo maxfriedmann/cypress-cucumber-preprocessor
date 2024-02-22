@@ -114,4 +114,4 @@ export function isPost12() {
 
 export function isPre12() {
   return !isPost12();
-}	
+}
