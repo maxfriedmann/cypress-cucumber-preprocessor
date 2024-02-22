@@ -34,7 +34,7 @@ import {
   HOOK_FAILURE_EXPR,
   INTERNAL_SPEC_PROPERTIES,
   INTERNAL_SUITE_PROPERTIES,
-  SUITE_CONFIGURATION_OPTIONS,
+  TEST_ISOLATION_CONFIGURATION_OPTION,
 } from "./constants";
 
 import {
@@ -291,8 +291,8 @@ function createFeature(context: CompositionContext, feature: messages.Feature) {
     .filter(looksLikeOptions)
     .map(tagToCypressOptions)
     .filter((tag) => {
-      return Object.keys(tag).every((key) =>
-        SUITE_CONFIGURATION_OPTIONS.includes(key)
+      return Object.keys(tag).every(
+        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
       );
     })
     .reduce(Object.assign, {});
@@ -436,7 +436,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     .map(tagToCypressOptions)
     .filter((tag) =>
       Object.keys(tag).every(
-        (key) => !SUITE_CONFIGURATION_OPTIONS.includes(key)
+        (key) => key !== TEST_ISOLATION_CONFIGURATION_OPTION
       )
     )
     .reduce(Object.assign, {});
