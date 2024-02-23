@@ -441,27 +441,31 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     [INTERNAL_SPEC_PROPERTIES]: internalProperties,
   };
 
-  pickle.tags.forEach((pickleTag) => {
-    for (const node of traverseGherkinDocument(gherkinDocument)) {
-      if ("tags" in node) {
-        for (const tag of node.tags) {
-          if (
-            looksLikeOptions(tag.name) &&
-            Object.keys(tagToCypressOptions(tag.name)).every(
-              (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
-            ) &&
-            tag.id === pickleTag.astNodeId &&
-            "id" in node &&
-            node.id === pickle.astNodeIds[0]
-          ) {
-            throw new Error(
-              `Tag ${tag.name} can only be used on a Feature or a Rule`
-            );
-          }
-        }
+
+  const scenario = assertAndReturn(
+    context.astIdsMap.get(
+      assertAndReturn(
+        pickle.astNodeIds?.[0],
+        "Expected to find at least one astNodeId"
+      )
+    ),
+    `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
+  );
+
+  if ('tags' in scenario) {
+    for (const tag of scenario.tags) {
+      if (
+        looksLikeOptions(tag.name) &&
+        Object.keys(tagToCypressOptions(tag.name)).every(
+          (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+        )
+      ) {
+        throw new Error(
+          `Tag ${tag.name} can only be used on a Feature or a Rule`
+        );
       }
     }
-  });
+  }
 
   const suiteOptions = tags
     .filter(looksLikeOptions)
