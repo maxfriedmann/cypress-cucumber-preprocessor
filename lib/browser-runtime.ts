@@ -446,6 +446,10 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
       if ("tags" in node) {
         for (const tag of node.tags) {
           if (
+            looksLikeOptions(tag.name) &&
+            Object.keys(tagToCypressOptions(tag.name)).every(
+              (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+            ) &&
             tag.id === pickleTag.astNodeId &&
             "id" in node &&
             node.id === pickle.astNodeIds[0]
