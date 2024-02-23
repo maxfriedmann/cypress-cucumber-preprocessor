@@ -52,13 +52,43 @@ Feature: suite only options
       """
     And a file named "cypress/support/step_definitions/steps.js" with:
       """
-    const { Given, Then } = require("@badeball/cypress-cucumber-preprocessor");
-    Given("a step", () => {
-    cy.get("body").invoke('html', 'Hello world')
-    });
-    Given("another step", () => {
-      cy.contains("Hello world").should("exist");
+      const { Given, Then } = require("@badeball/cypress-cucumber-preprocessor");
+      Given("a step", () => {
+        cy.get("body").invoke('html', 'Hello world')
+      });
+      Given("another step", () => {
+        cy.contains("Hello world").should("exist");
       });
       """
     When I run cypress
     Then it passes
+
+  Scenario: Configuring testIsolation on a Scenario fails
+    Given additional Cypress configuration
+      """
+      {
+        "e2e": {
+          "testIsolation": true
+        }
+      }
+      """
+    And a file named "cypress/e2e/a.feature" with:
+      """
+      Feature: a feature
+        @testIsolation(false)
+        Scenario: a scenario
+          Given a step
+      """
+    And a file named "cypress/support/step_definitions/steps.js" with:
+      """
+      const { Given, Then } = require("@badeball/cypress-cucumber-preprocessor");
+      Given("a step", () => {
+        cy.get("body").invoke('html', 'Hello world')
+      });
+      """
+    When I run cypress
+    Then it fails
+    And the output should contain
+      """
+      Tag @testIsolation(false) can only be used on a Feature or a Rule
+      """

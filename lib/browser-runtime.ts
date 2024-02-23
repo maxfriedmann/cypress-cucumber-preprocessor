@@ -441,6 +441,24 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     [INTERNAL_SPEC_PROPERTIES]: internalProperties,
   };
 
+  pickle.tags.forEach((pickleTag) => {
+    for (const node of traverseGherkinDocument(gherkinDocument)) {
+      if ("tags" in node) {
+        for (const tag of node.tags) {
+          if (
+            tag.id === pickleTag.astNodeId &&
+            "id" in node &&
+            node.id === pickle.astNodeIds[0]
+          ) {
+            throw new Error(
+              `Tag ${tag.name} can only be used on a Feature or a Rule`
+            );
+          }
+        }
+      }
+    }
+  });
+
   const suiteOptions = tags
     .filter(looksLikeOptions)
     .map(tagToCypressOptions)
