@@ -441,7 +441,6 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     [INTERNAL_SPEC_PROPERTIES]: internalProperties,
   };
 
-
   const scenario = assertAndReturn(
     context.astIdsMap.get(
       assertAndReturn(
@@ -452,7 +451,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
   );
 
-  if ('tags' in scenario) {
+  if ("tags" in scenario) {
     for (const tag of scenario.tags) {
       if (
         looksLikeOptions(tag.name) &&
