@@ -451,13 +451,16 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
   );
 
-  if ("tags" in scenario && 'id' in scenario) {
-    const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce((acc, tag) => {
-      acc[tag.name] = tag.id;
-      return acc;
-    }, {} as Record<string, string>);
+  if ("tags" in scenario && "id" in scenario) {
+    const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce(
+      (acc, tag) => {
+        acc[tag.name] = tag.id;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
 
-    if ('examples' in scenario) {
+    if ("examples" in scenario) {
       for (const example of scenario.examples) {
         example.tags.forEach((tag) => {
           tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] = tag.id;
