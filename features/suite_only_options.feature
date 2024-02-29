@@ -92,3 +92,71 @@ Feature: suite only options
       """
       Tag @testIsolation(false) can only be used on a Feature or a Rule
       """
+
+  Scenario: Configuring testIsolation on a Scenario Outline fails
+    Given additional Cypress configuration
+      """
+      {
+        "e2e": {
+          "testIsolation": true
+        }
+      }
+      """
+    And a file named "cypress/e2e/a.feature" with:
+      """
+      Feature: a feature
+        @testIsolation(false)
+        Scenario Outline: a scenario
+          Given a step
+
+          Examples:
+            | foo |
+            | bar |
+      """
+    And a file named "cypress/support/step_definitions/steps.js" with:
+      """
+      const { Given, Then } = require("@badeball/cypress-cucumber-preprocessor");
+      Given("a step", () => {
+        cy.get("body").invoke('html', 'Hello world')
+      });
+      """
+    When I run cypress
+    Then it fails
+    And the output should contain
+      """
+      Tag @testIsolation(false) can only be used on a Feature or a Rule
+      """
+
+  Scenario: Configuring testIsolation on Examples fails
+    Given additional Cypress configuration
+      """
+      {
+        "e2e": {
+          "testIsolation": true
+        }
+      }
+      """
+    And a file named "cypress/e2e/a.feature" with:
+      """
+      Feature: a feature
+        Scenario Outline: a scenario
+          Given a step
+
+          @testIsolation(false)
+          Examples:
+            | foo |
+            | bar |
+      """
+    And a file named "cypress/support/step_definitions/steps.js" with:
+      """
+      const { Given, Then } = require("@badeball/cypress-cucumber-preprocessor");
+      Given("a step", () => {
+        cy.get("body").invoke('html', 'Hello world')
+      });
+      """
+    When I run cypress
+    Then it fails
+    And the output should contain
+      """
+      Tag @testIsolation(false) can only be used on a Feature or a Rule
+      """
