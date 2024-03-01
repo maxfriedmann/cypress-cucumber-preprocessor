@@ -36,12 +36,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Cache NPM modules
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: npm@${{ matrix.example }}
       - name: Cache Cypress binaries
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/Cypress
           key: cypress-examples
