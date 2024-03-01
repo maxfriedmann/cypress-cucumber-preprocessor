@@ -451,7 +451,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
   );
 
-  if ("tags" in scenario && "id" in scenario) {
+  if ("tags" in scenario) {
     const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce(
       (acc, tag) => {
         acc[tag.name] = tag.id;
