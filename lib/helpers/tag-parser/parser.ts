@@ -111,7 +111,7 @@ type Primitive = string | boolean | number;
 export default class Parser {
   public constructor(private content: string) {}
 
-  parse(): Record<string, Primitive | Primitive[] | Record<string, Primitive>> {
+  parse(): [string, Primitive | Primitive[] | Record<string, Primitive>] {
     const tokens = new BufferedGenerator(new Tokenizer(this.content).tokens());
 
     let next: Token = expectToken(tokens.next());
@@ -186,13 +186,9 @@ export default class Parser {
     }
 
     if (isObjectMode) {
-      return {
-        [propertyName]: Object.fromEntries(entries),
-      };
+      return [propertyName, Object.fromEntries(entries)];
     } else {
-      return {
-        [propertyName]: values.length === 1 ? values[0] : values,
-      };
+      return [propertyName, values.length === 1 ? values[0] : values];
     }
   }
 }

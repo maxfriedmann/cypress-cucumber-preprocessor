@@ -287,15 +287,15 @@ function createStepDescription({
 }
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
-  const suiteOptions = collectTagNames(feature.tags)
-    .filter(looksLikeOptions)
-    .map(tagToCypressOptions)
-    .filter((tag) => {
-      return Object.keys(tag).every(
-        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
-      );
-    })
-    .reduce(Object.assign, {});
+  const suiteOptions = Object.fromEntries(
+    collectTagNames(feature.tags)
+      .filter(looksLikeOptions)
+      .map(tagToCypressOptions)
+      .filter(
+        ([property]) =>
+          property === (TEST_ISOLATION_CONFIGURATION_OPTION as string)
+      )
+  ) as Cypress.TestConfigOverrides;
 
   describe(feature.name || "<unamed feature>", suiteOptions, () => {
     before(function () {
@@ -357,15 +357,15 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
     }
   }
 
-  const suiteOptions = collectTagNames(rule.tags)
-    .filter(looksLikeOptions)
-    .map(tagToCypressOptions)
-    .filter((tag) => {
-      return Object.keys(tag).every(
-        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
-      );
-    })
-    .reduce(Object.assign, {});
+  const suiteOptions = Object.fromEntries(
+    collectTagNames(rule.tags)
+      .filter(looksLikeOptions)
+      .map(tagToCypressOptions)
+      .filter(
+        ([property]) =>
+          property === (TEST_ISOLATION_CONFIGURATION_OPTION as string)
+      )
+  ) as Cypress.TestConfigOverrides;
 
   describe(rule.name || "<unamed rule>", suiteOptions, () => {
     if (rule.children) {
@@ -486,15 +486,15 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     }
   }
 
-  const suiteOptions = tags
-    .filter(looksLikeOptions)
-    .map(tagToCypressOptions)
-    .filter((tag) =>
-      Object.keys(tag).every(
-        (key) => key !== TEST_ISOLATION_CONFIGURATION_OPTION
+  const suiteOptions = Object.fromEntries(
+    tags
+      .filter(looksLikeOptions)
+      .map(tagToCypressOptions)
+      .filter(
+        ([property]) =>
+          property !== (TEST_ISOLATION_CONFIGURATION_OPTION as string)
       )
-    )
-    .reduce(Object.assign, {});
+  ) as Cypress.TestConfigOverrides;
 
   if (suiteOptions.env) {
     Object.assign(suiteOptions.env, internalEnv);
