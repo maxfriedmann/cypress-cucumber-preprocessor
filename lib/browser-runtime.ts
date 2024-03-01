@@ -12,7 +12,7 @@ import { v4 as uuid } from "uuid";
 
 import random from "seedrandom";
 
-import { assertAndReturn, fail } from "./helpers/assertions";
+import { assert, assertAndReturn, fail } from "./helpers/assertions";
 
 import DataTable from "./data_table";
 
@@ -451,35 +451,38 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
   );
 
-  if ("tags" in scenario) {
-    const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce(
-      (acc, tag) => {
-        acc[tag.name] = tag.id;
-        return acc;
-      },
-      {} as Record<string, string>
-    );
+  assert("tags" in scenario, "Expected a scenario to have a tags property");
 
-    if ("examples" in scenario) {
-      for (const example of scenario.examples) {
-        example.tags.forEach((tag) => {
-          tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] = tag.id;
-        });
-      }
-    }
+  assert(
+    "examples" in scenario,
+    "Expected a scenario to have a examples property"
+  );
 
-    for (const tag of pickle.tags) {
-      if (
-        looksLikeOptions(tag.name) &&
-        tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] === tag.astNodeId &&
-        Object.keys(tagToCypressOptions(tag.name)).every(
-          (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
-        )
-      ) {
-        throw new Error(
-          `Tag ${tag.name} can only be used on a Feature or a Rule`
-        );
-      }
+  const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce(
+    (acc, tag) => {
+      acc[tag.name] = tag.id;
+      return acc;
+    },
+    {} as Record<string, string>
+  );
+
+  for (const example of scenario.examples) {
+    example.tags.forEach((tag) => {
+      tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] = tag.id;
+    });
+  }
+
+  for (const tag of pickle.tags) {
+    if (
+      looksLikeOptions(tag.name) &&
+      tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] === tag.astNodeId &&
+      Object.keys(tagToCypressOptions(tag.name)).every(
+        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+      )
+    ) {
+      throw new Error(
+        `Tag ${tag.name} can only be used on a Feature or a Rule`
+      );
     }
   }
 
