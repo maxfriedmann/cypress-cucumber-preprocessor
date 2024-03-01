@@ -34,19 +34,20 @@ import {
   HOOK_FAILURE_EXPR,
   INTERNAL_SPEC_PROPERTIES,
   INTERNAL_SUITE_PROPERTIES,
+  TEST_ISOLATION_CONFIGURATION_OPTION,
 } from "./constants";
 
 import {
   ITaskSpecEnvelopes,
-  ITaskTestCaseStarted,
   ITaskTestCaseFinished,
-  ITaskTestStepStarted,
+  ITaskTestCaseStarted,
   ITaskTestStepFinished,
+  ITaskTestStepStarted,
   TASK_SPEC_ENVELOPES,
-  TASK_TEST_CASE_STARTED,
   TASK_TEST_CASE_FINISHED,
-  TASK_TEST_STEP_STARTED,
+  TASK_TEST_CASE_STARTED,
   TASK_TEST_STEP_FINISHED,
+  TASK_TEST_STEP_STARTED,
 } from "./cypress-task-definitions";
 
 import { notNull } from "./helpers/type-guards";
@@ -286,7 +287,17 @@ function createStepDescription({
 }
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
-  describe(feature.name || "<unamed feature>", () => {
+  const suiteOptions = collectTagNames(feature.tags)
+    .filter(looksLikeOptions)
+    .map(tagToCypressOptions)
+    .filter((tag) => {
+      return Object.keys(tag).every(
+        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+      );
+    })
+    .reduce(Object.assign, {});
+
+  describe(feature.name || "<unamed feature>", suiteOptions, () => {
     before(function () {
       beforeHandler.call(this, context);
     });
@@ -346,7 +357,17 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
     }
   }
 
-  describe(rule.name || "<unamed rule>", () => {
+  const suiteOptions = collectTagNames(rule.tags)
+    .filter(looksLikeOptions)
+    .map(tagToCypressOptions)
+    .filter((tag) => {
+      return Object.keys(tag).every(
+        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+      );
+    })
+    .reduce(Object.assign, {});
+
+  describe(rule.name || "<unamed rule>", suiteOptions, () => {
     if (rule.children) {
       for (const child of rule.children) {
         if (child.scenario) {
@@ -420,9 +441,56 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     [INTERNAL_SPEC_PROPERTIES]: internalProperties,
   };
 
+  const scenario = assertAndReturn(
+    context.astIdsMap.get(
+      assertAndReturn(
+        pickle.astNodeIds?.[0],
+        "Expected to find at least one astNodeId"
+      )
+    ),
+    `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
+  );
+
+  if ("tags" in scenario && "id" in scenario) {
+    const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce(
+      (acc, tag) => {
+        acc[tag.name] = tag.id;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+
+    if ("examples" in scenario) {
+      for (const example of scenario.examples) {
+        example.tags.forEach((tag) => {
+          tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] = tag.id;
+        });
+      }
+    }
+
+    for (const tag of pickle.tags) {
+      if (
+        looksLikeOptions(tag.name) &&
+        tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] === tag.astNodeId &&
+        Object.keys(tagToCypressOptions(tag.name)).every(
+          (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
+        )
+      ) {
+        throw new Error(
+          `Tag ${tag.name} can only be used on a Feature or a Rule`
+        );
+      }
+    }
+  }
+
   const suiteOptions = tags
     .filter(looksLikeOptions)
     .map(tagToCypressOptions)
+    .filter((tag) =>
+      Object.keys(tag).every(
+        (key) => key !== TEST_ISOLATION_CONFIGURATION_OPTION
+      )
+    )
     .reduce(Object.assign, {});
 
   if (suiteOptions.env) {

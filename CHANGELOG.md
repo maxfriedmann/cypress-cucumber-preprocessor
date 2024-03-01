@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 - Add support for skipped / pending scenario hooks, fixes [#1159](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1159).
 
+- Add support for suite-level test configuration, fixes [#1158](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1158).
+
 ## v20.0.1
 
 - Handle more corner cases related to reload-behavior, fixes [#1142](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1142).
