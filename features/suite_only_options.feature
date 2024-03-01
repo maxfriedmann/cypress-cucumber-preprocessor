@@ -79,7 +79,7 @@ Feature: suite only options
       Then it fails
       And the output should contain
         """
-        Tag @testIsolation(false) can only be used on a Feature or a Rule
+        Tag testIsolation can only be used on a Feature or a Rule
         """
 
     Scenario: Configuring testIsolation on a Scenario Outline
@@ -105,7 +105,7 @@ Feature: suite only options
       Then it fails
       And the output should contain
         """
-        Tag @testIsolation(false) can only be used on a Feature or a Rule
+        Tag testIsolation can only be used on a Feature or a Rule
         """
 
     Scenario: Configuring testIsolation on Examples
@@ -131,5 +131,5 @@ Feature: suite only options
       Then it fails
       And the output should contain
         """
-        Tag @testIsolation(false) can only be used on a Feature or a Rule
+        Tag testIsolation can only be used on a Feature or a Rule
         """

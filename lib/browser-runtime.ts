@@ -34,7 +34,6 @@ import {
   HOOK_FAILURE_EXPR,
   INTERNAL_SPEC_PROPERTIES,
   INTERNAL_SUITE_PROPERTIES,
-  TEST_ISOLATION_CONFIGURATION_OPTION,
 } from "./constants";
 
 import {
@@ -65,6 +64,12 @@ import { runStepWithLogGroup } from "./helpers/cypress";
 import { getTags } from "./helpers/environment";
 
 import { ICaseHookParameter, IStepHookParameter } from "./public-member-types";
+
+import {
+  isExclusivelySuiteConfiguration,
+  isNotExclusivelySuiteConfiguration,
+  tagsToOptions,
+} from "./helpers/options";
 
 type Node = ReturnType<typeof parse>;
 
@@ -288,13 +293,7 @@ function createStepDescription({
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
   const suiteOptions = Object.fromEntries(
-    collectTagNames(feature.tags)
-      .filter(looksLikeOptions)
-      .map(tagToCypressOptions)
-      .filter(
-        ([property]) =>
-          property === (TEST_ISOLATION_CONFIGURATION_OPTION as string)
-      )
+    tagsToOptions(feature.tags).filter(isExclusivelySuiteConfiguration)
   ) as Cypress.TestConfigOverrides;
 
   describe(feature.name || "<unamed feature>", suiteOptions, () => {
@@ -358,13 +357,7 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
   }
 
   const suiteOptions = Object.fromEntries(
-    collectTagNames(rule.tags)
-      .filter(looksLikeOptions)
-      .map(tagToCypressOptions)
-      .filter(
-        ([property]) =>
-          property === (TEST_ISOLATION_CONFIGURATION_OPTION as string)
-      )
+    tagsToOptions(rule.tags).filter(isExclusivelySuiteConfiguration)
   ) as Cypress.TestConfigOverrides;
 
   describe(rule.name || "<unamed rule>", suiteOptions, () => {
@@ -458,51 +451,33 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     "Expected a scenario to have a examples property"
   );
 
-  const tagsDefinedOnThisScenarioTagNameAstIdMap = scenario.tags.reduce(
-    (acc, tag) => {
-      acc[tag.name] = tag.id;
-      return acc;
-    },
-    {} as Record<string, string>
-  );
+  const testSpecificOptions = tagsToOptions([
+    ...scenario.tags,
+    ...scenario.examples.flatMap((example) => example.tags),
+  ]);
 
-  for (const example of scenario.examples) {
-    example.tags.forEach((tag) => {
-      tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] = tag.id;
-    });
-  }
-
-  for (const tag of pickle.tags) {
-    if (
-      looksLikeOptions(tag.name) &&
-      tagsDefinedOnThisScenarioTagNameAstIdMap[tag.name] === tag.astNodeId &&
-      Object.keys(tagToCypressOptions(tag.name)).every(
-        (key) => key === TEST_ISOLATION_CONFIGURATION_OPTION
-      )
-    ) {
+  for (const entry of testSpecificOptions) {
+    if (isExclusivelySuiteConfiguration(entry)) {
       throw new Error(
-        `Tag ${tag.name} can only be used on a Feature or a Rule`
+        `Tag ${entry[0]} can only be used on a Feature or a Rule`
       );
     }
   }
 
-  const suiteOptions = Object.fromEntries(
+  const inheritedTestOptions = Object.fromEntries(
     tags
       .filter(looksLikeOptions)
       .map(tagToCypressOptions)
-      .filter(
-        ([property]) =>
-          property !== (TEST_ISOLATION_CONFIGURATION_OPTION as string)
-      )
+      .filter(isNotExclusivelySuiteConfiguration)
   ) as Cypress.TestConfigOverrides;
 
-  if (suiteOptions.env) {
-    Object.assign(suiteOptions.env, internalEnv);
+  if (inheritedTestOptions.env) {
+    Object.assign(inheritedTestOptions.env, internalEnv);
   } else {
-    suiteOptions.env = internalEnv;
+    inheritedTestOptions.env = internalEnv;
   }
 
-  it(scenarioName, suiteOptions, function () {
+  it(scenarioName, inheritedTestOptions, function () {
     const { remainingSteps, testCaseStartedId } =
       retrieveInternalSpecProperties();
 
