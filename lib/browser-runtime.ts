@@ -459,7 +459,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
   for (const entry of testSpecificOptions) {
     if (isExclusivelySuiteConfiguration(entry)) {
       throw new Error(
-        `Tag ${entry[0]} can only be used on a Feature or a Rule`
+        `The \`${entry[0]}\` configuration can only be overridden from a suite-level override (in Cucumber-terms this means on a Feature or Rule).`
       );
     }
   }

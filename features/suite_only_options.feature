@@ -79,7 +79,7 @@ Feature: suite only options
       Then it fails
       And the output should contain
         """
-        Tag testIsolation can only be used on a Feature or a Rule
+        The `testIsolation` configuration can only be overridden from a suite-level override (in Cucumber-terms this means on a Feature or Rule).
         """
 
     Scenario: Configuring testIsolation on a Scenario Outline
@@ -105,7 +105,7 @@ Feature: suite only options
       Then it fails
       And the output should contain
         """
-        Tag testIsolation can only be used on a Feature or a Rule
+        The `testIsolation` configuration can only be overridden from a suite-level override (in Cucumber-terms this means on a Feature or Rule).
         """
 
     Scenario: Configuring testIsolation on Examples
@@ -131,5 +131,5 @@ Feature: suite only options
       Then it fails
       And the output should contain
         """
-        Tag testIsolation can only be used on a Feature or a Rule
+        The `testIsolation` configuration can only be overridden from a suite-level override (in Cucumber-terms this means on a Feature or Rule).
         """
