@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v20.0.2
 
 - Add support for skipped / pending scenario hooks, fixes [#1159](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1159).
 
