@@ -9,6 +9,8 @@ import * as glob from "glob";
 import ICustomWorld from "../support/ICustomWorld";
 import { assertAndReturn } from "../support/helpers";
 
+const isCI = process.env.CI === "true";
+
 function execAsync(
   command: string
 ): Promise<{ stdout: string; stderr: string }> {
@@ -71,6 +73,19 @@ When(
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld, table) {
     await this.runCypress({ extraEnv: Object.fromEntries(table.rows()) });
+  }
+);
+
+When(
+  "I run cypress with a chromium-family browser",
+  { timeout: 60 * 1000 },
+  async function (this: ICustomWorld) {
+    /**
+     * Chrome is installed in CI, Chromium is installed in my (maintainer) environment.
+     */
+    await this.runCypress({
+      extraArgs: ["--browser", isCI ? "chrome" : "chromium"],
+    });
   }
 );
 

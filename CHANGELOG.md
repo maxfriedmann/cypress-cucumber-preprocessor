@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Handle browser / page crash gracefully, fixes [#1172](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1172).
+
 ## v20.0.2
 
 - Add support for skipped / pending scenario hooks, fixes [#1159](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1159).

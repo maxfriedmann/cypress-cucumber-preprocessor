@@ -496,6 +496,40 @@ export async function afterSpecHandler(
     return;
   }
 
+  /**
+   * This pretty much can't happen and the check is merely to satisfy TypeScript in the next block.
+   */
+  switch (state.state) {
+    case "uninitialized":
+    case "after-run":
+      throw createError("Unexpected state in afterSpecHandler: " + state.state);
+  }
+
+  const browserCrashExprCol = [
+    /We detected that the .+ process just crashed/,
+    /We detected that the .+ Renderer process just crashed/,
+  ];
+
+  const error = results.error;
+
+  if (error != null && browserCrashExprCol.some((expr) => expr.test(error))) {
+    console.log(
+      chalk.yellow(
+        `\nDue to browser crash, no reports are created for ${spec.relative}.`
+      )
+    );
+
+    state = {
+      state: "after-spec",
+      pretty: state.pretty,
+      messages: {
+        accumulation: state.messages.accumulation,
+      },
+    };
+
+    return;
+  }
+
   switch (state.state) {
     case "test-finished": // This is the normal case.
     case "before-spec": // This can happen if a spec doesn't contain any tests.
