@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v20.0.3
 
 - Handle browser / page crash gracefully, fixes [#1172](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1172).
 
