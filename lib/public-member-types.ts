@@ -3,7 +3,7 @@ import * as messages from "@cucumber/messages";
 export interface IParameterTypeDefinition<T, C extends Mocha.Context> {
   name: string;
   regexp: RegExp;
-  transformer: (this: C, ...match: string[]) => T;
+  transformer?: (this: C, ...match: string[]) => T;
 }
 
 export interface IRunHookOptions {

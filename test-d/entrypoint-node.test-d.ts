@@ -140,6 +140,11 @@ defineParameterType({
   },
 });
 
+defineParameterType({
+  name: "foo",
+  regexp: /foo/,
+});
+
 BeforeAll(function () {
   expectType<Mocha.Context>(this);
 });
