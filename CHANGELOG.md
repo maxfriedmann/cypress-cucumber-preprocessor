@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Updated all dependencies, fixes [#1180](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1180).
+
 ## v20.0.4
 
 - Fix type signature of `defineParameterType` to correctly reflect `transformer` property's optionality, fixes [#1179](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1179).
