@@ -53,6 +53,7 @@
     "test:unit": "mocha",
     "test:run-all-specs": "mocha --timeout 0 test/run-all-specs.ts",
     "test:integration": "cucumber-js",
+    "test:actions:examples": "xvfb-run bash -c 'act -W \".github/workflows/examples-branch.yml\" --use-gitignore=false --artifact-server-path=tmp/artifacts --env DISPLAY=$DISPLAY'",
     "prepublishOnly": "npm run clean && npm run build && npm run test"
   },
   "dependencies": {
