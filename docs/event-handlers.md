@@ -19,6 +19,7 @@ For example, if you specify a handler for `after:screenshot` and override this p
 The following plugins (non-exhaustive) are known to also define event handlers.
 
 - [@bahmutov/cypress-code-coverage][@bahmutov/cypress-code-coverage]
+- [allure-cypress][allure-cypress]
 - [cypress-allure-plugin][cypress-allure-plugin]
 - [cypress-cloud][cypress-cloud]
 - [cypress-testrail][cypress-testrail]
@@ -105,6 +106,7 @@ export default defineConfig({
 ```
 
 [@bahmutov/cypress-code-coverage]: https://github.com/bahmutov/cypress-code-coverage
+[allure-cypress]: https://github.com/allure-framework/allure-js
 [cypress-allure-plugin]: https://github.com/Shelex/cypress-allure-plugin
 [cypress-cloud]: https://github.com/currents-dev/cypress-cloud
 [cypress-testrail]: https://github.com/boxblinkracer/cypress-testrail
