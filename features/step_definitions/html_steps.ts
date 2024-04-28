@@ -3,7 +3,7 @@ import { JSDOM } from "jsdom";
 import path from "path";
 import { promises as fs } from "fs";
 import assert from "assert";
-import { assertAndReturn } from "../support/helpers";
+import { findByText } from "@testing-library/dom";
 import ICustomWorld from "../support/ICustomWorld";
 
 Then("there should be a HTML report", async function (this: ICustomWorld) {
@@ -21,24 +21,19 @@ Then(
       { runScripts: "dangerously" }
     );
 
-    const dt = assertAndReturn(
-      Array.from(dom.window.document.querySelectorAll("dt")).find(
-        (el) => el.textContent === "last run"
-      ),
-      "Expected to find a 'last run' dt"
+    const dt = await findByText(
+      dom.window.document.documentElement,
+      "last run",
+      {
+        selector: "dt",
+      }
     );
 
-    const dd = assertAndReturn(
-      dt.parentElement?.querySelector("dd"),
-      "Expected to find a 'last run' dt's dd"
-    );
+    const dd = await findByText(dt.parentElement!, /\d+ seconds? ago/, {
+      selector: "dd",
+    });
 
-    const lastRunText = assertAndReturn(
-      dd.textContent,
-      "Expected to find 'XX seconds ago'"
-    );
-
-    assert.match(lastRunText, /\d+ seconds? ago/);
+    assert(dd);
   }
 );
 
@@ -50,11 +45,12 @@ Then(
       { runScripts: "dangerously" }
     );
 
-    const dt = assertAndReturn(
-      Array.from(dom.window.document.querySelectorAll("dt")).find(
-        (el) => el.textContent && /\d+ executed/.test(el.textContent)
-      ),
-      "Expected to find a 'XX executed' dt"
+    const dt = await findByText(
+      dom.window.document.documentElement,
+      /\d+ executed/,
+      {
+        selector: "dt",
+      }
     );
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -72,11 +68,12 @@ Then(
       { runScripts: "dangerously" }
     );
 
-    const dd = assertAndReturn(
-      Array.from(dom.window.document.querySelectorAll("dd")).find(
-        (el) => el.textContent && /\d+% passed/.test(el.textContent)
-      ),
-      "Expected to find a 'XX% passed' dd"
+    const dd = await findByText(
+      dom.window.document.documentElement,
+      /\d+% passed/,
+      {
+        selector: "dd",
+      }
     );
 
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -94,19 +91,12 @@ Then(
       { runScripts: "dangerously" }
     );
 
-    const AccordionItemPanel = assertAndReturn(
-      dom.window.document.querySelector(
-        '[data-accordion-component="AccordionItemPanel"]'
-      ),
-      "Expected to find an AccordionItemPanel"
+    const AccordionItemPanel = await findByText(
+      dom.window.document.documentElement,
+      (_, element) => element?.textContent?.includes("Attached Image") ?? false,
+      { selector: '[data-accordion-component="AccordionItemPanel"]' }
     );
 
-    assert.match(
-      assertAndReturn(
-        AccordionItemPanel.textContent,
-        "Expected AccordionItemPanel to have textContent"
-      ),
-      /Attached Image/
-    );
+    assert(AccordionItemPanel);
   }
 );

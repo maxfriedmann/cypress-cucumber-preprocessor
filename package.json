@@ -89,6 +89,7 @@
     "@bahmutov/cypress-esbuild-preprocessor": "^2.2.0",
     "@cypress/browserify-preprocessor": "^3.0.2",
     "@cypress/webpack-preprocessor": "^6.0.1",
+    "@testing-library/dom": "^10.0.0",
     "@types/cli-table": "^0.3.4",
     "@types/common-ancestor-path": "^1.0.2",
     "@types/debug": "^4.1.12",
