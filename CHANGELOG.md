@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v20.0.5
 
 - Updated all dependencies, fixes [#1180](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1180).
 
