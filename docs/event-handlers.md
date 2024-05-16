@@ -24,6 +24,7 @@ The following plugins (non-exhaustive) are known to also define event handlers.
 - [cypress-cloud][cypress-cloud]
 - [cypress-testrail][cypress-testrail]
 - [cypress-xray-plugin][cypress-xray-plugin]
+- [cypress-split][cypress-split]
 
 If you use any of these plugins, then you need to consider [cypress-on-fix][cypress-on-fix], otherwise your mileage may vary.
 
@@ -112,3 +113,4 @@ export default defineConfig({
 [cypress-testrail]: https://github.com/boxblinkracer/cypress-testrail
 [cypress-xray-plugin]: https://github.com/Qytera-Gmbh/cypress-xray-plugin
 [cypress-on-fix]: https://github.com/bahmutov/cypress-on-fix
+[cypress-split]: https://github.com/bahmutov/cypress-split
