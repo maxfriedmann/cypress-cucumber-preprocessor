@@ -598,9 +598,9 @@ export function combineIntoConfiguration(
 }
 
 async function cosmiconfigResolver(projectRoot: string) {
-  const result = await cosmiconfig("cypress-cucumber-preprocessor").search(
-    projectRoot
-  );
+  const result = await cosmiconfig("cypress-cucumber-preprocessor", {
+    searchStrategy: "project",
+  }).search(projectRoot);
 
   return result?.config;
 }
