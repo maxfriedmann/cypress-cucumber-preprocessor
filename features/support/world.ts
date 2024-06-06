@@ -97,6 +97,13 @@ export default class CustomWorld implements ICustomWorld {
     extraEnv: Record<string, string>;
     expectedExitCode?: number;
   }) {
+    const shell = cmd.endsWith(".cmd");
+
+    if (shell) {
+      // https://github.com/nodejs/node/issues/29532
+      args = args.map((arg) => `"${arg}"`);
+    }
+
     const child = childProcess.spawn(cmd, args, {
       stdio: ["ignore", "pipe", "pipe"],
       cwd: this.tmpDir,
@@ -104,6 +111,8 @@ export default class CustomWorld implements ICustomWorld {
         ...process.env,
         ...extraEnv,
       },
+      // https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2
+      shell,
     });
 
     const combined = combine(child.stdout, child.stderr);
