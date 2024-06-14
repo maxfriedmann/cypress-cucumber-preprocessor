@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Updated all dependencies, fixes [#1198](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1198).
+
 ## v20.0.6
 
 - Search for configuration files using strategy `project`, fixes [#1185](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1185). 
