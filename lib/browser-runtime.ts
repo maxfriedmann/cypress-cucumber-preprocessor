@@ -1086,56 +1086,56 @@ export default function createTests(
 
   const testStepIds: TestStepIds = new Map();
 
-  const testCases: messages.TestCase[] = pickles
-    .filter((pickle) => {
-      return !omitFiltered || !shouldSkipPickle(testFilter, pickle);
-    })
-    .map((pickle) => {
-      const tags = collectTagNames(pickle.tags);
-      const beforeHooks = registry.resolveBeforeHooks(tags);
-      const afterHooks = registry.resolveAfterHooks(tags);
+  const includedPickles = pickles.filter((pickle) => {
+    return !omitFiltered || !shouldSkipPickle(testFilter, pickle);
+  });
 
-      const hooksToStep = (hook: ICaseHook): messages.TestStep => {
-        return {
-          id: createTestStepId({
-            testStepIds,
-            newId,
-            pickleId: pickle.id,
-            hookIdOrPickleStepId: hook.id,
-          }),
-          hookId: hook.id,
-        };
+  const testCases: messages.TestCase[] = includedPickles.map((pickle) => {
+    const tags = collectTagNames(pickle.tags);
+    const beforeHooks = registry.resolveBeforeHooks(tags);
+    const afterHooks = registry.resolveAfterHooks(tags);
+
+    const hooksToStep = (hook: ICaseHook): messages.TestStep => {
+      return {
+        id: createTestStepId({
+          testStepIds,
+          newId,
+          pickleId: pickle.id,
+          hookIdOrPickleStepId: hook.id,
+        }),
+        hookId: hook.id,
       };
+    };
 
-      const pickleStepToTestStep = (
-        pickleStep: messages.PickleStep
-      ): messages.TestStep => {
-        const stepDefinitionIds = registry
-          .getMatchingStepDefinitions(pickleStep.text)
-          .map((stepDefinition) => stepDefinition.id);
-
-        return {
-          id: createTestStepId({
-            testStepIds,
-            newId,
-            pickleId: pickle.id,
-            hookIdOrPickleStepId: pickleStep.id,
-          }),
-          pickleStepId: pickleStep.id,
-          stepDefinitionIds,
-        };
-      };
+    const pickleStepToTestStep = (
+      pickleStep: messages.PickleStep
+    ): messages.TestStep => {
+      const stepDefinitionIds = registry
+        .getMatchingStepDefinitions(pickleStep.text)
+        .map((stepDefinition) => stepDefinition.id);
 
       return {
-        id: pickle.id,
-        pickleId: pickle.id,
-        testSteps: [
-          ...beforeHooks.map(hooksToStep),
-          ...pickle.steps.map(pickleStepToTestStep),
-          ...afterHooks.map(hooksToStep),
-        ],
+        id: createTestStepId({
+          testStepIds,
+          newId,
+          pickleId: pickle.id,
+          hookIdOrPickleStepId: pickleStep.id,
+        }),
+        pickleStepId: pickleStep.id,
+        stepDefinitionIds,
       };
-    });
+    };
+
+    return {
+      id: pickle.id,
+      pickleId: pickle.id,
+      testSteps: [
+        ...beforeHooks.map(hooksToStep),
+        ...pickle.steps.map(pickleStepToTestStep),
+        ...afterHooks.map(hooksToStep),
+      ],
+    };
+  });
 
   const specEnvelopes: messages.Envelope[] = [];
 
@@ -1154,7 +1154,7 @@ export default function createTests(
     gherkinDocument,
   });
 
-  for (const pickle of pickles) {
+  for (const pickle of includedPickles) {
     specEnvelopes.push({
       pickle,
     });
