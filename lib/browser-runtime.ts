@@ -1023,10 +1023,12 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
   /**
    * Repopulate internal properties in case previous test is retried.
    */
-  updateInternalSpecProperties({
-    testCaseStartedId: context.newId(),
-    remainingSteps: [...properties.allSteps],
-  });
+  if (willBeRetried) {
+    updateInternalSpecProperties({
+      testCaseStartedId: context.newId(),
+      remainingSteps: [...properties.allSteps],
+    });
+  }
 }
 
 function afterHandler(this: Mocha.Context, context: CompositionContext) {
@@ -1039,6 +1041,7 @@ function afterHandler(this: Mocha.Context, context: CompositionContext) {
     });
   }
 }
+
 export default function createTests(
   registry: Registry,
   seed: number,
