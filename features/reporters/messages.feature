@@ -388,6 +388,93 @@ Feature: messages report
       Then it fails
       And the messages report should contain an image attachment for what appears to be a screenshot
 
+  Rule: it should include results of skipped (not omitted) tests
+    Scenario: first scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          @skip
+          Scenario: first scenario
+            Given a step
+          Scenario: second scenario
+            Given a step
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a messages similar to "fixtures/skipped-first-scenario.ndjson"
+
+    Scenario: middle scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          Scenario: first scenario
+            Given a step
+          @skip
+          Scenario: second scenario
+            Given a step
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a messages similar to "fixtures/skipped-second-scenario.ndjson"
+
+    Scenario: last scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          Scenario: first scenario
+            Given a step
+          Scenario: second scenario
+            Given a step
+          @skip
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a messages similar to "fixtures/skipped-third-scenario.ndjson"
+
+    Scenario: all scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          @skip
+          Scenario: first scenario
+            Given a step
+          @skip
+          Scenario: second scenario
+            Given a step
+          @skip
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And there should be a messages similar to "fixtures/skipped-all-scenarios.ndjson"
+
   Rule: failing Cypress hooks outside of the plugins control should discontinue the report
     Scenario: failing before hook
       Given a file named "cypress/e2e/a.feature" with:

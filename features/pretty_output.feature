@@ -438,6 +438,153 @@ Feature: pretty output
             Given a step
       """
 
+  Rule: it should include results of skipped (not omitted) tests
+    Scenario: first scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          @skip
+          Scenario: first scenario
+            Given a step
+          Scenario: second scenario
+            Given a step
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @skip
+          Scenario: first scenario # cypress/e2e/a.feature:3
+            Given a step
+            - skipped
+
+          Scenario: second scenario # cypress/e2e/a.feature:5
+            Given a step
+
+          Scenario: third scenario # cypress/e2e/a.feature:7
+            Given a step
+      """
+
+    Scenario: middle scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          Scenario: first scenario
+            Given a step
+          @skip
+          Scenario: second scenario
+            Given a step
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          Scenario: first scenario # cypress/e2e/a.feature:2
+            Given a step
+
+          @skip
+          Scenario: second scenario # cypress/e2e/a.feature:5
+            Given a step
+            - skipped
+
+          Scenario: third scenario # cypress/e2e/a.feature:7
+            Given a step
+      """
+
+    Scenario: last scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          Scenario: first scenario
+            Given a step
+          Scenario: second scenario
+            Given a step
+          @skip
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          Scenario: first scenario # cypress/e2e/a.feature:2
+            Given a step
+
+          Scenario: second scenario # cypress/e2e/a.feature:4
+            Given a step
+
+          @skip
+          Scenario: third scenario # cypress/e2e/a.feature:7
+            Given a step
+            - skipped
+      """
+
+    Scenario: all scenario skipped
+      Given a file named "cypress/e2e/a.feature" with:
+        """
+        Feature: a feature
+          @skip
+          Scenario: first scenario
+            Given a step
+          @skip
+          Scenario: second scenario
+            Given a step
+          @skip
+          Scenario: third scenario
+            Given a step
+        """
+      And a file named "cypress/support/step_definitions/steps.js" with:
+        """
+        const { Given } = require("@badeball/cypress-cucumber-preprocessor");
+        Given("a step", function () {});
+        """
+      When I run cypress
+      Then it passes
+      And the output should contain
+      """
+        Feature: a feature # cypress/e2e/a.feature:1
+
+          @skip
+          Scenario: first scenario # cypress/e2e/a.feature:3
+            Given a step
+            - skipped
+
+          @skip
+          Scenario: second scenario # cypress/e2e/a.feature:6
+            Given a step
+            - skipped
+
+          @skip
+          Scenario: third scenario # cypress/e2e/a.feature:9
+            Given a step
+            - skipped
+      """
+
   @network
   Rule: it should handle reloads gracefully in a multitude of scenarios
 

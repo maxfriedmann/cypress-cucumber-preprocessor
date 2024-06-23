@@ -100,3 +100,26 @@ Then(
     assert(AccordionItemPanel);
   }
 );
+
+Then(
+  "the HTML report should display {int} {string} scenario(s)",
+  async function (this: ICustomWorld, n: number, status: string) {
+    const dom = await JSDOM.fromFile(
+      path.join(this.tmpDir, "cucumber-report.html"),
+      { runScripts: "dangerously" }
+    );
+
+    const li = await findByText(
+      dom.window.document.documentElement,
+      new RegExp(`\\d+ ${status}`),
+      {
+        selector: "li",
+      }
+    );
+
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const actual = parseInt(li.textContent!, 10);
+
+    assert.equal(actual, n);
+  }
+);

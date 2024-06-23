@@ -82,6 +82,7 @@ interface CompositionContext {
   astIdsMap: ReturnType<typeof createAstIdMap>;
   testStepIds: TestStepIds;
   pickles: messages.Pickle[];
+  includedPickles: (messages.Pickle & { willBekipped: boolean })[];
   specEnvelopes: messages.Envelope[];
   testFilter: Node;
   omitFiltered: boolean;
@@ -206,6 +207,66 @@ function taskTestStepFinished(
       }
     );
   }
+}
+
+function emitSkippedPickle(
+  context: CompositionContext,
+  pickle: messages.Pickle
+) {
+  const { registry } = context;
+
+  const testCaseId = pickle.id;
+  const pickleSteps = pickle.steps ?? [];
+  const tags = collectTagNames(pickle.tags);
+  const beforeHooks = registry.resolveBeforeHooks(tags);
+  const afterHooks = registry.resolveAfterHooks(tags);
+  const testCaseStartedId = context.newId();
+  const timestamp = createTimestamp();
+
+  const steps: (ICaseHook | messages.PickleStep)[] = [
+    ...beforeHooks,
+    ...pickleSteps,
+    ...afterHooks,
+  ];
+
+  taskTestCaseStarted(context, {
+    id: testCaseStartedId,
+    testCaseId,
+    attempt: 0,
+    timestamp,
+  });
+
+  for (const step of steps) {
+    const testStepId = getTestStepId({
+      context,
+      pickleId: pickle.id,
+      hookIdOrPickleStepId: step.id,
+    });
+
+    taskTestStepStarted(context, {
+      testStepId,
+      testCaseStartedId,
+      timestamp,
+    });
+
+    taskTestStepFinished(context, {
+      testStepId,
+      testCaseStartedId,
+      testStepResult: {
+        status: messages.TestStepResultStatus.SKIPPED,
+        duration: {
+          seconds: 0,
+          nanos: 0,
+        },
+      },
+      timestamp,
+    });
+  }
+  taskTestCaseFinished(context, {
+    testCaseStartedId,
+    timestamp,
+    willBeRetried: false,
+  });
 }
 
 function findPickleById(context: CompositionContext, astId: string) {
@@ -478,6 +539,14 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
   }
 
   it(scenarioName, inheritedTestOptions, function () {
+    /**
+     * This must always be true, otherwise something is off.
+     */
+    assert(
+      context.includedPickles[0].id === pickle.id,
+      "Included pickle stack is unsynchronized"
+    );
+
     const { remainingSteps, testCaseStartedId } =
       retrieveInternalSpecProperties();
 
@@ -796,6 +865,13 @@ function beforeHandler(this: Mocha.Context, context: CompositionContext) {
   }
 
   taskSpecEnvelopes(context);
+
+  while (
+    context.includedPickles.length > 0 &&
+    context.includedPickles[0].willBekipped
+  ) {
+    emitSkippedPickle(context, context.includedPickles.shift()!);
+  }
 }
 
 function beforeEachHandler(context: CompositionContext) {
@@ -1028,6 +1104,15 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
       testCaseStartedId: context.newId(),
       remainingSteps: [...properties.allSteps],
     });
+  } else {
+    context.includedPickles.shift();
+
+    while (
+      context.includedPickles.length > 0 &&
+      context.includedPickles[0].willBekipped
+    ) {
+      emitSkippedPickle(context, context.includedPickles.shift()!);
+    }
   }
 }
 
@@ -1189,6 +1274,9 @@ export default function createTests(
     astIdsMap: createAstIdMap(gherkinDocument),
     testStepIds,
     pickles,
+    includedPickles: includedPickles.map((pickle) => {
+      return { ...pickle, willBekipped: shouldSkipPickle(testFilter, pickle) };
+    }),
     specEnvelopes,
     testFilter,
     omitFiltered,
