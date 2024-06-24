@@ -1,5 +1,7 @@
 import fs from "fs";
 
+import { inspect } from "node:util";
+
 import { IdGenerator, SourceMediaType } from "@cucumber/messages";
 
 import parse from "@cucumber/tag-expressions";
@@ -46,6 +48,8 @@ import { getTags } from "./helpers/environment";
 import { memoize } from "./helpers/memoize";
 
 import { assertNever } from "./helpers/assertions";
+
+import debug from "./helpers/debug";
 
 const resolve = memoize(origResolve);
 
@@ -133,6 +137,8 @@ export async function addCucumberPreprocessorPlugin(
   const tags = getTags(config.env);
 
   if (tags !== null && preprocessor.filterSpecs) {
+    debug(`Filtering specs using expression ${inspect(tags)}`);
+
     const node = parse(tags);
 
     const testFiles = getTestFiles(
@@ -175,6 +181,8 @@ export async function addCucumberPreprocessorPlugin(
         node.evaluate(pickle.tags?.map((tag) => tag.name).filter(notNull) ?? [])
       );
     });
+
+    debug(`Resolved specs ${inspect(testFiles)}`);
 
     const propertyName = "specPattern" in config ? "specPattern" : "testFiles";
 
