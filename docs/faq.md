@@ -4,7 +4,7 @@
 
 * Node requirements
   * [I get `fs_1.promises.rm is not a function`](#i-get-fs_1promisesrm-is-not-a-function)
-  * [I get `state.messages.findLastIndex is not a function`](#i-get-statemessagesfindlastindex-is-not-a-function)
+  * [I get `state.messages.current.findLastIndex is not a function`](#i-get-statemessagesfindlastindex-is-not-a-function)
 * Cypress oddities
   * [`--env` / `tags` isn't picked up](#--env--tags-isnt-picked-up)
   * [Negated tags / complex tag expressions aren't working as expected](#negated-tags--complex-tag-expressions-arent-working-as-expected)
@@ -24,7 +24,7 @@
 
 Upgrade your node version to at least [v14.14.0](https://nodejs.org/api/fs.html#fspromisesrmpath-options).
 
-## I get `state.messages.findLastIndex is not a function`
+## I get `state.messages.current.findLastIndex is not a function`
 
 Upgrade your node version to at least [v18.0.0](https://nodejs.org/en/blog/announcements/v18-release-announce#v8-101). This only applies to users of any kind of reports (messages, json and html).
 
