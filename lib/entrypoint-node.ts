@@ -82,6 +82,11 @@ export function attach(
   throw createUnimplemented();
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export function log(text: string) {
+  throw createUnimplemented();
+}
+
 export function Before(options: string, fn: ICaseHookBody): void;
 export function Before(options: ICaseHookOptions, fn: ICaseHookBody): void;
 export function Before(fn: ICaseHookBody): void;

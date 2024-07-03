@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 
 - Add support for attachments with filenames. This is in line with how cucumber-js behaves.
 
+- Implement `log`, as seen in cucumber-js.
+
 ## v20.1.0
 
 - Include skipped (not omitted) tests in reports, fixes [#1041](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1041).
