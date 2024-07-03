@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 - Implement `log`, as seen in cucumber-js.
 
+- Minor changes to the messages report, to ensure compatibility with `cucumber-js`.
+
 ## v20.1.0
 
 - Include skipped (not omitted) tests in reports, fixes [#1041](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1041).

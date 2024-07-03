@@ -33,7 +33,7 @@ import { resolve as origResolve } from "./preprocessor-configuration";
 
 import { ensureIsAbsolute } from "./helpers/paths";
 
-import { createTimestamp } from "./helpers/messages";
+import { createTimestamp, orderMessages } from "./helpers/messages";
 
 import { memoize } from "./helpers/memoize";
 
@@ -304,7 +304,12 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
   };
 }
 
-export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
+export async function afterRunHandler(
+  config: Cypress.PluginConfigOptions,
+  results:
+    | CypressCommandLine.CypressRunResult
+    | CypressCommandLine.CypressFailedRunResult
+) {
   debug("afterRunHandler()");
 
   const preprocessor = await resolve(config, config.env, "/");
@@ -323,10 +328,7 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
 
   const testRunFinished: messages.Envelope = {
     testRunFinished: {
-      /**
-       * We're missing a "success" attribute here, but cucumber-js doesn't output it, so I won't.
-       * Mostly because I don't want to look into the semantics of it right now.
-       */
+      success: "totalFailed" in results ? results.totalFailed === 0 : false,
       timestamp: createTimestamp(),
     } as messages.TestRunFinished,
   };
@@ -577,8 +579,8 @@ export async function afterSpecHandler(
         state: "after-spec",
         pretty: state.pretty,
         messages: {
-          accumulation: state.messages.accumulation.concat(
-            state.messages.current
+          accumulation: orderMessages(
+            state.messages.accumulation.concat(state.messages.current)
           ),
         },
       };
