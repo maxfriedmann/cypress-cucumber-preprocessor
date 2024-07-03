@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Expand type signature of scenario and step hooks, to allow tags to be defined using pure string arguments. This is in line with how cucumber-js behaves.
+
 ## v20.1.0
 
 - Include skipped (not omitted) tests in reports, fixes [#1041](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1041).

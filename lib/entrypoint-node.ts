@@ -78,44 +78,48 @@ export function attach(data: string | ArrayBuffer, mediaType?: string) {
   throw createUnimplemented();
 }
 
+export function Before(options: string, fn: ICaseHookBody): void;
 export function Before(options: ICaseHookOptions, fn: ICaseHookBody): void;
 export function Before(fn: ICaseHookBody): void;
 export function Before(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: ICaseHookBody | ICaseHookOptions,
+  optionsOrFn: string | ICaseHookBody | ICaseHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: ICaseHookBody
 ) {
   throw createUnimplemented();
 }
 
+export function After(options: string, fn: ICaseHookBody): void;
 export function After(options: ICaseHookOptions, fn: ICaseHookBody): void;
 export function After(fn: ICaseHookBody): void;
 export function After(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: ICaseHookBody | ICaseHookOptions,
+  optionsOrFn: string | ICaseHookBody | ICaseHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: ICaseHookBody
 ) {
   throw createUnimplemented();
 }
 
+export function BeforeStep(options: string, fn: IStepHookBody): void;
 export function BeforeStep(options: IStepHookOptions, fn: IStepHookBody): void;
 export function BeforeStep(fn: IStepHookBody): void;
 export function BeforeStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IStepHookBody | IStepHookOptions,
+  optionsOrFn: string | IStepHookBody | IStepHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IStepHookBody
 ) {
   throw createUnimplemented();
 }
 
+export function AfterStep(options: string, fn: IStepHookBody): void;
 export function AfterStep(options: IStepHookOptions, fn: IStepHookBody): void;
 export function AfterStep(fn: IStepHookBody): void;
 export function AfterStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  optionsOrFn: IStepHookBody | IStepHookOptions,
+  optionsOrFn: string | IStepHookBody | IStepHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   maybeFn?: IStepHookBody
 ) {

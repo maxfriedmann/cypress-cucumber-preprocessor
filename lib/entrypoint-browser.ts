@@ -70,61 +70,73 @@ function defineParameterType<T, C extends Mocha.Context>(
   getRegistry().defineParameterType(options);
 }
 
+function defineBefore(options: string, fn: ICaseHookBody): void;
 function defineBefore(options: ICaseHookOptions, fn: ICaseHookBody): void;
 function defineBefore(fn: ICaseHookBody): void;
 function defineBefore(
-  optionsOrFn: ICaseHookBody | ICaseHookOptions,
+  optionsOrFn: string | ICaseHookBody | ICaseHookOptions,
   maybeFn?: ICaseHookBody
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineBefore({}, optionsOrFn);
   } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
     getRegistry().defineBefore(optionsOrFn, maybeFn);
+  } else if (typeof optionsOrFn === "string" && typeof maybeFn === "function") {
+    getRegistry().defineBefore({ tags: optionsOrFn }, maybeFn);
   } else {
     throw new Error("Unexpected argument for Before hook");
   }
 }
 
+function defineAfter(options: string, fn: ICaseHookBody): void;
 function defineAfter(options: ICaseHookOptions, fn: ICaseHookBody): void;
 function defineAfter(fn: ICaseHookBody): void;
 function defineAfter(
-  optionsOrFn: ICaseHookBody | ICaseHookOptions,
+  optionsOrFn: string | ICaseHookBody | ICaseHookOptions,
   maybeFn?: ICaseHookBody
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineAfter({}, optionsOrFn);
   } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
     getRegistry().defineAfter(optionsOrFn, maybeFn);
+  } else if (typeof optionsOrFn === "string" && typeof maybeFn === "function") {
+    getRegistry().defineAfter({ tags: optionsOrFn }, maybeFn);
   } else {
     throw new Error("Unexpected argument for After hook");
   }
 }
 
+function defineBeforeStep(options: string, fn: IStepHookBody): void;
 function defineBeforeStep(options: IStepHookOptions, fn: IStepHookBody): void;
 function defineBeforeStep(fn: IStepHookBody): void;
 function defineBeforeStep(
-  optionsOrFn: IStepHookBody | IStepHookOptions,
+  optionsOrFn: string | IStepHookBody | IStepHookOptions,
   maybeFn?: IStepHookBody
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineBeforeStep({}, optionsOrFn);
   } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
     getRegistry().defineBeforeStep(optionsOrFn, maybeFn);
+  } else if (typeof optionsOrFn === "string" && typeof maybeFn === "function") {
+    getRegistry().defineBeforeStep({ tags: optionsOrFn }, maybeFn);
   } else {
     throw new Error("Unexpected argument for BeforeStep hook");
   }
 }
 
+function defineAfterStep(options: string, fn: IStepHookBody): void;
 function defineAfterStep(options: IStepHookOptions, fn: IStepHookBody): void;
 function defineAfterStep(fn: IStepHookBody): void;
 function defineAfterStep(
-  optionsOrFn: IStepHookBody | IStepHookOptions,
+  optionsOrFn: string | IStepHookBody | IStepHookOptions,
   maybeFn?: IStepHookBody
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineAfterStep({}, optionsOrFn);
   } else if (typeof optionsOrFn === "object" && typeof maybeFn === "function") {
     getRegistry().defineAfterStep(optionsOrFn, maybeFn);
+  } else if (typeof optionsOrFn === "string" && typeof maybeFn === "function") {
+    getRegistry().defineAfterStep({ tags: optionsOrFn }, maybeFn);
   } else {
     throw new Error("Unexpected argument for AfterStep hook");
   }
