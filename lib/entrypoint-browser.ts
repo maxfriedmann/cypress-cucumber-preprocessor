@@ -174,11 +174,13 @@ function defineAfterAll(
 
 function createStringAttachment(
   data: string,
+  fileName: string | undefined,
   mediaType: string,
   encoding: AttachmentContentEncoding
 ) {
   const taskData: ITaskCreateStringAttachment = {
     data,
+    fileName,
     mediaType,
     encoding,
   };
@@ -188,19 +190,35 @@ function createStringAttachment(
   });
 }
 
-export function attach(data: string | ArrayBuffer, mediaType?: string) {
+export function attach(
+  data: string | ArrayBuffer,
+  mediaTypeOrOptions?: string | { mediaType: string; fileName?: string }
+) {
+  let mediaType, fileName;
+
+  if (mediaTypeOrOptions != null) {
+    if (typeof mediaTypeOrOptions === "string") {
+      mediaType = mediaTypeOrOptions;
+    } else {
+      mediaType = mediaTypeOrOptions.mediaType;
+      fileName = mediaTypeOrOptions.fileName;
+    }
+  }
+
   if (typeof data === "string") {
     mediaType = mediaType ?? "text/plain";
 
     if (mediaType.startsWith("base64:")) {
       createStringAttachment(
         data,
+        fileName,
         mediaType.replace("base64:", ""),
         AttachmentContentEncoding.BASE64
       );
     } else {
       createStringAttachment(
         data,
+        fileName,
         mediaType ?? "text/plain",
         AttachmentContentEncoding.IDENTITY
       );
@@ -212,6 +230,7 @@ export function attach(data: string | ArrayBuffer, mediaType?: string) {
 
     createStringAttachment(
       fromByteArray(new Uint8Array(data)),
+      fileName,
       mediaType,
       AttachmentContentEncoding.BASE64
     );
