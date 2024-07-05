@@ -19,11 +19,11 @@
 
 ## I get `fs_1.promises.rm is not a function`
 
-Upgrade your node version to at least [v14.14.0](https://nodejs.org/api/fs.html#fspromisesrmpath-options).
+Upgrade your node version to v18.0.0, which is the minimum required version.
 
 ## I get `state.messages.current.findLastIndex is not a function`
 
-Upgrade your node version to at least [v18.0.0](https://nodejs.org/en/blog/announcements/v18-release-announce#v8-101). This only applies to users of any kind of reports (messages, json and html).
+Upgrade your node version to v18.0.0, which is the minimum required version.
 
 <!-- Cypress oddities -->
 
