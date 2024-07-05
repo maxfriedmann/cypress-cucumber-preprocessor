@@ -12,6 +12,7 @@
 - [I get `Cannot find module '@badeball/cypress-cucumber-preprocessor/esbuild'`](#i-get-cannot-find-module-badeballcypress-cucumber-preprocessoresbuild)
 - [My JSON report isn't generated in run mode](#my-json-report-isnt-generated-in-run-mode)
 - [I get `Unexpected state in <state-handler>: <state>`](#i-get-unexpected-state-in-state-handler-state)
+- [I get `Webpack Compilation Error` (shown below)](#i-get-webpack-compilation-error-shown-below)
 - [Why is `cypress-tags` missing?](#why-is-cypress-tags-missing)
 - [Function members `And(..)` and `But(..)` are missing](#function-members-and-and-but-are-missing)
 
@@ -86,6 +87,20 @@ You may have stumbled upon a configuration caveat (see [docs/configuration.md: C
 ## I get `Unexpected state in <state-handler>: <state>`
 
 You might be overriding some of the plugin's own event handlers (see [docs/event-handlers.md: On event handlers](https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md)).
+
+<!-- Configuration issues -->
+
+## I get `Webpack Compilation Error` (shown below)
+
+```
+Error: Webpack Compilation Error
+Module parse failed: Unexpected token (2:21)
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+```
+
+This virtually always means that you have misconfigured `@cypress/webpack-preprocessor`. [Here's](https://github.com/badeball/cypress-cucumber-preprocessor/blob/v20.1.0/examples/webpack-cjs/cypress.config.js#L20-L28) an example of the crucial configuration value, for which when missing generates the error above.
+
+This is usually seen when users are diverging from the [examples](https://github.com/badeball/cypress-cucumber-preprocessor/tree/master/examples) by EG. placing preprocessor configuration in `cypress/plugins/index.js` (which some blog posts reference despite this being deprecated) or by placing webpack-specific content in `webpack.config.js` (or similar) and *not* referencing this file in `cypress.config.js`.
 
 <!-- Feature deprecations -->
 
