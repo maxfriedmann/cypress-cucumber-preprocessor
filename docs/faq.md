@@ -1,24 +1,21 @@
 [← Back to documentation](readme.md)
 
-# Frequently asked questions
+# Frequently asked questions <!-- omit from toc -->
 
-* Node requirements
-  * [I get `fs_1.promises.rm is not a function`](#i-get-fs_1promisesrm-is-not-a-function)
-  * [I get `state.messages.current.findLastIndex is not a function`](#i-get-statemessagescurrentfindlastindex-is-not-a-function)
-* Cypress oddities
-  * [`--env` / `tags` isn't picked up](#--env--tags-isnt-picked-up)
-  * [Negated tags / complex tag expressions aren't working as expected](#negated-tags--complex-tag-expressions-arent-working-as-expected)
-  * [JSON reports aren't generated in open / interactive mode](#json-reports-arent-generated-in-open--interactive-mode)
-* TypeScript related
-  * [I get `cypress_esbuild_preprocessor_1.createBundler is not a function`](#i-get-cypress_esbuild_preprocessor_1createbundler-is-not-a-function)
-  * [I get `cypress_esbuild_preprocessor_1.default is not a function`](#i-get-cypress_esbuild_preprocessor_1default-is-not-a-function)
-  * [I get `Cannot find module '@badeball/cypress-cucumber-preprocessor/esbuild'`](#i-get-cannot-find-module-badeballcypress-cucumber-preprocessoresbuild)
-* On event handlers
-  * [My JSON report isn't generated](#my-json-report-isnt-generated)
-  * [I get `Unexpected state in <state-handler>: <state>`](#i-get-unexpected-state-in-state-handler-state)
-* Feature deprecations
-  * [Why is `cypress-tags` missing?](#why-is-cypress-tags-missing)
-  * [The members `And(..)` and `But(..)` are missing](#function-members-and-and-but-are-missing)
+- [I get `fs_1.promises.rm is not a function`](#i-get-fs_1promisesrm-is-not-a-function)
+- [I get `state.messages.current.findLastIndex is not a function`](#i-get-statemessagescurrentfindlastindex-is-not-a-function)
+- [`--env` / `tags` isn't picked up](#--env--tags-isnt-picked-up)
+- [Negated tags / complex tag expressions aren't working as expected](#negated-tags--complex-tag-expressions-arent-working-as-expected)
+- [JSON reports aren't generated in open / interactive mode](#json-reports-arent-generated-in-open--interactive-mode)
+- [I get `cypress_esbuild_preprocessor_1.createBundler is not a function`](#i-get-cypress_esbuild_preprocessor_1createbundler-is-not-a-function)
+- [I get `cypress_esbuild_preprocessor_1.default is not a function`](#i-get-cypress_esbuild_preprocessor_1default-is-not-a-function)
+- [I get `Cannot find module '@badeball/cypress-cucumber-preprocessor/esbuild'`](#i-get-cannot-find-module-badeballcypress-cucumber-preprocessoresbuild)
+- [My JSON report isn't generated](#my-json-report-isnt-generated)
+- [I get `Unexpected state in <state-handler>: <state>`](#i-get-unexpected-state-in-state-handler-state)
+- [Why is `cypress-tags` missing?](#why-is-cypress-tags-missing)
+- [Function members `And(..)` and `But(..)` are missing](#function-members-and-and-but-are-missing)
+
+<!-- Node requirements -->
 
 ## I get `fs_1.promises.rm is not a function`
 
@@ -27,6 +24,8 @@ Upgrade your node version to at least [v14.14.0](https://nodejs.org/api/fs.html#
 ## I get `state.messages.current.findLastIndex is not a function`
 
 Upgrade your node version to at least [v18.0.0](https://nodejs.org/en/blog/announcements/v18-release-announce#v8-101). This only applies to users of any kind of reports (messages, json and html).
+
+<!-- Cypress oddities -->
 
 ## `--env` / `tags` isn't picked up
 
@@ -39,6 +38,8 @@ Windows / CMD.EXE users must be aware that single-quotes bear no special meaning
 ## JSON reports aren't generated in open / interactive mode
 
 JSON reports aren't generated in open / interactive mode. They rely on some events that aren't available in open-mode, at least not without `experimentalInteractiveRunEvents: true`. However, this experimental flag broke some time ago, ref. [cypress-io/cypress#18955](https://github.com/cypress-io/cypress/issues/18955), [cypress-io/cypress#26634](https://github.com/cypress-io/cypress/issues/26634). There's unfortunately little indication that these issues will be fixed and meanwhile reports will not be available in open / interactive mode.
+
+<!-- TypeScript related -->
 
 ## I get `cypress_esbuild_preprocessor_1.createBundler is not a function`
 
@@ -76,6 +77,8 @@ Set `compilerOptions.moduleResolution` to `node16` in your `tsconfig.json`. User
 }
 ```
 
+<!-- On event handlers -->
+
 ## My JSON report isn't generated
 
 You may have stumbled upon a configuration caveat (see [docs/configuration.md: Caveats / Debugging](configuration.md#caveats--debugging)) or are overriding some of the plugin's own event handlers (see [docs/event-handlers.md: On event handlers](https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md)).
@@ -83,6 +86,8 @@ You may have stumbled upon a configuration caveat (see [docs/configuration.md: C
 ## I get `Unexpected state in <state-handler>: <state>`
 
 You might be overriding some of the plugin's own event handlers (see [docs/event-handlers.md: On event handlers](https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md)).
+
+<!-- Feature deprecations -->
 
 ## Why is `cypress-tags` missing?
 
