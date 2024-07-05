@@ -5,12 +5,12 @@
 - [I get `fs_1.promises.rm is not a function`](#i-get-fs_1promisesrm-is-not-a-function)
 - [I get `state.messages.current.findLastIndex is not a function`](#i-get-statemessagescurrentfindlastindex-is-not-a-function)
 - [`--env` / `tags` isn't picked up](#--env--tags-isnt-picked-up)
-- [Negated tags / complex tag expressions aren't working as expected](#negated-tags--complex-tag-expressions-arent-working-as-expected)
+- [Negated tags / complex tag expressions aren't working as expected on Windows](#negated-tags--complex-tag-expressions-arent-working-as-expected-on-windows)
 - [JSON reports aren't generated in open / interactive mode](#json-reports-arent-generated-in-open--interactive-mode)
 - [I get `cypress_esbuild_preprocessor_1.createBundler is not a function`](#i-get-cypress_esbuild_preprocessor_1createbundler-is-not-a-function)
 - [I get `cypress_esbuild_preprocessor_1.default is not a function`](#i-get-cypress_esbuild_preprocessor_1default-is-not-a-function)
 - [I get `Cannot find module '@badeball/cypress-cucumber-preprocessor/esbuild'`](#i-get-cannot-find-module-badeballcypress-cucumber-preprocessoresbuild)
-- [My JSON report isn't generated](#my-json-report-isnt-generated)
+- [My JSON report isn't generated in run mode](#my-json-report-isnt-generated-in-run-mode)
 - [I get `Unexpected state in <state-handler>: <state>`](#i-get-unexpected-state-in-state-handler-state)
 - [Why is `cypress-tags` missing?](#why-is-cypress-tags-missing)
 - [Function members `And(..)` and `But(..)` are missing](#function-members-and-and-but-are-missing)
@@ -31,7 +31,7 @@ Upgrade your node version to v18.0.0, which is the minimum required version.
 
 This might be because you're trying to specify `-e / --env` multiple times, but [multiple values should be comma-separated](https://docs.cypress.io/guides/guides/command-line#cypress-run-env-lt-env-gt).
 
-## Negated tags / complex tag expressions aren't working as expected
+## Negated tags / complex tag expressions aren't working as expected on Windows
 
 Windows / CMD.EXE users must be aware that single-quotes bear no special meaning and should not be used to group words in your shell. For these users, only double-quotes should be used for this purpose. What this means is that, for these users, running `cypress run --env tags='not @foo'` <ins>is not going to behave</ins> and double-quotes must be used. Furthermore, similar scripts contained in `package.json` should also use double-quotes (escaped necessarily, as that is JSON).
 
@@ -79,7 +79,7 @@ Set `compilerOptions.moduleResolution` to `node16` in your `tsconfig.json`. User
 
 <!-- On event handlers -->
 
-## My JSON report isn't generated
+## My JSON report isn't generated in run mode
 
 You may have stumbled upon a configuration caveat (see [docs/configuration.md: Caveats / Debugging](configuration.md#caveats--debugging)) or are overriding some of the plugin's own event handlers (see [docs/event-handlers.md: On event handlers](https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md)).
 
