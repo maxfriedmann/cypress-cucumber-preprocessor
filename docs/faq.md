@@ -15,6 +15,7 @@
 - [I get `Webpack Compilation Error` (shown below)](#i-get-webpack-compilation-error-shown-below)
 - [Why is `cypress-tags` missing?](#why-is-cypress-tags-missing)
 - [Function members `And(..)` and `But(..)` are missing](#function-members-and-and-but-are-missing)
+- [Which preprocessor version should I choose?](#which-preprocessor-version-should-i-choose)
 
 <!-- Node requirements -->
 
@@ -113,3 +114,7 @@ The `cypress-tags` executable has been removed and made redundant. Specs contain
 These have been [deprecated](https://github.com/badeball/cypress-cucumber-preprocessor/issues/821) to reflect cucumber-js' behavior. You can still however use the `And` keyword in `.feature` files. As explained on [SO](https://stackoverflow.com/questions/24747464/how-to-use-and-in-a-gherkin-using-cucumber-js#comment38690100_24748612),
 
 > `And` is only used in scenarios, not as step definition methods. Semantically it means "same keyword as in previous step"; technically it is just another step. In fact, you can use `Given()`, `When()` and `Then()` interchangeably in your step definitions, Cucumber will not enforce a match between the step keyword and the step definition function.
+
+## Which preprocessor version should I choose?
+
+The observant reader might have noticed that there's a NPM package named `cypress-cucumber-preprocessor` and `@badeball/cypress-cucumber-preprocessor`. This is merely a result of maintainer and ownership transfer. The package `cypress-cucumber-preprocessor` is severely outdated by now and as far as I (the current maintainer) knows, there's no reason to be using it.
