@@ -118,3 +118,5 @@ These have been [deprecated](https://github.com/badeball/cypress-cucumber-prepro
 ## Which preprocessor version should I choose?
 
 The observant reader might have noticed that there's a NPM package named `cypress-cucumber-preprocessor` and `@badeball/cypress-cucumber-preprocessor`. This is merely a result of maintainer and ownership transfer. The package `cypress-cucumber-preprocessor` is severely outdated by now and as far as I (the current maintainer) knows, there's no reason to be using it.
+
+In any case, chose one over the other and don't attempt to mix these, essentially different packages, in the same project.
