@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Omit outputting empty "then" entries to the command log, relates to [#1214](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1214).
+
 ## v20.1.0
 
 - Include skipped (not omitted) tests in reports, fixes [#1041](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1041).
