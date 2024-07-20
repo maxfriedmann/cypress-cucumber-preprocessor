@@ -43,7 +43,7 @@ export function runStepWithLogGroup(options: {
   argument?: DataTable | string;
   text?: string;
 }) {
-  Cypress.log({
+  const log = Cypress.log({
     name: options.keyword,
     message: options.text == null ? "" : `**${options.text}**`,
     groupStart: true,
@@ -71,7 +71,7 @@ export function runStepWithLogGroup(options: {
   }
 
   return ensureChain(ret).then((result) => {
-    Cypress.log({ groupEnd: true, emitOnly: true } as object);
+    (log as any).endGroup();
     return result;
   });
 }
