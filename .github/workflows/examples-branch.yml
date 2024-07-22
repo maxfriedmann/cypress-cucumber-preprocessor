@@ -71,6 +71,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Sparse checkout sanity check
+        run: |
+          [ ! -f package.json ]
+          [ ! -f package-lock.json ]
       - name: Cache NPM modules
         uses: actions/cache@v4
         with:
