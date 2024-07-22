@@ -66,9 +66,6 @@ jobs:
     strategy:
       matrix:
         example: ${{fromJson(needs.find-examples.outputs.matrix)}}
-    defaults:
-      run:
-        working-directory: examples/${{ matrix.example }}
     env:
       NPM_CONFIG_PACKAGE_LOCK: "false"
     steps:
@@ -76,32 +73,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           sparse-checkout: examples/${{ matrix.example }}
-      - name: Cache NPM modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.npm
-          key: npm@${{ matrix.example }}
-      - name: Cache Cypress binaries
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/Cypress
-          key: cypress-examples
-      - name: pwd
-        run: echo $PWD
       - name: ls
         run: ls -la
-      - name: Retrieve dirty build
-        uses: actions/download-artifact@v4
-        with:
-          name: build
-      - name: Install NPM modules
-        run: npm install
-      - name: Install dirty build
-        run: npm install badeball-*
-      - name: Run Cypress
-        run: |
-          if [[ "${{ matrix.example }}" == ct-* ]]; then
-            npx cypress run --component
-          else
-            npx cypress run --e2e
-          fi
+      - name: tree
+        run: tree
