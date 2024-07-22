@@ -66,6 +66,9 @@ jobs:
     strategy:
       matrix:
         example: ${{fromJson(needs.find-examples.outputs.matrix)}}
+    defaults:
+      run:
+        working-directory: examples/${{ matrix.example }}
     env:
       NPM_CONFIG_PACKAGE_LOCK: "false"
     steps:
@@ -89,13 +92,10 @@ jobs:
           name: build
           path: examples/${{ matrix.example }}
       - name: Install NPM modules
-        working-directory: examples/${{ matrix.example }}
         run: npm install
       - name: Install dirty build
-        working-directory: examples/${{ matrix.example }}
         run: npm install badeball-*
       - name: Run Cypress
-        working-directory: examples/${{ matrix.example }}
         run: |
           if [[ "${{ matrix.example }}" == ct-* ]]; then
             npx cypress run --component
