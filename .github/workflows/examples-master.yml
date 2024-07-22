@@ -30,6 +30,9 @@ jobs:
     strategy:
       matrix:
         example: ${{fromJson(needs.find-examples.outputs.matrix)}}
+    defaults:
+      run:
+        working-directory: examples/${{ matrix.example }}
     env:
       NPM_CONFIG_PACKAGE_LOCK: "false"
     steps:
@@ -48,10 +51,8 @@ jobs:
           path: ~/.cache/Cypress
           key: cypress-examples
       - name: Install NPM modules
-        working-directory: examples/${{ matrix.example }}
         run: npm install
       - name: Run Cypress
-        working-directory: examples/${{ matrix.example }}
         run: |
           if [[ "${{ matrix.example }}" == ct-* ]]; then
             npx cypress run --component
