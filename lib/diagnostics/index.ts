@@ -53,7 +53,7 @@ export function comparePosition(a: Position, b: Position) {
 
 export function compareStepDefinition(
   a: IStepDefinition<unknown[], Mocha.Context>,
-  b: IStepDefinition<unknown[], Mocha.Context>
+  b: IStepDefinition<unknown[], Mocha.Context>,
 ) {
   return (
     expressionToString(a.expression) === expressionToString(b.expression) &&
@@ -62,7 +62,7 @@ export function compareStepDefinition(
 }
 
 export function position(
-  definition: IStepDefinition<unknown[], Mocha.Context>
+  definition: IStepDefinition<unknown[], Mocha.Context>,
 ): Position {
   return assertAndReturn(definition.position, "Expected to find a position");
 }
@@ -70,7 +70,7 @@ export function position(
 export function groupToMap<T, K>(
   collection: T[],
   getKeyFn: (el: T) => K,
-  compareKeyFn: (a: K, b: K) => boolean
+  compareKeyFn: (a: K, b: K) => boolean,
 ): Map<K, T[]> {
   const map = new Map<K, T[]>();
 
@@ -79,7 +79,6 @@ export function groupToMap<T, K>(
 
     for (const existingKey of map.keys()) {
       if (compareKeyFn(key, existingKey)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         map.get(existingKey)!.push(el);
         continue el;
       }
@@ -93,7 +92,7 @@ export function groupToMap<T, K>(
 
 export function mapValues<K, A, B>(
   map: Map<K, A>,
-  fn: (el: A) => B
+  fn: (el: A) => B,
 ): Map<K, B> {
   const mapped = new Map<K, B>();
 
@@ -105,7 +104,7 @@ export function mapValues<K, A, B>(
 }
 
 export function createLineBuffer(
-  fn: (append: (string: string) => void) => void
+  fn: (append: (string: string) => void) => void,
 ): string[] {
   const buffer: string[] = [];
   const append = (line: string) => buffer.push(line);
@@ -115,27 +114,26 @@ export function createLineBuffer(
 
 export function createDefinitionsUsage(
   projectRoot: string,
-  result: DiagnosticResult
+  result: DiagnosticResult,
 ): string {
   const groups = mapValues(
     groupToMap(
       result.definitionsUsage,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       (definitionsUsage) => definitionsUsage.definition.position!.source,
-      strictCompare
+      strictCompare,
     ),
     (definitionsUsages) =>
       mapValues(
         groupToMap(
           definitionsUsages,
           (definitionsUsage) => definitionsUsage.definition,
-          compareStepDefinition
+          compareStepDefinition,
         ),
         (definitionsUsages) =>
           definitionsUsages.flatMap(
-            (definitionsUsage) => definitionsUsage.steps
-          )
-      )
+            (definitionsUsage) => definitionsUsage.steps,
+          ),
+      ),
   );
 
   const entries: [string, string][] = Array.from(groups.entries())
@@ -150,7 +148,7 @@ export function createDefinitionsUsage(
             inspect(
               expression instanceof RegularExpression
                 ? expression.regexp
-                : expression.source
+                : expression.source,
             ) + (steps.length === 0 ? ` (${yellow("unused")})` : ""),
             ...steps.map((step) => {
               return "  " + step.text;
@@ -187,7 +185,7 @@ export function createDefinitionsUsage(
 
 export function createAmbiguousStep(
   projectRoot: string,
-  ambiguousStep: AmbiguousStep
+  ambiguousStep: AmbiguousStep,
 ): string[] {
   const relativeToProjectRoot = (path: string) =>
     ensureIsRelative(projectRoot, path);
@@ -195,10 +193,10 @@ export function createAmbiguousStep(
   return createLineBuffer((append) => {
     append(
       `${red(
-        "Error"
+        "Error",
       )}: Multiple matching step definitions at ${relativeToProjectRoot(
-        ambiguousStep.step.source
-      )}:${ambiguousStep.step.line} for`
+        ambiguousStep.step.source,
+      )}:${ambiguousStep.step.line} for`,
     );
     append("");
     append("  " + ambiguousStep.step.text);
@@ -212,10 +210,10 @@ export function createAmbiguousStep(
           `  - ${inspect(
             definition.expression instanceof RegularExpression
               ? definition.expression.regexp
-              : definition.expression.source
+              : definition.expression.source,
           )} (${relativeToProjectRoot(position(definition).source)}:${
             position(definition).line
-          })`
+          })`,
       )
       .forEach(append);
   });
@@ -223,7 +221,7 @@ export function createAmbiguousStep(
 
 export function createUnmatchedStep(
   projectRoot: string,
-  unmatch: UnmatchedStep
+  unmatch: UnmatchedStep,
 ): string[] {
   const relativeToProjectRoot = (path: string) =>
     ensureIsRelative(projectRoot, path);
@@ -231,14 +229,14 @@ export function createUnmatchedStep(
   return createLineBuffer((append) => {
     append(
       `${red("Error")}: Step implementation missing at ${relativeToProjectRoot(
-        unmatch.step.source
-      )}:${unmatch.step.line}`
+        unmatch.step.source,
+      )}:${unmatch.step.line}`,
     );
     append("");
     append("  " + unmatch.step.text);
     append("");
     append(
-      "We tried searching for files containing step definitions using the following search pattern template(s):"
+      "We tried searching for files containing step definitions using the following search pattern template(s):",
     );
     append("");
     unmatch.stepDefinitionHints.stepDefinitions
@@ -250,14 +248,14 @@ export function createUnmatchedStep(
     unmatch.stepDefinitionHints.stepDefinitionPatterns
       .map(
         (stepDefinitionPattern) =>
-          "  - " + relativeToProjectRoot(stepDefinitionPattern)
+          "  - " + relativeToProjectRoot(stepDefinitionPattern),
       )
       .forEach(append);
     append("");
 
     if (unmatch.stepDefinitionHints.stepDefinitionPaths.length === 0) {
       append(
-        "These patterns matched *no files* containing step definitions. This almost certainly means that you have misconfigured `stepDefinitions`. Alternatively, you can implement it using the suggestion(s) below."
+        "These patterns matched *no files* containing step definitions. This almost certainly means that you have misconfigured `stepDefinitions`. Alternatively, you can implement it using the suggestion(s) below.",
       );
     } else {
       append("These patterns matched the following file(s):");
@@ -265,17 +263,17 @@ export function createUnmatchedStep(
       unmatch.stepDefinitionHints.stepDefinitionPaths
         .map(
           (stepDefinitionPath) =>
-            "  - " + relativeToProjectRoot(stepDefinitionPath)
+            "  - " + relativeToProjectRoot(stepDefinitionPath),
         )
         .forEach(append);
       append("");
       append(
-        "However, none of these files contained a matching step definition. You can implement it using the suggestion(s) below."
+        "However, none of these files contained a matching step definition. You can implement it using the suggestion(s) below.",
       );
     }
 
     const cucumberExpressionGenerator = new CucumberExpressionGenerator(
-      () => unmatch.parameterTypeRegistry.parameterTypes
+      () => unmatch.parameterTypeRegistry.parameterTypes,
     );
 
     const generatedExpressions =
@@ -289,12 +287,12 @@ export function createUnmatchedStep(
           generateSnippet(
             generatedExpression,
             "Context" as any,
-            unmatch.argument
+            unmatch.argument,
           ),
           {
             count: 2,
-          }
-        )
+          },
+        ),
       );
     }
   });
@@ -312,13 +310,13 @@ export async function execute(options: {
 
   const implicitIntegrationFolder = assertAndReturn(
     ancestor(...getTestFiles(cypress).map(path.dirname).map(path.normalize)),
-    "Expected to find a common ancestor path"
+    "Expected to find a common ancestor path",
   );
 
   const preprocessor = await resolvePreprocessorConfiguration(
     cypress,
     options.env,
-    implicitIntegrationFolder
+    implicitIntegrationFolder,
   );
 
   const result = await diagnose({
@@ -361,7 +359,7 @@ export async function execute(options: {
 
           rest
             .map((line) =>
-              line === "" ? "" : indent(line, { count: title.length })
+              line === "" ? "" : indent(line, { count: title.length }),
             )
             .forEach(append);
 
@@ -374,6 +372,6 @@ export async function execute(options: {
       } else {
         append("No problems found.");
       }
-    })
+    }),
   );
 }

@@ -37,7 +37,7 @@ const { stringify } = JSON;
 export async function compile(
   configuration: ICypressConfiguration,
   data: string,
-  uri: string
+  uri: string,
 ) {
   configuration = rebuildOriginalConfigObject(configuration);
 
@@ -54,42 +54,42 @@ export async function compile(
     data,
     relativeUri,
     SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
-    options
+    options,
   );
 
   if (envelopes[0].parseError) {
     throw new Error(
       assertAndReturn(
         envelopes[0].parseError.message,
-        "Expected parse error to have a description"
-      )
+        "Expected parse error to have a description",
+      ),
     );
   }
 
   const gherkinDocument = assertAndReturn(
     envelopes.map((envelope) => envelope.gherkinDocument).find(notNull),
-    "Expected to find a gherkin document amongst the envelopes."
+    "Expected to find a gherkin document amongst the envelopes.",
   );
 
   const pickles = envelopes.map((envelope) => envelope.pickle).filter(notNull);
 
   const implicitIntegrationFolder = assertAndReturn(
     ancestor(
-      ...getTestFiles(configuration).map(path.dirname).map(path.normalize)
+      ...getTestFiles(configuration).map(path.dirname).map(path.normalize),
     ),
-    "Expected to find a common ancestor path"
+    "Expected to find a common ancestor path",
   );
 
   const preprocessor = await resolve(
     configuration,
     configuration.env,
-    implicitIntegrationFolder
+    implicitIntegrationFolder,
   );
 
   const { stepDefinitions } = preprocessor;
 
   debug(
-    `resolving step definitions using template(s) ${inspect(stepDefinitions)}`
+    `resolving step definitions using template(s) ${inspect(stepDefinitions)}`,
   );
 
   const stepDefinitionPatterns = getStepDefinitionPatterns(
@@ -97,21 +97,21 @@ export async function compile(
       cypress: configuration,
       preprocessor,
     },
-    uri
+    uri,
   );
 
   debug(
     `for ${inspect(
-      ensureIsRelative(configuration.projectRoot, uri)
+      ensureIsRelative(configuration.projectRoot, uri),
     )} yielded patterns ${inspect(
       stepDefinitionPatterns.map((pattern) =>
-        ensureIsRelative(configuration.projectRoot, pattern)
-      )
-    )}`
+        ensureIsRelative(configuration.projectRoot, pattern),
+      ),
+    )}`,
   );
 
   const stepDefinitionPaths = await getStepDefinitionPaths(
-    stepDefinitionPatterns
+    stepDefinitionPatterns,
   );
 
   if (stepDefinitionPaths.length === 0) {
@@ -120,9 +120,9 @@ export async function compile(
     debug(
       `found step definitions ${inspect(
         stepDefinitionPaths.map((path) =>
-          ensureIsRelative(configuration.projectRoot, path)
-        )
-      )}`
+          ensureIsRelative(configuration.projectRoot, path),
+        ),
+      )}`,
     );
   }
 
@@ -146,7 +146,7 @@ export async function compile(
     {
       stepDefinitions,
       stepDefinitionPatterns: stepDefinitionPatterns.map(
-        ensureRelativeToProjectRoot
+        ensureRelativeToProjectRoot,
       ),
       stepDefinitionPaths: stepDefinitionPaths.map(ensureRelativeToProjectRoot),
     },

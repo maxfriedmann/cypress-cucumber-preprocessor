@@ -14,7 +14,7 @@ import prettier from "prettier";
 
 export async function insertValuesInConfigFile(
   filePath: string,
-  obj: Record<string, any> = {}
+  obj: Record<string, any> = {},
 ) {
   await insertValuesInJavaScript(filePath, obj);
 
@@ -23,20 +23,20 @@ export async function insertValuesInConfigFile(
 
 export async function insertValuesInJavaScript(
   filePath: string,
-  obj: Record<string, any>
+  obj: Record<string, any>,
 ) {
   const fileContents = await fs.readFile(filePath, { encoding: "utf8" });
 
   const finalCode = await insertValueInJSString(fileContents, obj);
 
-  const prettifiedCode = prettier.format(finalCode, { parser: "babel" });
+  const prettifiedCode = await prettier.format(finalCode, { parser: "babel" });
 
   await fs.writeFile(filePath, prettifiedCode);
 }
 
 export async function insertValueInJSString(
   fileContents: string,
-  obj: Record<string, any>
+  obj: Record<string, any>,
 ): Promise<string> {
   const ast = parse(fileContents, {
     plugins: ["typescript"],
@@ -48,7 +48,7 @@ export async function insertValueInJSString(
   function handleExport(
     nodePath:
       | NodePath<namedTypes.CallExpression, any>
-      | NodePath<namedTypes.ObjectExpression, any>
+      | NodePath<namedTypes.ObjectExpression, any>,
   ): void {
     if (
       nodePath.node.type === "CallExpression" &&
@@ -71,7 +71,7 @@ export async function insertValueInJSString(
     }
 
     throw new Error(
-      "Cypress was unable to add/update values in your configuration file."
+      "Cypress was unable to add/update values in your configuration file.",
     );
   }
 
@@ -102,7 +102,7 @@ export async function insertValueInJSString(
   if (!objectLiteralNode) {
     // if the export is no object litteral
     throw new Error(
-      "Cypress was unable to add/update values in your configuration file."
+      "Cypress was unable to add/update values in your configuration file.",
     );
   }
 
@@ -111,7 +111,7 @@ export async function insertValueInJSString(
 
   // sort splicers to keep the order of the original file
   const sortedSplicers = splicers.sort((a, b) =>
-    a.start === b.start ? 0 : a.start > b.start ? 1 : -1
+    a.start === b.start ? 0 : a.start > b.start ? 1 : -1,
   );
 
   if (!sortedSplicers.length) return fileContents;
@@ -131,7 +131,7 @@ export async function insertValueInJSString(
 
 export function isDefineConfigFunction(
   ast: File,
-  functionName: string
+  functionName: string,
 ): boolean {
   let value = false;
 
@@ -153,7 +153,7 @@ export function isDefineConfigFunction(
                 prop.key.type === "Identifier" &&
                 prop.key.name === "defineConfig"
               );
-            }
+            },
           );
 
           if (defineConfigFunctionNode) {
@@ -177,7 +177,7 @@ export function isDefineConfigFunction(
               specifier.imported.type === "Identifier" &&
               specifier.imported.name === "defineConfig"
             );
-          }
+          },
         );
 
         if (defineConfigFunctionNode) {
@@ -197,12 +197,12 @@ function setRootKeysSplicers(
   splicers: Splicer[],
   obj: Record<string, any>,
   objectLiteralNode: namedTypes.ObjectExpression,
-  lineStartSpacer: string
+  lineStartSpacer: string,
 ) {
   const objectLiteralStartIndex = (objectLiteralNode as any).start + 1;
   // add values
   const objKeys = Object.keys(obj).filter((key) =>
-    ["boolean", "number", "string"].includes(typeof obj[key])
+    ["boolean", "number", "string"].includes(typeof obj[key]),
   );
 
   // update values
@@ -225,7 +225,7 @@ function setRootKeysSplicers(
         propertyToUpdate,
         obj[key],
         key,
-        obj
+        obj,
       );
     }
   });
@@ -250,7 +250,7 @@ function setSubKeysSplicers(
   obj: Record<string, any>,
   objectLiteralNode: namedTypes.ObjectExpression,
   lineStartSpacer: string,
-  parentLineStartSpacer: string
+  parentLineStartSpacer: string,
 ) {
   const objectLiteralStartIndex = (objectLiteralNode as any).start + 1;
 
@@ -294,7 +294,7 @@ function setSubKeysSplicers(
     subvaluesInserted += `\n${parentLineStartSpacer}${key}: {`;
     keysToInsertForSubKeys[key].forEach((subkey) => {
       subvaluesInserted += `\n${parentLineStartSpacer}${lineStartSpacer}${subkey}: ${JSON.stringify(
-        obj[key][subkey]
+        obj[key][subkey],
       )},`;
     });
 
@@ -328,7 +328,7 @@ function setSubKeysSplicers(
           splicers,
           obj[key],
           propertyToUpdate.value,
-          parentLineStartSpacer + lineStartSpacer
+          parentLineStartSpacer + lineStartSpacer,
         );
       }
     });
@@ -339,7 +339,7 @@ function setSplicerToUpdateProperty(
   propertyToUpdate: namedTypes.ObjectProperty,
   updatedValue: any,
   key: string,
-  obj: Record<string, any>
+  obj: Record<string, any>,
 ) {
   if (
     propertyToUpdate &&
@@ -356,14 +356,14 @@ function setSplicerToUpdateProperty(
     });
   } else {
     throw new Error(
-      "Cypress was unable to add/update values in your configuration file."
+      "Cypress was unable to add/update values in your configuration file.",
     );
   }
 }
 
 function propertyFromKey(
   objectLiteralNode: namedTypes.ObjectExpression | undefined,
-  key: string
+  key: string,
 ): namedTypes.ObjectProperty | undefined {
   return objectLiteralNode?.properties.find((prop) => {
     return (
@@ -375,7 +375,7 @@ function propertyFromKey(
 }
 
 function isPrimitive(
-  value: NodePath["node"]
+  value: NodePath["node"],
 ): value is
   | namedTypes.NumericLiteral
   | namedTypes.StringLiteral
@@ -388,7 +388,7 @@ function isPrimitive(
 }
 
 function isUndefinedOrNull(
-  value: NodePath["node"]
+  value: NodePath["node"],
 ): value is namedTypes.Identifier {
   return (
     value.type === "Identifier" && ["undefined", "null"].includes(value.name)

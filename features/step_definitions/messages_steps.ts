@@ -15,7 +15,7 @@ import ICustomWorld from "../support/ICustomWorld";
 
 async function readMessagesReport(
   cwd: string,
-  options: { normalize: boolean } = { normalize: true }
+  options: { normalize: boolean } = { normalize: true },
 ): Promise<messages.Envelope[]> {
   const absoluteMessagesPath = path.join(cwd, "cucumber-messages.ndjson");
 
@@ -39,7 +39,7 @@ Then(
   async function (this: ICustomWorld, a, b) {
     const absoluteMessagesPath = path.join(
       this.tmpDir,
-      "cucumber-messages.ndjson"
+      "cucumber-messages.ndjson",
     );
 
     const messages = (await fs.readFile(absoluteMessagesPath))
@@ -58,7 +58,7 @@ Then(
     if (bCount !== 1) {
       throw new Error(`Expected to find a single "${b}", but found ${bCount}`);
     }
-  }
+  },
 );
 
 Then("there should be no messages report", async function (this: ICustomWorld) {
@@ -67,14 +67,14 @@ Then("there should be no messages report", async function (this: ICustomWorld) {
     {
       code: "ENOENT",
     },
-    "Expected there to be no messages report"
+    "Expected there to be no messages report",
   );
 });
 
 Then("there should be a messages report", async function (this: ICustomWorld) {
   await assert.doesNotReject(
     () => fs.access(path.join(this.tmpDir, "cucumber-messages.ndjson")),
-    "Expected there to be a messages file"
+    "Expected there to be a messages file",
   );
 });
 
@@ -86,19 +86,19 @@ Then(
     const absoluteExpectedJsonpath = path.join(
       process.cwd(),
       "features",
-      fixturePath
+      fixturePath,
     );
 
     if (process.env.WRITE_FIXTURES) {
       await fs.writeFile(absoluteExpectedJsonpath, ndJsonToString(ndjson));
     } else {
       const expectedJsonOutput = stringToNdJson(
-        (await fs.readFile(absoluteExpectedJsonpath)).toString()
+        (await fs.readFile(absoluteExpectedJsonpath)).toString(),
       );
 
       assert.deepStrictEqual(ndjson, expectedJsonOutput);
     }
-  }
+  },
 );
 
 Then(
@@ -114,7 +114,7 @@ Then(
       throw new Error("Expected to find an attachment, but found none");
     } else if (attachments.length > 1) {
       throw new Error(
-        "Expected to find a single attachment, but found " + attachments.length
+        "Expected to find a single attachment, but found " + attachments.length,
       );
     }
 
@@ -131,7 +131,7 @@ Then(
           } else {
             resolve(data);
           }
-        }
+        },
       );
     });
 
@@ -144,7 +144,7 @@ Then(
 
     assert.strictEqual(actualWidth, expectedDimensions.width);
     assert.strictEqual(actualHeight, expectedDimensions.height);
-  }
+  },
 );
 
 Then(
@@ -155,11 +155,11 @@ Then(
     for (const message of messages) {
       if (message.gherkinDocument) {
         throw new Error(
-          `Expected to find no specs, but found a gherkin document`
+          `Expected to find no specs, but found a gherkin document`,
         );
       }
     }
-  }
+  },
 );
 
 Then(
@@ -175,17 +175,17 @@ Then(
     >;
 
     const isTestStepFinishedEnvelope = (
-      envelope: messages.Envelope
+      envelope: messages.Envelope,
     ): envelope is TestStepFinishedEnvelope => !!envelope.testStepFinished;
 
     const testStepFinishedCol: TestStepFinishedEnvelope[] = messages.filter(
-      isTestStepFinishedEnvelope
+      isTestStepFinishedEnvelope,
     );
 
     if (testStepFinishedCol.length !== 1) {
       throw new Error(
         "Expected to find a single testStepFinished envelope, but found " +
-          testStepFinishedCol.length
+          testStepFinishedCol.length,
       );
     }
 
@@ -197,7 +197,7 @@ Then(
     ) {
       throw new Error("Expected to find non-zero duration");
     }
-  }
+  },
 );
 
 Then(
@@ -207,9 +207,9 @@ Then(
 
     const hook = assertAndReturn(
       messages.map((message) => message.hook).find((hook) => hook),
-      "Expected to find a hook among messages"
+      "Expected to find a hook among messages",
     );
 
     assert.equal(hook.name, name);
-  }
+  },
 );

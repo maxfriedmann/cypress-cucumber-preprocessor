@@ -37,15 +37,15 @@ declare const results: CypressCommandLine.RunResult;
 declare const details: Cypress.ScreenshotDetails;
 
 expectType<Promise<IPreprocessorConfiguration>>(
-  resolvePreprocessorConfiguration(config, {}, "/")
+  resolvePreprocessorConfiguration(config, {}, "/"),
 );
 
 expectType<Promise<Cypress.PluginConfigOptions>>(
-  addCucumberPreprocessorPlugin(on, config)
+  addCucumberPreprocessorPlugin(on, config),
 );
 
 expectType<Promise<Cypress.PluginConfigOptions>>(
-  addCucumberPreprocessorPlugin(on, config, {})
+  addCucumberPreprocessorPlugin(on, config, {}),
 );
 
 expectType<Promise<Cypress.PluginConfigOptions>>(
@@ -55,7 +55,7 @@ expectType<Promise<Cypress.PluginConfigOptions>>(
     omitBeforeSpecHandler: true,
     omitAfterSpecHandler: true,
     omitAfterScreenshotHandler: true,
-  })
+  }),
 );
 
 expectType<Promise<void>>(beforeRunHandler(config));
@@ -67,7 +67,7 @@ expectType<Promise<void>>(beforeSpecHandler(config, spec));
 expectType<Promise<void>>(afterSpecHandler(config, spec, results));
 
 expectType<Promise<Cypress.ScreenshotDetails>>(
-  afterScreenshotHandler(config, details)
+  afterScreenshotHandler(config, details),
 );
 
 Given("foo", function (foo, bar: number, baz: string) {
@@ -207,7 +207,7 @@ BeforeStep(
     expectType<messages.GherkinDocument>(gherkinDocument);
     expectType<string>(testCaseStartedId);
     expectType<string>(testStepId);
-  }
+  },
 );
 
 BeforeStep(
@@ -225,7 +225,7 @@ BeforeStep(
     expectType<messages.GherkinDocument>(gherkinDocument);
     expectType<string>(testCaseStartedId);
     expectType<string>(testStepId);
-  }
+  },
 );
 
 AfterStep(function ({
@@ -258,7 +258,7 @@ AfterStep(
     expectType<messages.GherkinDocument>(gherkinDocument);
     expectType<string>(testCaseStartedId);
     expectType<string>(testStepId);
-  }
+  },
 );
 
 AfterStep(
@@ -276,7 +276,7 @@ AfterStep(
     expectType<messages.GherkinDocument>(gherkinDocument);
     expectType<string>(testCaseStartedId);
     expectType<string>(testStepId);
-  }
+  },
 );
 
 expectType<messages.GherkinDocument>(window.testState.gherkinDocument);
@@ -294,7 +294,7 @@ interface MathWorld {
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Mocha {
-    // eslint-disable-next-line @typescript-eslint/no-empty-interface
+    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
     interface Context extends MathWorld {}
   }
 }

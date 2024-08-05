@@ -23,7 +23,7 @@ pipeline(
       envelopes.push(envelope);
       callback();
     },
-  })
+  }),
 )
   .then(() => {
     let jsonOutput: string | undefined;
@@ -38,7 +38,7 @@ pipeline(
 
     assertIsString(
       jsonOutput,
-      "Expected JSON formatter to have finished, but it never returned"
+      "Expected JSON formatter to have finished, but it never returned",
     );
 
     console.log(jsonOutput);

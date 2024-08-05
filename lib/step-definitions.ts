@@ -17,13 +17,13 @@ import { IPreprocessorConfiguration } from "./preprocessor-configuration";
 import { ensureIsAbsolute } from "./helpers/paths";
 
 export async function getStepDefinitionPaths(
-  stepDefinitionPatterns: string[]
+  stepDefinitionPatterns: string[],
 ): Promise<string[]> {
   return (
     await Promise.all(
       stepDefinitionPatterns.map((pattern) =>
-        glob.glob(pattern, { nodir: true, windowsPathsNoEscape: true })
-      )
+        glob.glob(pattern, { nodir: true, windowsPathsNoEscape: true }),
+      ),
     )
   ).reduce((acum, el) => acum.concat(el), []);
 }
@@ -35,7 +35,7 @@ function trimFeatureExtension(filepath: string) {
 export function pathParts(relativePath: string): string[] {
   assert(
     !path.isAbsolute(relativePath),
-    `Expected a relative path but got ${relativePath}`
+    `Expected a relative path but got ${relativePath}`,
   );
 
   const parts: string[] = [];
@@ -57,7 +57,7 @@ export function getStepDefinitionPatterns(
       "stepDefinitions" | "implicitIntegrationFolder"
     >;
   },
-  filepath: string
+  filepath: string,
 ): string[] {
   const projectRoot = configuration.cypress.projectRoot;
 
@@ -69,10 +69,10 @@ export function getStepDefinitionPatterns(
     trimFeatureExtension(
       path.relative(
         configuration.preprocessor.implicitIntegrationFolder,
-        filepath
-      )
+        filepath,
+      ),
     ),
-    { windowsPathsNoEscape: true }
+    { windowsPathsNoEscape: true },
   );
 
   debug(`replacing [filepath] with ${util.inspect(filepathReplacement)}`);
@@ -88,8 +88,8 @@ export function getStepDefinitionPatterns(
       if (pattern.includes("[filepath]") && pattern.includes("[filepart]")) {
         throw new Error(
           `Pattern cannot contain both [filepath] and [filepart], but got ${util.inspect(
-            pattern
-          )}`
+            pattern,
+          )}`,
         );
       } else if (pattern.includes("[filepath]")) {
         return pattern.replace("[filepath]", filepathReplacement);

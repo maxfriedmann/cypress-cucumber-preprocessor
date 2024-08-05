@@ -21,13 +21,13 @@ function example(options: {
   context(options.description, () => {
     it("returns the proper snippet", () => {
       const snippets = new CucumberExpressionGenerator(
-        () => new ParameterTypeRegistry().parameterTypes
+        () => new ParameterTypeRegistry().parameterTypes,
       ).generateExpressions(options.pattern);
 
       const actual = generateSnippet(
         snippets[0],
         options.type,
-        options.parameter ?? null
+        options.parameter ?? null,
       );
 
       assert.strictEqual(actual, options.expected);

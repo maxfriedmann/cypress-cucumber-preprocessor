@@ -78,7 +78,7 @@ export function comparePosition(a: Position, b: Position) {
 
 export function compareStepDefinition(
   a: IStepDefinition<unknown[], Mocha.Context>,
-  b: IStepDefinition<unknown[], Mocha.Context>
+  b: IStepDefinition<unknown[], Mocha.Context>,
 ) {
   return (
     expressionToString(a.expression) === expressionToString(b.expression) &&
@@ -87,7 +87,7 @@ export function compareStepDefinition(
 }
 
 export function position(
-  definition: IStepDefinition<unknown[], Mocha.Context>
+  definition: IStepDefinition<unknown[], Mocha.Context>,
 ): Position {
   return assertAndReturn(definition.position, "Expected to find a position");
 }
@@ -111,23 +111,23 @@ export async function diagnose(configuration: {
 
     const stepDefinitionPatterns = getStepDefinitionPatterns(
       configuration,
-      testFile
+      testFile,
     );
 
     const stepDefinitions = await getStepDefinitionPaths(
-      stepDefinitionPatterns
+      stepDefinitionPatterns,
     );
 
     const randomPart = Math.random().toString(16).slice(2, 8);
 
     const inputFileName = path.join(
       configuration.cypress.projectRoot,
-      ".input-" + randomPart + ".js"
+      ".input-" + randomPart + ".js",
     );
 
     const outputFileName = path.join(
       configuration.cypress.projectRoot,
-      ".output-" + randomPart + ".cjs"
+      ".output-" + randomPart + ".cjs",
     );
 
     let registry: Registry;
@@ -139,9 +139,9 @@ export async function diagnose(configuration: {
         inputFileName,
         stepDefinitions
           .map(
-            (stepDefinition) => `require(${JSON.stringify(stepDefinition)});`
+            (stepDefinition) => `require(${JSON.stringify(stepDefinition)});`,
           )
-          .join("\n")
+          .join("\n"),
       );
 
       const esbuildResult = await esbuild.build({
@@ -157,7 +157,7 @@ export async function diagnose(configuration: {
         }
 
         throw new Error(
-          `Failed to compile step definitions of ${testFile}, with errors shown above...`
+          `Failed to compile step definitions of ${testFile}, with errors shown above...`,
         );
       }
 
@@ -173,12 +173,13 @@ export async function diagnose(configuration: {
 
       registry = withRegistry(true, () => {
         try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports
           require(outputFileName);
         } catch (e: unknown) {
           console.log(util.inspect(e));
 
           throw new Error(
-            "Failed to evaluate step definitions, with errors shown above..."
+            "Failed to evaluate step definitions, with errors shown above...",
           );
         }
       });
@@ -186,7 +187,7 @@ export async function diagnose(configuration: {
       registry.finalize(newId);
 
       const consumer = await new sourceMap.SourceMapConsumer(
-        (await fs.readFile(outputFileName + ".map")).toString()
+        (await fs.readFile(outputFileName + ".map")).toString(),
       );
 
       for (const stepDefinition of registry.stepDefinitions) {
@@ -197,15 +198,15 @@ export async function diagnose(configuration: {
         stepDefinition.position = {
           line: assertAndReturn(
             newPosition.line,
-            "Expected to find a line number"
+            "Expected to find a line number",
           ),
           column: assertAndReturn(
             newPosition.column,
-            "Expected to find a column number"
+            "Expected to find a column number",
           ),
           source: assertAndReturn(
             newPosition.source,
-            "Expected to find a source"
+            "Expected to find a source",
           ),
         };
       }
@@ -229,26 +230,26 @@ export async function diagnose(configuration: {
 
     const relativeUri = ensureIsRelative(
       configuration.cypress.projectRoot,
-      testFile
+      testFile,
     );
 
     const envelopes = generateMessages(
       (await fs.readFile(testFile)).toString(),
       relativeUri,
       SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
-      options
+      options,
     );
 
     const gherkinDocument = assertAndReturn(
       envelopes
         .map((envelope) => envelope.gherkinDocument)
         .find((document) => document),
-      "Expected to find a gherkin document"
+      "Expected to find a gherkin document",
     );
 
     for (const stepDefinition of registry.stepDefinitions) {
       const usage = result.definitionsUsage.find((usage) =>
-        compareStepDefinition(usage.definition, stepDefinition)
+        compareStepDefinition(usage.definition, stepDefinition),
       );
 
       if (!usage) {
@@ -270,7 +271,7 @@ export async function diagnose(configuration: {
         for (const step of pickle.steps) {
           const text = assertAndReturn(
             step.text,
-            "Expected pickle step to have a text"
+            "Expected pickle step to have a text",
           );
 
           const matchingStepDefinitions =
@@ -278,12 +279,12 @@ export async function diagnose(configuration: {
 
           const astNodeId = assertAndReturn(
             step.astNodeIds?.[0],
-            "Expected to find at least one astNodeId"
+            "Expected to find at least one astNodeId",
           );
 
           const astNode = assertAndReturn(
             astIdMap.get(astNodeId),
-            `Expected to find scenario step associated with id = ${astNodeId}`
+            `Expected to find scenario step associated with id = ${astNodeId}`,
           );
 
           assert("location" in astNode, "Expected ast node to have a location");
@@ -301,12 +302,11 @@ export async function diagnose(configuration: {
               step: {
                 source: testFile,
                 line: astNode.location.line,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 text: step.text!,
               },
               type: assertAndReturn(
                 step.type,
-                "Expected pickleStep to have a type"
+                "Expected pickleStep to have a type",
               ),
               argument,
               parameterTypeRegistry: registry.parameterTypeRegistry,
@@ -323,16 +323,15 @@ export async function diagnose(configuration: {
               result.definitionsUsage.find((usage) =>
                 compareStepDefinition(
                   usage.definition,
-                  matchingStepDefinitions[0]
-                )
+                  matchingStepDefinitions[0],
+                ),
               ),
-              "Expected to find usage"
+              "Expected to find usage",
             );
 
             usage.steps.push({
               source: testFile,
               line: astNode.location?.line,
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               text: step.text!,
             });
           } else {
@@ -341,16 +340,15 @@ export async function diagnose(configuration: {
                 result.definitionsUsage.find((usage) =>
                   compareStepDefinition(
                     usage.definition,
-                    matchingStepDefinition
-                  )
+                    matchingStepDefinition,
+                  ),
                 ),
-                "Expected to find usage"
+                "Expected to find usage",
               );
 
               usage.steps.push({
                 source: testFile,
                 line: astNode.location.line,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 text: step.text!,
               });
             }
@@ -359,7 +357,6 @@ export async function diagnose(configuration: {
               step: {
                 source: testFile,
                 line: astNode.location.line,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 text: step.text!,
               },
               definitions: matchingStepDefinitions,

@@ -28,8 +28,8 @@ describe("Run all specs", () => {
     const title = aggregatedTitle(
       assertAndReturn(
         this.test?.ctx?.currentTest,
-        "Expected hook to have a context and a test"
-      )
+        "Expected hook to have a context and a test",
+      ),
     );
 
     this.tmpDir = path.join(projectPath, "tmp", title.replace(/[()?]/g, ""));
@@ -68,7 +68,7 @@ describe("Run all specs", () => {
               setupNodeEvents
             },
           });
-        `
+        `,
       );
     } else {
       await writeFile(
@@ -76,7 +76,7 @@ describe("Run all specs", () => {
         JSON.stringify({
           testFiles: "**/*.feature",
           video: false,
-        })
+        }),
       );
 
       await writeFile(
@@ -93,7 +93,7 @@ describe("Run all specs", () => {
               })
             );
           }
-        `
+        `,
       );
     }
 
@@ -107,8 +107,8 @@ describe("Run all specs", () => {
         this.tmpDir,
         "node_modules",
         "@badeball",
-        "cypress-cucumber-preprocessor"
-      )
+        "cypress-cucumber-preprocessor",
+      ),
     );
   });
 
@@ -126,28 +126,28 @@ describe("Run all specs", () => {
 
     await writeFile(
       path.join(this.tmpDir, "cypress", "integration", "a.feature"),
-      feature
+      feature,
     );
 
     await writeFile(
       path.join(this.tmpDir, "cypress", "integration", "a.ts"),
-      steps
+      steps,
     );
 
     await writeFile(
       path.join(this.tmpDir, "cypress", "integration", "b.feature"),
-      feature
+      feature,
     );
 
     await writeFile(
       path.join(this.tmpDir, "cypress", "integration", "b.ts"),
-      steps
+      steps,
     );
 
     child_process.spawnSync(
       path.join(projectPath, "node_modules", ".bin", "cypress"),
       ["open"],
-      { cwd: this.tmpDir, stdio: "inherit" }
+      { cwd: this.tmpDir, stdio: "inherit" },
     );
   });
 });

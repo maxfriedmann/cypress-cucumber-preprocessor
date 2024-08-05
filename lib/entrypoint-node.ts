@@ -48,7 +48,7 @@ export function defineStep<T extends unknown[], C extends Mocha.Context>(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   description: string | RegExp,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  implementation: IStepDefinitionBody<T, C>
+  implementation: IStepDefinitionBody<T, C>,
 ) {
   throw createUnimplemented();
 }
@@ -61,14 +61,14 @@ export function Step(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   text: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  argument?: DataTable | string
+  argument?: DataTable | string,
 ) {
   throw createUnimplemented();
 }
 
 export function defineParameterType<T, C extends Mocha.Context>(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  options: IParameterTypeDefinition<T, C>
+  options: IParameterTypeDefinition<T, C>,
 ) {
   throw createUnimplemented();
 }
@@ -84,7 +84,7 @@ export function Before(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   optionsOrFn: ICaseHookBody | ICaseHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: ICaseHookBody
+  maybeFn?: ICaseHookBody,
 ) {
   throw createUnimplemented();
 }
@@ -95,7 +95,7 @@ export function After(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   optionsOrFn: ICaseHookBody | ICaseHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: ICaseHookBody
+  maybeFn?: ICaseHookBody,
 ) {
   throw createUnimplemented();
 }
@@ -106,7 +106,7 @@ export function BeforeStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   optionsOrFn: IStepHookBody | IStepHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: IStepHookBody
+  maybeFn?: IStepHookBody,
 ) {
   throw createUnimplemented();
 }
@@ -117,7 +117,7 @@ export function AfterStep(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   optionsOrFn: IStepHookBody | IStepHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: IStepHookBody
+  maybeFn?: IStepHookBody,
 ) {
   throw createUnimplemented();
 }
@@ -128,7 +128,7 @@ export function BeforeAll(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   optionsOrFn: IRunHookBody | IRunHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: IRunHookBody
+  maybeFn?: IRunHookBody,
 ) {
   throw createUnimplemented();
 }
@@ -139,7 +139,7 @@ export function AfterAll(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   optionsOrFn: IRunHookBody | IRunHookOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  maybeFn?: IRunHookBody
+  maybeFn?: IRunHookBody,
 ) {
   throw createUnimplemented();
 }

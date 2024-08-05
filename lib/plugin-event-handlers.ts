@@ -227,7 +227,7 @@ const createPrettyStream = () => {
 
 const createStateError = (stateHandler: string, currentState: State["state"]) =>
   new CypressCucumberError(
-    `Unexpected state in ${stateHandler}: ${currentState}. This almost always means that you or some other plugin, are overwriting this plugin's event handlers. For more information & workarounds, see https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md (if neither workaround work, please report at ${homepage})`
+    `Unexpected state in ${stateHandler}: ${currentState}. This almost always means that you or some other plugin, are overwriting this plugin's event handlers. For more information & workarounds, see https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/event-handlers.md (if neither workaround work, please report at ${homepage})`,
   );
 
 export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
@@ -281,7 +281,7 @@ export async function beforeRunHandler(config: Cypress.PluginConfigOptions) {
     const writable = createPrettyStream();
 
     const eventBroadcaster = createPrettyFormatter(useColors(), (chunk) =>
-      writable.write(chunk)
+      writable.write(chunk),
     );
 
     pretty = {
@@ -345,7 +345,7 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
   if (preprocessor.messages.enabled) {
     const messagesPath = ensureIsAbsolute(
       config.projectRoot,
-      preprocessor.messages.output
+      preprocessor.messages.output,
     );
 
     await fs.mkdir(path.dirname(messagesPath), { recursive: true });
@@ -354,14 +354,14 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
       messagesPath,
       state.messages.accumulation
         .map((message) => JSON.stringify(message))
-        .join("\n") + "\n"
+        .join("\n") + "\n",
     );
   }
 
   if (preprocessor.json.enabled) {
     const jsonPath = ensureIsAbsolute(
       config.projectRoot,
-      preprocessor.json.output
+      preprocessor.json.output,
     );
 
     await fs.mkdir(path.dirname(jsonPath), { recursive: true });
@@ -372,7 +372,7 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
       state.messages.accumulation,
       (chunk) => {
         jsonOutput = chunk;
-      }
+      },
     );
 
     for (const message of state.messages.accumulation) {
@@ -381,7 +381,7 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
 
     assertIsString(
       jsonOutput,
-      "Expected JSON formatter to have finished, but it never returned"
+      "Expected JSON formatter to have finished, but it never returned",
     );
 
     await fs.writeFile(jsonPath, jsonOutput);
@@ -390,7 +390,7 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
   if (preprocessor.html.enabled) {
     const htmlPath = ensureIsAbsolute(
       config.projectRoot,
-      preprocessor.html.output
+      preprocessor.html.output,
     );
 
     await fs.mkdir(path.dirname(htmlPath), { recursive: true });
@@ -400,14 +400,14 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
     await pipeline(
       stream.Readable.from(state.messages.accumulation),
       createHtmlStream(),
-      output
+      output,
     );
   }
 }
 
 export async function beforeSpecHandler(
   config: Cypress.PluginConfigOptions,
-  spec: Cypress.Spec
+  spec: Cypress.Spec,
 ) {
   debug("beforeSpecHandler()");
 
@@ -482,7 +482,7 @@ export async function beforeSpecHandler(
 export async function afterSpecHandler(
   config: Cypress.PluginConfigOptions,
   spec: Cypress.Spec,
-  results: CypressCommandLine.RunResult
+  results: CypressCommandLine.RunResult,
 ) {
   debug("afterSpecHandler()");
 
@@ -515,8 +515,8 @@ export async function afterSpecHandler(
   if (error != null && browserCrashExprCol.some((expr) => expr.test(error))) {
     console.log(
       chalk.yellow(
-        `\nDue to browser crash, no reports are created for ${spec.relative}.`
-      )
+        `\nDue to browser crash, no reports are created for ${spec.relative}.`,
+      ),
     );
 
     state = {
@@ -544,14 +544,14 @@ export async function afterSpecHandler(
   assert(results, "Expected results to be defined");
 
   const wasRemainingSkipped = results.tests.some((test) =>
-    test.displayError?.match(HOOK_FAILURE_EXPR)
+    test.displayError?.match(HOOK_FAILURE_EXPR),
   );
 
   if (wasRemainingSkipped) {
     console.log(
       chalk.yellow(
-        `  Hook failures can't be represented in any reports (messages / json / html), thus none is created for ${spec.relative}.`
-      )
+        `  Hook failures can't be represented in any reports (messages / json / html), thus none is created for ${spec.relative}.`,
+      ),
     );
 
     state = {
@@ -578,7 +578,7 @@ export async function afterSpecHandler(
         pretty: state.pretty,
         messages: {
           accumulation: state.messages.accumulation.concat(
-            state.messages.current
+            state.messages.current,
           ),
         },
       };
@@ -588,7 +588,7 @@ export async function afterSpecHandler(
 
 export async function afterScreenshotHandler(
   config: Cypress.PluginConfigOptions,
-  details: Cypress.ScreenshotDetails
+  details: Cypress.ScreenshotDetails,
 ) {
   debug("afterScreenshotHandler()");
 
@@ -631,7 +631,7 @@ export async function afterScreenshotHandler(
 
 export async function specEnvelopesHandler(
   config: Cypress.PluginConfigOptions,
-  data: ITaskSpecEnvelopes
+  data: ITaskSpecEnvelopes,
 ) {
   debug("specEnvelopesHandler()");
 
@@ -673,7 +673,7 @@ export async function specEnvelopesHandler(
 
 export async function testCaseStartedHandler(
   config: Cypress.PluginConfigOptions,
-  data: ITaskTestCaseStarted
+  data: ITaskTestCaseStarted,
 ) {
   debug("testCaseStartedHandler()");
 
@@ -684,7 +684,7 @@ export async function testCaseStartedHandler(
     case "has-reloaded-received-envelopes":
       {
         const iLastTestCaseStarted = state.messages.current.findLastIndex(
-          (message) => message.testCaseStarted
+          (message) => message.testCaseStarted,
         );
 
         const lastTestCaseStarted =
@@ -711,7 +711,7 @@ export async function testCaseStartedHandler(
             const writable = createPrettyStream();
 
             const broadcaster = createPrettyFormatter(useColors(), (chunk) =>
-              writable.write(chunk)
+              writable.write(chunk),
             );
 
             for (const message of state.specEnvelopes) {
@@ -728,7 +728,7 @@ export async function testCaseStartedHandler(
           // Discard messages of previous test, which is being re-run.
           state.messages.current = state.messages.current.slice(
             0,
-            iLastTestCaseStarted
+            iLastTestCaseStarted,
           );
         }
       }
@@ -759,7 +759,7 @@ export async function testCaseStartedHandler(
 
 export function testStepStartedHandler(
   config: Cypress.PluginConfigOptions,
-  data: ITaskTestStepStarted
+  data: ITaskTestStepStarted,
 ) {
   debug("testStepStartedHandler()");
 
@@ -801,13 +801,13 @@ export type OnAfterStep = (
   options: {
     attach: Attach;
     result: messages.TestStepResult;
-  } & IStepHookParameter
+  } & IStepHookParameter,
 ) => Promise<void> | void;
 
 export async function testStepFinishedHandler(
   config: Cypress.PluginConfigOptions,
   options: { onAfterStep?: OnAfterStep },
-  testStepFinished: ITaskTestStepFinished
+  testStepFinished: ITaskTestStepFinished,
 ) {
   debug("testStepFinishedHandler()");
 
@@ -831,7 +831,7 @@ export async function testStepFinishedHandler(
       .map((message) => message.testCaseStarted)
       .filter(notNull)
       .find((testCaseStarted) => testCaseStarted.id === testCaseStartedId),
-    "Expected to find a testCaseStarted"
+    "Expected to find a testCaseStarted",
   );
 
   const testCase = assertAndReturn(
@@ -839,12 +839,12 @@ export async function testStepFinishedHandler(
       .map((message) => message.testCase)
       .filter(notNull)
       .find((testCase) => testCase.id === pickleId),
-    "Expected to find a testCase"
+    "Expected to find a testCase",
   );
 
   const { pickleStepId, hookId } = assertAndReturn(
     testCase.testSteps.find((testStep) => testStep.id === testStepId),
-    "Expected to find a testStep"
+    "Expected to find a testStep",
   );
 
   if (pickleStepId != null) {
@@ -853,12 +853,12 @@ export async function testStepFinishedHandler(
         .map((message) => message.pickle)
         .filter(notNull)
         .find((pickle) => pickle.id === pickleId),
-      "Expected to find a pickle"
+      "Expected to find a pickle",
     );
 
     const pickleStep = assertAndReturn(
       pickle.steps.find((step) => step.id === pickleStepId),
-      "Expected to find a pickleStep"
+      "Expected to find a pickleStep",
     );
 
     const gherkinDocument = assertAndReturn(
@@ -866,7 +866,7 @@ export async function testStepFinishedHandler(
         .map((message) => message.gherkinDocument)
         .filter(notNull)
         .find((gherkinDocument) => gherkinDocument.uri === pickle.uri),
-      "Expected to find a gherkinDocument"
+      "Expected to find a gherkinDocument",
     );
 
     const attachments: ITaskCreateStringAttachment[] = [];
@@ -934,7 +934,7 @@ export async function testStepFinishedHandler(
 
 export function testCaseFinishedHandler(
   config: Cypress.PluginConfigOptions,
-  data: ITaskTestCaseFinished
+  data: ITaskTestCaseFinished,
 ) {
   debug("testCaseFinishedHandler()");
 
@@ -967,7 +967,7 @@ export function testCaseFinishedHandler(
 
 export async function createStringAttachmentHandler(
   config: Cypress.PluginConfigOptions,
-  { data, mediaType, encoding }: ITaskCreateStringAttachment
+  { data, mediaType, encoding }: ITaskCreateStringAttachment,
 ) {
   debug("createStringAttachmentHandler()");
 

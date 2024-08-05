@@ -12,7 +12,7 @@ import { compile } from "../template";
 
 export function transform(
   configuration: ICypressConfiguration,
-  filepath: string
+  filepath: string,
 ) {
   if (!filepath.match(".feature$")) {
     return new PassThrough();
@@ -31,7 +31,7 @@ export function transform(
       try {
         done(
           null,
-          await compile(configuration, buffer.toString("utf8"), filepath)
+          await compile(configuration, buffer.toString("utf8"), filepath),
         );
 
         debug(`compiled ${filepath}`);
@@ -51,7 +51,7 @@ type ICypressPreprocessorFile = EventEmitter & {
 
 function preprendTransformerToOptions(
   configuration: ICypressConfiguration,
-  options: any
+  options: any,
 ) {
   let wrappedTransform;
 
@@ -79,7 +79,7 @@ function preprendTransformerToOptions(
 export function preprocessor(
   configuration: ICypressConfiguration,
   options = browserify.defaultOptions,
-  { prependTransform = true }: { prependTransform?: boolean } = {}
+  { prependTransform = true }: { prependTransform?: boolean } = {},
 ) {
   if (prependTransform) {
     options = preprendTransformerToOptions(configuration, options);

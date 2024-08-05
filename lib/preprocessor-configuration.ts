@@ -16,7 +16,7 @@ import {
 
 function hasOwnProperty<X extends Record<string, unknown>, Y extends string>(
   value: X,
-  property: Y
+  property: Y,
 ): value is X & Record<Y, unknown> {
   return Object.prototype.hasOwnProperty.call(value, property);
 }
@@ -33,22 +33,22 @@ function isFilterSpecsMixedMode(value: any): value is FilterSpecsMixedMode {
 
 function validateUserConfigurationEntry(
   key: string,
-  value: Record<string, unknown>
+  value: Record<string, unknown>,
 ): Partial<IUserConfiguration> {
   switch (key) {
     case "stepDefinitions":
       if (!isStringOrStringArray(value)) {
         throw new Error(
           `Expected a string or array of strings (stepDefinitions), but got ${util.inspect(
-            value
-          )}`
+            value,
+          )}`,
         );
       }
       return { [key]: value };
     case "messages": {
       if (typeof value !== "object" || value == null) {
         throw new Error(
-          `Expected an object (messages), but got ${util.inspect(value)}`
+          `Expected an object (messages), but got ${util.inspect(value)}`,
         );
       }
       if (
@@ -57,8 +57,8 @@ function validateUserConfigurationEntry(
       ) {
         throw new Error(
           `Expected a boolean (messages.enabled), but got ${util.inspect(
-            value.enabled
-          )}`
+            value.enabled,
+          )}`,
         );
       }
       let output: string | undefined;
@@ -68,8 +68,8 @@ function validateUserConfigurationEntry(
         } else {
           throw new Error(
             `Expected a string (messages.output), but got ${util.inspect(
-              value.output
-            )}`
+              value.output,
+            )}`,
           );
         }
       }
@@ -82,7 +82,7 @@ function validateUserConfigurationEntry(
     case "json": {
       if (typeof value !== "object" || value == null) {
         throw new Error(
-          `Expected an object (json), but got ${util.inspect(value)}`
+          `Expected an object (json), but got ${util.inspect(value)}`,
         );
       }
       if (
@@ -91,8 +91,8 @@ function validateUserConfigurationEntry(
       ) {
         throw new Error(
           `Expected a boolean (json.enabled), but got ${util.inspect(
-            value.enabled
-          )}`
+            value.enabled,
+          )}`,
         );
       }
       let output: string | undefined;
@@ -102,8 +102,8 @@ function validateUserConfigurationEntry(
         } else {
           throw new Error(
             `Expected a string (json.output), but got ${util.inspect(
-              value.output
-            )}`
+              value.output,
+            )}`,
           );
         }
       }
@@ -116,7 +116,7 @@ function validateUserConfigurationEntry(
     case "html": {
       if (typeof value !== "object" || value == null) {
         throw new Error(
-          `Expected an object (html), but got ${util.inspect(value)}`
+          `Expected an object (html), but got ${util.inspect(value)}`,
         );
       }
       if (
@@ -125,8 +125,8 @@ function validateUserConfigurationEntry(
       ) {
         throw new Error(
           `Expected a boolean (html.enabled), but got ${util.inspect(
-            value.enabled
-          )}`
+            value.enabled,
+          )}`,
         );
       }
       let output: string | undefined;
@@ -136,8 +136,8 @@ function validateUserConfigurationEntry(
         } else {
           throw new Error(
             `Expected a string (html.output), but got ${util.inspect(
-              value.output
-            )}`
+              value.output,
+            )}`,
           );
         }
       }
@@ -150,7 +150,7 @@ function validateUserConfigurationEntry(
     case "pretty": {
       if (typeof value !== "object" || value == null) {
         throw new Error(
-          `Expected an object (pretty), but got ${util.inspect(value)}`
+          `Expected an object (pretty), but got ${util.inspect(value)}`,
         );
       }
       if (
@@ -159,8 +159,8 @@ function validateUserConfigurationEntry(
       ) {
         throw new Error(
           `Expected a boolean (pretty.enabled), but got ${util.inspect(
-            value.enabled
-          )}`
+            value.enabled,
+          )}`,
         );
       }
       const prettyConfig = {
@@ -172,8 +172,8 @@ function validateUserConfigurationEntry(
       if (!isFilterSpecsMixedMode(value)) {
         throw new Error(
           `Unrecognize filterSpecsMixedMode: ${util.inspect(
-            value
-          )} (valid options are "hide", "show" and "empty-set")`
+            value,
+          )} (valid options are "hide", "show" and "empty-set")`,
         );
       }
       return { [key]: value };
@@ -181,7 +181,7 @@ function validateUserConfigurationEntry(
     case "filterSpecs": {
       if (!isBoolean(value)) {
         throw new Error(
-          `Expected a boolean (filterSpecs), but got ${util.inspect(value)}`
+          `Expected a boolean (filterSpecs), but got ${util.inspect(value)}`,
         );
       }
       return { [key]: value };
@@ -189,7 +189,7 @@ function validateUserConfigurationEntry(
     case "omitFiltered": {
       if (!isBoolean(value)) {
         throw new Error(
-          `Expected a boolean (omitFiltered), but got ${util.inspect(value)}`
+          `Expected a boolean (omitFiltered), but got ${util.inspect(value)}`,
         );
       }
       return { [key]: value };
@@ -207,21 +207,21 @@ function validateUserConfiguration(configuration: object): IUserConfiguration {
   if (!isPlainObject(configuration)) {
     throw new Error(
       `Malformed configuration, expected an object, but got ${util.inspect(
-        configuration
-      )}`
+        configuration,
+      )}`,
     );
   }
 
   return Object.assign(
     {},
     ...Object.entries(configuration).map((entry) =>
-      validateUserConfigurationEntry(...entry)
-    )
+      validateUserConfigurationEntry(...entry),
+    ),
   );
 }
 
 function validateEnvironmentOverrides(
-  environment: Record<string, unknown>
+  environment: Record<string, unknown>,
 ): IEnvironmentOverrides {
   const overrides: IEnvironmentOverrides = {};
 
@@ -233,8 +233,8 @@ function validateEnvironmentOverrides(
     } else {
       throw new Error(
         `Expected a string or array of strings (stepDefinitions), but got ${util.inspect(
-          stepDefinitions
-        )}`
+          stepDefinitions,
+        )}`,
       );
     }
   }
@@ -249,8 +249,8 @@ function validateEnvironmentOverrides(
     } else {
       throw new Error(
         `Expected a boolean (messagesEnabled), but got ${util.inspect(
-          messagesEnabled
-        )}`
+          messagesEnabled,
+        )}`,
       );
     }
   }
@@ -263,8 +263,8 @@ function validateEnvironmentOverrides(
     } else {
       throw new Error(
         `Expected a string (messagesOutput), but got ${util.inspect(
-          messagesOutput
-        )}`
+          messagesOutput,
+        )}`,
       );
     }
   }
@@ -278,7 +278,7 @@ function validateEnvironmentOverrides(
       overrides.jsonEnabled = stringToMaybeBoolean(jsonEnabled);
     } else {
       throw new Error(
-        `Expected a boolean (jsonEnabled), but got ${util.inspect(jsonEnabled)}`
+        `Expected a boolean (jsonEnabled), but got ${util.inspect(jsonEnabled)}`,
       );
     }
   }
@@ -290,7 +290,7 @@ function validateEnvironmentOverrides(
       overrides.jsonOutput = jsonOutput;
     } else {
       throw new Error(
-        `Expected a string (jsonOutput), but got ${util.inspect(jsonOutput)}`
+        `Expected a string (jsonOutput), but got ${util.inspect(jsonOutput)}`,
       );
     }
   }
@@ -304,7 +304,7 @@ function validateEnvironmentOverrides(
       overrides.htmlEnabled = stringToMaybeBoolean(htmlEnabled);
     } else {
       throw new Error(
-        `Expected a boolean (htmlEnabled), but got ${util.inspect(htmlEnabled)}`
+        `Expected a boolean (htmlEnabled), but got ${util.inspect(htmlEnabled)}`,
       );
     }
   }
@@ -316,7 +316,7 @@ function validateEnvironmentOverrides(
       overrides.htmlOutput = htmlOutput;
     } else {
       throw new Error(
-        `Expected a string (htmlOutput), but got ${util.inspect(htmlOutput)}`
+        `Expected a string (htmlOutput), but got ${util.inspect(htmlOutput)}`,
       );
     }
   }
@@ -331,8 +331,8 @@ function validateEnvironmentOverrides(
     } else {
       throw new Error(
         `Expected a boolean (prettyEnabled), but got ${util.inspect(
-          prettyEnabled
-        )}`
+          prettyEnabled,
+        )}`,
       );
     }
   }
@@ -345,8 +345,8 @@ function validateEnvironmentOverrides(
     } else {
       throw new Error(
         `Unrecognize filterSpecsMixedMode: ${util.inspect(
-          filterSpecsMixedMode
-        )} (valid options are "hide", "show" and "empty-set")`
+          filterSpecsMixedMode,
+        )} (valid options are "hide", "show" and "empty-set")`,
       );
     }
   }
@@ -360,7 +360,7 @@ function validateEnvironmentOverrides(
       overrides.filterSpecs = stringToMaybeBoolean(filterSpecs);
     } else {
       throw new Error(
-        `Expected a boolean (filterSpecs), but got ${util.inspect(filterSpecs)}`
+        `Expected a boolean (filterSpecs), but got ${util.inspect(filterSpecs)}`,
       );
     }
   }
@@ -375,8 +375,8 @@ function validateEnvironmentOverrides(
     } else {
       throw new Error(
         `Expected a boolean (omitFiltered), but got ${util.inspect(
-          omitFiltered
-        )}`
+          omitFiltered,
+        )}`,
       );
     }
   }
@@ -482,13 +482,13 @@ export function combineIntoConfiguration(
   configuration: IUserConfiguration,
   overrides: IEnvironmentOverrides,
   cypress: ICypressRuntimeConfiguration,
-  implicitIntegrationFolder: string
+  implicitIntegrationFolder: string,
 ): IPreprocessorConfiguration {
   const defaultStepDefinitions = DEFAULT_STEP_DEFINITIONS.map((pattern) =>
     pattern.replace(
       "[integration-directory]",
-      ensureIsRelative(cypress.projectRoot, implicitIntegrationFolder)
-    )
+      ensureIsRelative(cypress.projectRoot, implicitIntegrationFolder),
+    ),
   );
 
   const specific = configuration[cypress.testingType];
@@ -540,12 +540,12 @@ export function combineIntoConfiguration(
   };
 
   const usingPrettyReporter = cypress.reporter.endsWith(
-    COMPILED_REPORTER_ENTRYPOINT
+    COMPILED_REPORTER_ENTRYPOINT,
   );
 
   if (usingPrettyReporter) {
     debug(
-      "detected use of @badeball/cypress-cucumber-preprocessor/pretty-reporter, enabling pretty output"
+      "detected use of @badeball/cypress-cucumber-preprocessor/pretty-reporter, enabling pretty output",
     );
   }
 
@@ -606,14 +606,14 @@ async function cosmiconfigResolver(projectRoot: string) {
 }
 
 export type ConfigurationFileResolver = (
-  projectRoot: string
+  projectRoot: string,
 ) => unknown | Promise<unknown>;
 
 export async function resolve(
   cypressConfig: ICypressRuntimeConfiguration,
   environment: Record<string, unknown>,
   implicitIntegrationFolder: string,
-  configurationFileResolver: ConfigurationFileResolver = cosmiconfigResolver
+  configurationFileResolver: ConfigurationFileResolver = cosmiconfigResolver,
 ): Promise<IPreprocessorConfiguration> {
   const result = await configurationFileResolver(cypressConfig.projectRoot);
 
@@ -628,8 +628,8 @@ export async function resolve(
 
     debug(
       `resolved explicit user configuration ${util.inspect(
-        explicitConfiguration
-      )}`
+        explicitConfiguration,
+      )}`,
     );
   } else {
     explicitConfiguration = {};
@@ -641,7 +641,7 @@ export async function resolve(
     explicitConfiguration,
     environmentOverrides,
     cypressConfig,
-    implicitIntegrationFolder
+    implicitIntegrationFolder,
   );
 
   debug(`resolved configuration ${util.inspect(configuration)}`);

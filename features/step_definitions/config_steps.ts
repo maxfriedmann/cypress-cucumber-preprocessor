@@ -6,10 +6,10 @@ import ICustomWorld from "../support/ICustomWorld";
 
 async function updateJsonConfiguration(
   absoluteConfigPath: string,
-  additionalJsonContent: any
+  additionalJsonContent: any,
 ) {
   const existingConfig = JSON.parse(
-    (await fs.readFile(absoluteConfigPath)).toString()
+    (await fs.readFile(absoluteConfigPath)).toString(),
   );
 
   await fs.writeFile(
@@ -20,8 +20,8 @@ async function updateJsonConfiguration(
         ...additionalJsonContent,
       },
       null,
-      2
-    )
+      2,
+    ),
   );
 }
 
@@ -30,11 +30,11 @@ Given(
   async function (this: ICustomWorld, jsonContent) {
     const absoluteConfigPath = path.join(
       this.tmpDir,
-      ".cypress-cucumber-preprocessorrc"
+      ".cypress-cucumber-preprocessorrc",
     );
 
     await updateJsonConfiguration(absoluteConfigPath, JSON.parse(jsonContent));
-  }
+  },
 );
 
 Given(
@@ -42,7 +42,7 @@ Given(
   async function (this: ICustomWorld, jsonContent) {
     await insertValuesInConfigFile(
       path.join(this.tmpDir, "cypress.config.js"),
-      JSON.parse(jsonContent)
+      JSON.parse(jsonContent),
     );
-  }
+  },
 );

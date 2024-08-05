@@ -32,7 +32,7 @@ Given(
 
     const absoluteFilePath = path.join(
       this.tmpDir,
-      "cypress/support/step_definitions/hooks.js"
+      "cypress/support/step_definitions/hooks.js",
     );
 
     let content: string = "";
@@ -84,5 +84,5 @@ Given(
     }
 
     await writeFile(absoluteFilePath, content);
-  }
+  },
 );

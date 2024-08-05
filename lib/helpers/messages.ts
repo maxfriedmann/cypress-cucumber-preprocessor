@@ -18,7 +18,7 @@ export function createTimestamp(): StrictTimestamp {
 
 export function duration(
   start: StrictTimestamp,
-  end: StrictTimestamp
+  end: StrictTimestamp,
 ): StrictTimestamp {
   return {
     seconds: end.seconds - start.seconds,

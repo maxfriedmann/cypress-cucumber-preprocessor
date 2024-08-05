@@ -26,7 +26,7 @@ export function isNotExclusivelySuiteConfiguration(entry: ConfigurationEntry) {
 }
 
 export function hasExclusivelySuiteConfiguration(
-  config: Cypress.TestConfigOverrides
+  config: Cypress.TestConfigOverrides,
 ) {
   return Object.keys(config).includes(TEST_ISOLATION_CONFIGURATION_OPTION);
 }

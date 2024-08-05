@@ -19,7 +19,7 @@ const loader: ILoaderDefinition = function (data) {
 
   compile(this.query, data, this.resourcePath).then(
     (result) => callback(null, result),
-    (error) => callback(error)
+    (error) => callback(error),
   );
 };
 
