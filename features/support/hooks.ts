@@ -29,7 +29,7 @@ Before(async function ({ gherkinDocument, pickle }) {
           expect(Cypress.$(top.document).find(selector)).to.exist;
         });
       });
-    `
+    `,
   );
 
   await writeFile(
@@ -45,7 +45,7 @@ Before(async function ({ gherkinDocument, pickle }) {
             setupNodeEvents
           }
         })
-      `
+      `,
   );
 
   await fs.mkdir(path.join(this.tmpDir, "node_modules", "@badeball"), {
@@ -58,16 +58,16 @@ Before(async function ({ gherkinDocument, pickle }) {
       this.tmpDir,
       "node_modules",
       "@badeball",
-      "cypress-cucumber-preprocessor"
+      "cypress-cucumber-preprocessor",
     ),
-    "dir"
+    "dir",
   );
 });
 
 Before({ tags: "not @no-default-preprocessor-config" }, async function () {
   await writeFile(
     path.join(this.tmpDir, ".cypress-cucumber-preprocessorrc"),
-    "{}"
+    "{}",
   );
 });
 
@@ -91,7 +91,7 @@ Before({ tags: "not @no-default-plugin" }, async function () {
 
           return config;
         };
-      `
+      `,
   );
 });
 
@@ -108,7 +108,7 @@ After(function () {
     !this.verifiedLastRunError
   ) {
     throw new Error(
-      `Last run errored unexpectedly. Output:\n\n${this.lastRun.output}`
+      `Last run errored unexpectedly. Output:\n\n${this.lastRun.output}`,
     );
   }
 });

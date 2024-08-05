@@ -22,7 +22,11 @@ export function stripIndent(content: string) {
 
 export function indent(
   string: string,
-  options: { count?: number; indent?: string; includeEmptyLines?: boolean } = {}
+  options: {
+    count?: number;
+    indent?: string;
+    includeEmptyLines?: boolean;
+  } = {},
 ) {
   const { count = 1, indent = " ", includeEmptyLines = false } = options;
 

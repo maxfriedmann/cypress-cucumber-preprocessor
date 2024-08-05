@@ -15,7 +15,7 @@ function combine(...streams: Readable[]) {
     stream.pipe(combined, { end: false });
     stream.once(
       "end",
-      () => streams.every((s) => s.readableEnded) && combined.emit("end")
+      () => streams.every((s) => s.readableEnded) && combined.emit("end"),
     );
     return combined;
   }, new PassThrough());
@@ -43,7 +43,7 @@ export default class CustomWorld implements ICustomWorld {
         projectPath,
         "node_modules",
         ".bin",
-        isWin ? "cypress.cmd" : "cypress"
+        isWin ? "cypress.cmd" : "cypress",
       ),
       args: ["run", ...extraArgs],
       extraEnv: {
@@ -140,7 +140,7 @@ export default class CustomWorld implements ICustomWorld {
           throw new Error(`Last run passed unexpectedly. Output:\n\n${output}`);
         } else {
           throw new Error(
-            `Last run errored unexpectedly. Output:\n\n${output}`
+            `Last run errored unexpectedly. Output:\n\n${output}`,
           );
         }
       } else {

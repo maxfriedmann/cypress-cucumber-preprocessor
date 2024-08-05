@@ -10,7 +10,7 @@ Given(
     const absoluteFilePath = path.join(this.tmpDir, filePath);
 
     await writeFile(absoluteFilePath, stripIndent(fileContent));
-  }
+  },
 );
 
 Given(
@@ -19,5 +19,5 @@ Given(
     const absoluteFilePath = path.join(this.tmpDir, filePath);
 
     await writeFile(absoluteFilePath, "");
-  }
+  },
 );

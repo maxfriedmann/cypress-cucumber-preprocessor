@@ -125,7 +125,7 @@ export class Registry {
           id: newId(),
           expression: new CucumberExpression(
             description,
-            this.parameterTypeRegistry
+            this.parameterTypeRegistry,
           ),
           implementation,
           position,
@@ -135,7 +135,7 @@ export class Registry {
           id: newId(),
           expression: new RegularExpression(
             description,
-            this.parameterTypeRegistry
+            this.parameterTypeRegistry,
           ),
           implementation,
           position,
@@ -169,14 +169,14 @@ export class Registry {
     transformer,
   }: IParameterTypeDefinition<T, C>) {
     this.parameterTypeRegistry.defineParameterType(
-      new ParameterType(name, regexp, null, transformer, true, false)
+      new ParameterType(name, regexp, null, transformer, true, false),
     );
   }
 
   public defineCaseHook(
     keyword: CaseHookKeyword,
     options: ICaseHookOptions,
-    fn: ICaseHookBody
+    fn: ICaseHookBody,
   ) {
     const { order, ...remainingOptions } = options;
     this.preliminaryHooks.push({
@@ -200,7 +200,7 @@ export class Registry {
   public defineStepHook(
     keyword: StepHookKeyword,
     options: ICaseHookOptions,
-    fn: IStepHookBody
+    fn: IStepHookBody,
   ) {
     const { order, ...remainingOptions } = options;
     this.stepHooks.push({
@@ -224,7 +224,7 @@ export class Registry {
   public defineRunHook(
     keyword: RunHookKeyword,
     options: IRunHookOptions,
-    fn: IRunHookBody
+    fn: IRunHookBody,
   ) {
     this.runHooks.push({
       implementation: fn,
@@ -244,7 +244,7 @@ export class Registry {
 
   public getMatchingStepDefinitions(text: string) {
     return this.stepDefinitions.filter((stepDefinition) =>
-      stepDefinition.expression.match(text)
+      stepDefinition.expression.match(text),
     );
   }
 
@@ -253,7 +253,7 @@ export class Registry {
 
     if (matchingStepDefinitions.length === 0) {
       throw new MissingDefinitionError(
-        `Step implementation missing for: ${text}`
+        `Step implementation missing for: ${text}`,
       );
     } else if (matchingStepDefinitions.length > 1) {
       throw new MultipleDefinitionsError(
@@ -273,7 +273,7 @@ export class Registry {
                 return ` ${stringExpression}`;
               }
             })
-            .join("\n")
+            .join("\n"),
       );
     } else {
       return matchingStepDefinitions[0];
@@ -283,11 +283,10 @@ export class Registry {
   public runStepDefininition(
     world: Mocha.Context,
     text: string,
-    argument?: DataTable | string
+    argument?: DataTable | string,
   ): unknown {
     const stepDefinition = this.resolveStepDefintion(text);
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const args = stepDefinition.expression
       .match(text)!
       .map((match) => match.getValue(world));
@@ -318,7 +317,7 @@ export class Registry {
   public runCaseHook(
     world: Mocha.Context,
     hook: ICaseHook,
-    options: ICaseHookParameter
+    options: ICaseHookParameter,
   ) {
     return hook.implementation.call(world, options);
   }
@@ -342,7 +341,7 @@ export class Registry {
   public runStepHook(
     world: Mocha.Context,
     hook: IStepHook,
-    options: IStepHookParameter
+    options: IStepHookParameter,
   ) {
     return hook.implementation.call(world, options);
   }
@@ -373,7 +372,7 @@ const globalPropertyName =
 
 export function withRegistry(
   experimentalSourceMap: boolean,
-  fn: () => void
+  fn: () => void,
 ): Registry {
   const registry = new Registry(experimentalSourceMap);
   assignRegistry(registry);
@@ -393,6 +392,6 @@ export function freeRegistry() {
 export function getRegistry(): Registry {
   return assertAndReturn(
     globalThis[globalPropertyName],
-    "Expected to find a global registry (this usually means you are trying to define steps or hooks in support/e2e.js, which is not supported)"
+    "Expected to find a global registry (this usually means you are trying to define steps or hooks in support/e2e.js, which is not supported)",
   );
 }

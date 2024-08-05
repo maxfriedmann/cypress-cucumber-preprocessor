@@ -50,7 +50,7 @@ export interface IStepHookBody {
 
 export interface IStepDefinitionBody<
   T extends unknown[],
-  C extends Mocha.Context
+  C extends Mocha.Context,
 > {
   (this: C, ...args: T): void;
 }

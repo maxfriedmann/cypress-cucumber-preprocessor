@@ -45,7 +45,7 @@ import { AddOptions } from "./add-cucumber-preprocessor-plugin";
 
 function defineStep<T extends unknown[], C extends Mocha.Context>(
   description: string | RegExp,
-  implementation: IStepDefinitionBody<T, C>
+  implementation: IStepDefinitionBody<T, C>,
 ) {
   getRegistry().defineStep(description, implementation);
 }
@@ -53,7 +53,7 @@ function defineStep<T extends unknown[], C extends Mocha.Context>(
 function runStepDefininition(
   world: Mocha.Context,
   text: string,
-  argument?: DataTable | string
+  argument?: DataTable | string,
 ) {
   cy.then(() => {
     runStepWithLogGroup({
@@ -65,7 +65,7 @@ function runStepDefininition(
 }
 
 function defineParameterType<T, C extends Mocha.Context>(
-  options: IParameterTypeDefinition<T, C>
+  options: IParameterTypeDefinition<T, C>,
 ) {
   getRegistry().defineParameterType(options);
 }
@@ -74,7 +74,7 @@ function defineBefore(options: ICaseHookOptions, fn: ICaseHookBody): void;
 function defineBefore(fn: ICaseHookBody): void;
 function defineBefore(
   optionsOrFn: ICaseHookBody | ICaseHookOptions,
-  maybeFn?: ICaseHookBody
+  maybeFn?: ICaseHookBody,
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineBefore({}, optionsOrFn);
@@ -89,7 +89,7 @@ function defineAfter(options: ICaseHookOptions, fn: ICaseHookBody): void;
 function defineAfter(fn: ICaseHookBody): void;
 function defineAfter(
   optionsOrFn: ICaseHookBody | ICaseHookOptions,
-  maybeFn?: ICaseHookBody
+  maybeFn?: ICaseHookBody,
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineAfter({}, optionsOrFn);
@@ -104,7 +104,7 @@ function defineBeforeStep(options: IStepHookOptions, fn: IStepHookBody): void;
 function defineBeforeStep(fn: IStepHookBody): void;
 function defineBeforeStep(
   optionsOrFn: IStepHookBody | IStepHookOptions,
-  maybeFn?: IStepHookBody
+  maybeFn?: IStepHookBody,
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineBeforeStep({}, optionsOrFn);
@@ -119,7 +119,7 @@ function defineAfterStep(options: IStepHookOptions, fn: IStepHookBody): void;
 function defineAfterStep(fn: IStepHookBody): void;
 function defineAfterStep(
   optionsOrFn: IStepHookBody | IStepHookOptions,
-  maybeFn?: IStepHookBody
+  maybeFn?: IStepHookBody,
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineAfterStep({}, optionsOrFn);
@@ -134,7 +134,7 @@ function defineBeforeAll(options: IRunHookOptions, fn: IRunHookBody): void;
 function defineBeforeAll(fn: IRunHookBody): void;
 function defineBeforeAll(
   optionsOrFn: IRunHookBody | IRunHookOptions,
-  maybeFn?: IRunHookBody
+  maybeFn?: IRunHookBody,
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineBeforeAll({}, optionsOrFn);
@@ -149,7 +149,7 @@ function defineAfterAll(options: IRunHookOptions, fn: IRunHookBody): void;
 function defineAfterAll(fn: IRunHookBody): void;
 function defineAfterAll(
   optionsOrFn: IRunHookBody | IRunHookOptions,
-  maybeFn?: IRunHookBody
+  maybeFn?: IRunHookBody,
 ) {
   if (typeof optionsOrFn === "function") {
     getRegistry().defineAfterAll({}, optionsOrFn);
@@ -163,7 +163,7 @@ function defineAfterAll(
 function createStringAttachment(
   data: string,
   mediaType: string,
-  encoding: AttachmentContentEncoding
+  encoding: AttachmentContentEncoding,
 ) {
   const taskData: ITaskCreateStringAttachment = {
     data,
@@ -184,13 +184,13 @@ export function attach(data: string | ArrayBuffer, mediaType?: string) {
       createStringAttachment(
         data,
         mediaType.replace("base64:", ""),
-        AttachmentContentEncoding.BASE64
+        AttachmentContentEncoding.BASE64,
       );
     } else {
       createStringAttachment(
         data,
         mediaType ?? "text/plain",
-        AttachmentContentEncoding.IDENTITY
+        AttachmentContentEncoding.IDENTITY,
       );
     }
   } else if (data instanceof ArrayBuffer) {
@@ -201,7 +201,7 @@ export function attach(data: string | ArrayBuffer, mediaType?: string) {
     createStringAttachment(
       fromByteArray(new Uint8Array(data)),
       mediaType,
-      AttachmentContentEncoding.BASE64
+      AttachmentContentEncoding.BASE64,
     );
   } else {
     throw Error("Invalid attachment data: must be a ArrayBuffer or string");
@@ -264,32 +264,30 @@ export function resolvePreprocessorConfiguration(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   implicitIntegrationFolder: string,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  configurationFileResolver?: ConfigurationFileResolver
+  configurationFileResolver?: ConfigurationFileResolver,
 ): Promise<IPreprocessorConfiguration> {
   throw createUnimplemented();
 }
 
 export async function addCucumberPreprocessorPlugin(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   on: Cypress.PluginEvents,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   config: Cypress.PluginConfigOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  options: AddOptions = {}
+  options: AddOptions = {},
 ): Promise<Cypress.PluginConfigOptions> {
   throw createUnimplemented();
 }
 
 export async function beforeRunHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  config: Cypress.PluginConfigOptions
+  config: Cypress.PluginConfigOptions,
 ): Promise<void> {
   throw createUnimplemented();
 }
 
 export async function afterRunHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  config: Cypress.PluginConfigOptions
+  config: Cypress.PluginConfigOptions,
 ): Promise<void> {
   throw createUnimplemented();
 }
@@ -298,7 +296,7 @@ export async function beforeSpecHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   config: Cypress.PluginConfigOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  spec: Cypress.Spec
+  spec: Cypress.Spec,
 ): Promise<void> {
   throw createUnimplemented();
 }
@@ -309,7 +307,7 @@ export async function afterSpecHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   spec: Cypress.Spec,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  results: CypressCommandLine.RunResult
+  results: CypressCommandLine.RunResult,
 ): Promise<void> {
   throw createUnimplemented();
 }
@@ -318,7 +316,7 @@ export async function afterScreenshotHandler(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   config: Cypress.PluginConfigOptions,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  details: Cypress.ScreenshotDetails
+  details: Cypress.ScreenshotDetails,
 ): Promise<Cypress.ScreenshotDetails> {
   throw createUnimplemented();
 }

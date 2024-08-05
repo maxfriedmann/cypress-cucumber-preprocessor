@@ -3,7 +3,7 @@ import messages from "@cucumber/messages";
 import { assertAndReturn } from "./assertions";
 
 export function* traverseGherkinDocument(
-  gherkinDocument: messages.GherkinDocument
+  gherkinDocument: messages.GherkinDocument,
 ) {
   yield gherkinDocument;
 
@@ -187,21 +187,20 @@ function* traverseExample(example: messages.Examples) {
 }
 
 export function collectTagNames(
-  tags: readonly (messages.Tag | messages.PickleTag)[] | null | undefined
+  tags: readonly (messages.Tag | messages.PickleTag)[] | null | undefined,
 ) {
   return (
     tags?.map((tag) =>
-      assertAndReturn(tag.name, "Expected tag to have a name")
+      assertAndReturn(tag.name, "Expected tag to have a name"),
     ) ?? []
   );
 }
 
-export type YieldType<T extends Generator> = T extends Generator<infer R>
-  ? R
-  : never;
+export type YieldType<T extends Generator> =
+  T extends Generator<infer R> ? R : never;
 
 export function createAstIdMap(
-  gherkinDocument: messages.GherkinDocument
+  gherkinDocument: messages.GherkinDocument,
 ): Map<string, YieldType<ReturnType<typeof traverseGherkinDocument>>> {
   const astIdMap = new Map<
     string,

@@ -9,10 +9,9 @@ function isObject(object: any): object is object {
   return typeof object === "object" && object != null;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+function hasOwnProperty<X extends object, Y extends PropertyKey>(
   obj: X,
-  prop: Y
+  prop: Y,
 ): obj is X & Record<Y, unknown> {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
@@ -49,7 +48,7 @@ Then("there should be no JSON output", async function (this: ICustomWorld) {
     {
       code: "ENOENT",
     },
-    "Expected there to be no JSON file"
+    "Expected there to be no JSON file",
   );
 });
 
@@ -63,7 +62,7 @@ Then(
     const absoluteExpectedJsonpath = path.join(
       process.cwd(),
       "features",
-      fixturePath
+      fixturePath,
     );
 
     const actualJsonOutput = prepareJsonReport(JSON.parse(json.toString()));
@@ -71,15 +70,15 @@ Then(
     if (process.env.WRITE_FIXTURES) {
       await fs.writeFile(
         absoluteExpectedJsonpath,
-        JSON.stringify(actualJsonOutput, null, 2) + "\n"
+        JSON.stringify(actualJsonOutput, null, 2) + "\n",
       );
     } else {
       const expectedJsonOutput = JSON.parse(
-        (await fs.readFile(absoluteExpectedJsonpath)).toString()
+        (await fs.readFile(absoluteExpectedJsonpath)).toString(),
       );
       assert.deepStrictEqual(actualJsonOutput, expectedJsonOutput);
     }
-  }
+  },
 );
 
 Then(
@@ -101,7 +100,7 @@ Then(
     } else if (embeddings.length > 1) {
       throw new Error(
         "Expected to find a single embedding in JSON, but found " +
-          embeddings.length
+          embeddings.length,
       );
     }
 
@@ -118,7 +117,7 @@ Then(
           } else {
             resolve(data);
           }
-        }
+        },
       );
     });
 
@@ -131,7 +130,7 @@ Then(
 
     assert.strictEqual(actualWidth, expectedDimensions.width);
     assert.strictEqual(actualHeight, expectedDimensions.height);
-  }
+  },
 );
 
 Then(
@@ -151,7 +150,7 @@ Then(
     if (embeddings.length !== 2) {
       throw new Error(
         "Expected to find two embeddings in JSON, but found " +
-          embeddings.length
+          embeddings.length,
       );
     }
 
@@ -160,15 +159,15 @@ Then(
     assert.strictEqual(
       Buffer.from(first.data, "base64").toString(),
       "false",
-      "Expected first attachment to equal 'false'"
+      "Expected first attachment to equal 'false'",
     );
 
     assert.strictEqual(
       Buffer.from(second.data, "base64").toString(),
       "true",
-      "Expected second attachment to equal 'true'"
+      "Expected second attachment to equal 'true'",
     );
-  }
+  },
 );
 
 Then(
@@ -188,15 +187,15 @@ Then(
     if (embeddings.length !== 1) {
       throw new Error(
         "Expected to find one embeddings in JSON, but found " +
-          embeddings.length
+          embeddings.length,
       );
     }
 
     assert.strictEqual(
       Buffer.from(embeddings[0].data, "base64").toString(),
-      content
+      content,
     );
-  }
+  },
 );
 
 Then(
@@ -210,10 +209,10 @@ Then(
 
     if (actualJsonOutput.length !== 1) {
       throw new Error(
-        `Expected to find a single spec, but found ${actualJsonOutput.length}`
+        `Expected to find a single spec, but found ${actualJsonOutput.length}`,
       );
     }
-  }
+  },
 );
 
 Then(
@@ -227,10 +226,10 @@ Then(
 
     if (actualJsonOutput.length > 0) {
       throw new Error(
-        `Expected to find zero specs, but found ${actualJsonOutput.length}`
+        `Expected to find zero specs, but found ${actualJsonOutput.length}`,
       );
     }
-  }
+  },
 );
 
 Then(
@@ -246,8 +245,8 @@ Then(
 
     if (elements.length !== n) {
       throw new Error(
-        `Expected to find ${n} tests, but found ${elements.length}`
+        `Expected to find ${n} tests, but found ${elements.length}`,
       );
     }
-  }
+  },
 );

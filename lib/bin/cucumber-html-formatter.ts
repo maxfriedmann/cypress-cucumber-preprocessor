@@ -11,7 +11,7 @@ stream
     process.stdin,
     new NdjsonToMessageStream(),
     createHtmlStream(),
-    process.stdout
+    process.stdout,
   )
   .catch((err) => {
     console.error(err.stack);

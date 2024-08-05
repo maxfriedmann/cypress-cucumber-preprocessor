@@ -12,7 +12,7 @@ import { assertAndReturn } from "../support/helpers";
 const isCI = process.env.CI === "true";
 
 function execAsync(
-  command: string
+  command: string,
 ): Promise<{ stdout: string; stderr: string }> {
   return new Promise((resolve, reject) => {
     childProcess.exec(command, (error, stdout, stderr) => {
@@ -28,7 +28,7 @@ function execAsync(
 async function parseArgs(unparsedArgs: string): Promise<string[]> {
   // Use user's preferred shell to split args.
   const { stdout } = await execAsync(
-    `node -p "JSON.stringify(process.argv)" -- ${unparsedArgs}`
+    `node -p "JSON.stringify(process.argv)" -- ${unparsedArgs}`,
   );
 
   // Drop 1st arg, which is the path of node.
@@ -42,7 +42,7 @@ When(
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld) {
     await this.runCypress();
-  }
+  },
 );
 
 When(
@@ -50,7 +50,7 @@ When(
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld, unparsedArgs) {
     await this.runCypress({ extraArgs: await parseArgs(unparsedArgs) });
-  }
+  },
 );
 
 When(
@@ -59,13 +59,13 @@ When(
   async function (
     this: ICustomWorld,
     unparsedArgs: string,
-    expectedExitCode: number
+    expectedExitCode: number,
   ) {
     await this.runCypress({
       extraArgs: await parseArgs(unparsedArgs),
       expectedExitCode,
     });
-  }
+  },
 );
 
 When(
@@ -73,7 +73,7 @@ When(
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld, table) {
     await this.runCypress({ extraEnv: Object.fromEntries(table.rows()) });
-  }
+  },
 );
 
 When(
@@ -86,7 +86,7 @@ When(
     await this.runCypress({
       extraArgs: ["--browser", isCI ? "chrome" : "chromium"],
     });
-  }
+  },
 );
 
 When(
@@ -94,7 +94,7 @@ When(
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld) {
     await this.runDiagnostics();
-  }
+  },
 );
 
 When(
@@ -113,7 +113,7 @@ When(
     const absoluteFilePath = path.join(this.tmpDir, "cucumber-messages.ndjson");
 
     await fs.writeFile(absoluteFilePath, expectLastRun(this).output);
-  }
+  },
 );
 
 const expectLastRun = (world: ICustomWorld) =>
@@ -127,7 +127,7 @@ Then("it fails", function (this: ICustomWorld) {
   assert.notEqual(
     expectLastRun(this).exitCode,
     0,
-    "Expected a non-zero exit code"
+    "Expected a non-zero exit code",
   );
   this.verifiedLastRunError = true;
 });
@@ -137,15 +137,15 @@ Then(
   function (this: ICustomWorld) {
     assert.match(
       expectLastRun(this).stdout,
-      /All specs passed!\s+\d+ms\s+1\s+1\D/
+      /All specs passed!\s+\d+ms\s+1\s+1\D/,
     );
-  }
+  },
 );
 
 Then("it should appear as if both tests ran", function (this: ICustomWorld) {
   assert.match(
     expectLastRun(this).stdout,
-    /All specs passed!\s+\d+ms\s+2\s+2\D/
+    /All specs passed!\s+\d+ms\s+2\s+2\D/,
   );
 });
 
@@ -154,9 +154,9 @@ Then(
   function (this: ICustomWorld) {
     assert.match(
       expectLastRun(this).stdout,
-      /All specs passed!\s+\d+ms\s+2\s+-\s+-\s+2\D/
+      /All specs passed!\s+\d+ms\s+2\s+-\s+-\s+2\D/,
     );
-  }
+  },
 );
 
 const ranTestExpr = (spec: string) =>
@@ -166,14 +166,14 @@ Then(
   "it should appear to have ran spec {string}",
   function (this: ICustomWorld, spec) {
     assert.match(expectLastRun(this).stdout, ranTestExpr(spec));
-  }
+  },
 );
 
 Then(
   "it should appear to not have ran spec {string}",
   function (this: ICustomWorld, spec) {
     assert.doesNotMatch(expectLastRun(this).stdout, ranTestExpr(spec));
-  }
+  },
 );
 
 Then(
@@ -182,7 +182,7 @@ Then(
     for (const spec of [a, b]) {
       assert.match(expectLastRun(this).stdout, ranTestExpr(spec));
     }
-  }
+  },
 );
 
 Then(
@@ -191,7 +191,7 @@ Then(
     if (expectLastRun(this).stdout.includes(string)) {
       assert.fail(`Expected to not find ${util.inspect(string)}, but did`);
     }
-  }
+  },
 );
 
 /**
@@ -209,7 +209,7 @@ Then(
   "it should appear to have run the scenario {string}",
   function (this: ICustomWorld, scenarioName) {
     assert.match(expectLastRun(this).stdout, runScenarioExpr(scenarioName));
-  }
+  },
 );
 
 Then(
@@ -217,9 +217,9 @@ Then(
   function (this: ICustomWorld, scenarioName) {
     assert.doesNotMatch(
       expectLastRun(this).stdout,
-      runScenarioExpr(scenarioName)
+      runScenarioExpr(scenarioName),
     );
-  }
+  },
 );
 
 Then(
@@ -228,7 +228,7 @@ Then(
     for (const { Name: scenarioName } of scenarioTable.hashes()) {
       assert.match(expectLastRun(this).stdout, runScenarioExpr(scenarioName));
     }
-  }
+  },
 );
 
 Then(
@@ -237,10 +237,10 @@ Then(
     for (const { Name: scenarioName } of scenarioTable.hashes()) {
       assert.doesNotMatch(
         expectLastRun(this).stdout,
-        runScenarioExpr(scenarioName)
+        runScenarioExpr(scenarioName),
       );
     }
-  }
+  },
 );
 
 const normalizeOutput = (world: ICustomWorld) =>
@@ -256,12 +256,12 @@ Then(
   "the output should not contain {string}",
   function (this: ICustomWorld, content) {
     assert.doesNotMatch(normalizeOutput(this), new RegExp(rescape(content)));
-  }
+  },
 );
 
 Then(
   "it should appear to have skipped the scenario {string}",
   function (this: ICustomWorld, scenarioName) {
     assert.match(expectLastRun(this).stdout, pendingScenarioExpr(scenarioName));
-  }
+  },
 );

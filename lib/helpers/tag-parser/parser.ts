@@ -18,10 +18,10 @@ function createUnexpectedEndOfString() {
 
 function createUnexpectedToken(
   token: TYield<TokenGenerator>,
-  expectation: string
+  expectation: string,
 ) {
   return new Error(
-    `Unexpected token at ${token.position}: ${token.value} (${expectation})`
+    `Unexpected token at ${token.position}: ${token.value} (${expectation})`,
   );
 }
 
@@ -54,7 +54,7 @@ function parsePrimitiveToken(token: Token) {
   } else {
     throw createUnexpectedToken(
       token.value,
-      "expected a string, a boolean or a number"
+      "expected a string, a boolean or a number",
     );
   }
 }
@@ -125,7 +125,7 @@ export default class Parser {
     if (!isWordChar(next.value.value[0])) {
       throw createUnexpectedToken(
         next.value,
-        "expected tag to start with a property name"
+        "expected tag to start with a property name",
       );
     }
 
@@ -142,7 +142,6 @@ export default class Parser {
     const values: Primitive[] = [];
 
     if (isObjectMode) {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const key = expectToken(tokens.next()).value.value;
 
@@ -163,7 +162,6 @@ export default class Parser {
         }
       }
     } else {
-      // eslint-disable-next-line no-constant-condition
       while (true) {
         const value = parsePrimitiveToken(tokens.next());
 

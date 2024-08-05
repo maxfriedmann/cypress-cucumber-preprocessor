@@ -10,7 +10,7 @@ export async function writeFile(filePath: string, fileContent: string) {
 
 export function assertAndReturn<T>(
   value: T | null | undefined,
-  msg?: string
+  msg?: string,
 ): T {
   assert(value, msg);
   return value;
@@ -20,10 +20,9 @@ function isObject(object: any): object is object {
   return typeof object === "object" && object != null;
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+function hasOwnProperty<X extends object, Y extends PropertyKey>(
   obj: X,
-  prop: Y
+  prop: Y,
 ): obj is X & Record<Y, unknown> {
   return Object.prototype.hasOwnProperty.call(obj, prop);
 }
@@ -86,7 +85,7 @@ export function prepareMessagesReport(messages: any) {
       for (const idCollectionProperty of idCollectionProperties) {
         if (hasOwnProperty(node, idCollectionProperty)) {
           node[idCollectionProperty] = (node[idCollectionProperty] as any).map(
-            () => "id"
+            () => "id",
           );
         }
       }

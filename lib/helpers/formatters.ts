@@ -25,18 +25,18 @@ export function createHtmlStream(): CucumberHtmlStream {
     }),
     require.resolve("@cucumber/html-formatter/dist/main.js", {
       paths: [__dirname],
-    })
+    }),
   );
 }
 
 export function createJsonFormatter(
   envelopes: messages.Envelope[],
-  log: (chunk: string) => void
+  log: (chunk: string) => void,
 ): EventEmitter {
   const eventBroadcaster = new EventEmitter();
 
   const eventDataCollector = new formatterHelpers.EventDataCollector(
-    eventBroadcaster
+    eventBroadcaster,
   );
 
   const stepDefinitions = envelopes
@@ -56,9 +56,9 @@ export function createJsonFormatter(
     log(chunk) {
       assertIsString(
         chunk,
-        "Expected a JSON output of string, but got " + typeof chunk
-      ),
-        log(chunk);
+        "Expected a JSON output of string, but got " + typeof chunk,
+      );
+      log(chunk);
     },
     supportCodeLibrary: {
       stepDefinitions,
@@ -76,12 +76,12 @@ export function createJsonFormatter(
 
 export function createPrettyFormatter(
   useColors: boolean,
-  log: (chunk: string) => void
+  log: (chunk: string) => void,
 ): EventEmitter {
   const eventBroadcaster = new EventEmitter();
 
   const eventDataCollector = new formatterHelpers.EventDataCollector(
-    eventBroadcaster
+    eventBroadcaster,
   );
 
   const colorFns: IFormatterOptions["colorFns"] = useColors
@@ -122,9 +122,9 @@ export function createPrettyFormatter(
     log(chunk) {
       assertIsString(
         chunk,
-        "Expected a JSON output of string, but got " + typeof chunk
-      ),
-        log(chunk);
+        "Expected a JSON output of string, but got " + typeof chunk,
+      );
+      log(chunk);
     },
     supportCodeLibrary: null as any,
     colorFns,

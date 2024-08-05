@@ -24,7 +24,7 @@ export function getFunctionName(type: messages.PickleStepType) {
 export function generateSnippet(
   expression: GeneratedExpression,
   type: messages.PickleStepType,
-  parameter: "dataTable" | "docString" | null
+  parameter: "dataTable" | "docString" | null,
 ) {
   const definition = expression.source
     .replace(/\\/g, "\\\\")

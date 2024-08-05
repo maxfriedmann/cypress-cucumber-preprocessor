@@ -16,7 +16,7 @@ function identity<T>(value: T): T {
 
 function sortByTimestamp<T extends { timestamp: StrictTimestamp }>(
   a: T,
-  b: T
+  b: T,
 ): number {
   return (
     durationToNanoseconds(a.timestamp) - durationToNanoseconds(b.timestamp)
@@ -24,7 +24,7 @@ function sortByTimestamp<T extends { timestamp: StrictTimestamp }>(
 }
 
 export function mergeMessages(
-  messagesCols: messages.Envelope[][]
+  messagesCols: messages.Envelope[][],
 ): messages.Envelope[] {
   const messages = messagesCols.flat();
 
@@ -35,7 +35,7 @@ export function mergeMessages(
   for (const { uri } of sources) {
     if (sourcesSeen.has(uri)) {
       throw new CypressCucumberError(
-        `Found duplicate sources in collections: ${uri} (this usually means you're trying to merge unrelated reports)"`
+        `Found duplicate sources in collections: ${uri} (this usually means you're trying to merge unrelated reports)"`,
       );
     } else {
       sourcesSeen.add(uri);
@@ -44,7 +44,7 @@ export function mergeMessages(
 
   const meta = assertAndReturn(
     messages.map((message) => message.meta).find(notNull),
-    "Expected to find a meta envelope"
+    "Expected to find a meta envelope",
   );
 
   const testRunStarted = assertAndReturn(
@@ -53,7 +53,7 @@ export function mergeMessages(
       .filter(notNull)
       .sort(sortByTimestamp)
       .find(identity),
-    "Expected to find a testRunStarted envelope"
+    "Expected to find a testRunStarted envelope",
   );
 
   const testRunFinished = assertAndReturn(
@@ -62,7 +62,7 @@ export function mergeMessages(
       .filter(notNull)
       .sort(sortByTimestamp)
       .findLast(identity),
-    "Expected to find a testRunFinished envelope"
+    "Expected to find a testRunFinished envelope",
   );
 
   const isPassThroughMessage = (message: messages.Envelope) =>
@@ -87,8 +87,8 @@ export async function mergeMessagesFiles(files: string[]): Promise<string> {
         .toString()
         .trim()
         .split("\n")
-        .map((line) => JSON.parse(line))
-    )
+        .map((line) => JSON.parse(line)),
+    ),
   );
 
   return messages.map((message) => JSON.stringify(message)).join("\n");

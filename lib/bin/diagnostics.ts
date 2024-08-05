@@ -6,5 +6,5 @@ execute({ argv: process.argv, env: process.env, cwd: process.cwd() }).catch(
   (err) => {
     console.error(err.stack);
     process.exitCode = 1;
-  }
+  },
 );

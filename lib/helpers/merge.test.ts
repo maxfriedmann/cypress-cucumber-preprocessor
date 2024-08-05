@@ -40,7 +40,7 @@ describe("mergeMessagesArgs()", () => {
     const expected = stringToNdJson(
       (
         await fs.readFile("features/fixtures/multiple-features.ndjson")
-      ).toString()
+      ).toString(),
     );
 
     assert.deepEqual(actual, expected);

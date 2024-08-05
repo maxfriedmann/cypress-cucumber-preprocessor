@@ -15,21 +15,21 @@ export function retrievePositionFromSourceMap(): Position {
   return {
     line: assertAndReturn(
       relevantFrame.getLineNumber(),
-      "Expected to find a line number"
+      "Expected to find a line number",
     ),
     column: assertAndReturn(
       relevantFrame.getColumnNumber(),
-      "Expected to find a column number"
+      "Expected to find a column number",
     ),
     source: assertAndReturn(
       relevantFrame.fileName,
-      "Expected to find a filename"
+      "Expected to find a filename",
     ),
   };
 }
 
 export function maybeRetrievePositionFromSourceMap(
-  experimentalSourceMap: boolean
+  experimentalSourceMap: boolean,
 ): Position | undefined {
   if (experimentalSourceMap) {
     return retrievePositionFromSourceMap();

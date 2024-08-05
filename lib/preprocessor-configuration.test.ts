@@ -39,16 +39,16 @@ async function test<T>(options: {
     Object.assign(
       { testingType: options.testingType },
       DUMMY_POST10_CONFIG,
-      options.cypressConfiguration
+      options.cypressConfiguration,
     ),
     options.environment,
     "cypress/e2e",
-    () => options.configuration
+    () => options.configuration,
   );
 
   assert.deepStrictEqual(
     options.getValueFn(configuration),
-    options.expectedValue
+    options.expectedValue,
   );
 }
 
@@ -159,7 +159,7 @@ function basicBooleanExample(options: {
             value: !expectedValue,
           }),
           expectedValue: expectedValue,
-        })
+        }),
       );
     }
 
@@ -272,12 +272,12 @@ describe("resolve()", () => {
     describe(testingType, () => {
       describe("stepDefinitions", () => {
         const getValueFn = (
-          configuration: IPreprocessorConfiguration
+          configuration: IPreprocessorConfiguration,
         ): string | string[] => configuration.stepDefinitions;
 
         const setValueFn = (
           configuration: IBaseUserConfiguration,
-          value: string | string[]
+          value: string | string[],
         ) => (configuration.stepDefinitions = value);
 
         it("default", () =>
@@ -453,12 +453,12 @@ describe("resolve()", () => {
       describe("messages", () => {
         describe("enabled", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): boolean => configuration.messages.enabled;
 
           const setValueFn = (
             configuration: IBaseUserConfiguration,
-            value: boolean
+            value: boolean,
           ) => (configuration.messages = { enabled: value });
 
           basicBooleanExample({
@@ -472,12 +472,12 @@ describe("resolve()", () => {
 
         describe("output", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): string => configuration.messages.output;
 
           const setValueFn = (
             configuration: IBaseUserConfiguration,
-            value: string
+            value: string,
           ) => (configuration.messages = { enabled: true, output: value });
 
           basicStringExample({
@@ -493,12 +493,12 @@ describe("resolve()", () => {
       describe("json", () => {
         describe("enabled", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): boolean => configuration.json.enabled;
 
           const setValueFn = (
             configuration: IBaseUserConfiguration,
-            value: boolean
+            value: boolean,
           ) => (configuration.json = { enabled: value });
 
           basicBooleanExample({
@@ -512,12 +512,12 @@ describe("resolve()", () => {
 
         describe("output", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): string => configuration.json.output;
 
           const setValueFn = (
             configuration: IUserConfiguration,
-            value: string
+            value: string,
           ) => (configuration.json = { enabled: true, output: value });
 
           basicStringExample({
@@ -533,12 +533,12 @@ describe("resolve()", () => {
       describe("html", () => {
         describe("enabled", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): boolean => configuration.html.enabled;
 
           const setValueFn = (
             configuration: IBaseUserConfiguration,
-            value: boolean
+            value: boolean,
           ) => (configuration.html = { enabled: value });
 
           basicBooleanExample({
@@ -552,12 +552,12 @@ describe("resolve()", () => {
 
         describe("output", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): string => configuration.html.output;
 
           const setValueFn = (
             configuration: IUserConfiguration,
-            value: string
+            value: string,
           ) => (configuration.html = { enabled: true, output: value });
 
           basicStringExample({
@@ -573,12 +573,12 @@ describe("resolve()", () => {
       describe("pretty", () => {
         describe("enabled", () => {
           const getValueFn = (
-            configuration: IPreprocessorConfiguration
+            configuration: IPreprocessorConfiguration,
           ): boolean => configuration.pretty.enabled;
 
           const setValueFn = (
             configuration: IBaseUserConfiguration,
-            value: boolean
+            value: boolean,
           ) => (configuration.pretty = { enabled: value });
 
           basicBooleanExample({
@@ -605,12 +605,12 @@ describe("resolve()", () => {
 
       describe("filterSpecsMixedMode", () => {
         const getValueFn = (
-          configuration: IPreprocessorConfiguration
+          configuration: IPreprocessorConfiguration,
         ): FilterSpecsMixedMode => configuration.filterSpecsMixedMode;
 
         const setValueFn = (
           configuration: IBaseUserConfiguration,
-          value: FilterSpecsMixedMode
+          value: FilterSpecsMixedMode,
         ) => (configuration.filterSpecsMixedMode = value);
 
         it("default", () =>
@@ -704,27 +704,27 @@ describe("resolve()", () => {
               resolve(
                 Object.assign(
                   { testingType: testingType },
-                  DUMMY_POST10_CONFIG
+                  DUMMY_POST10_CONFIG,
                 ),
                 {},
                 "cypress/e2e",
-                () => ({ filterSpecsMixedMode: "foobar" })
+                () => ({ filterSpecsMixedMode: "foobar" }),
               ),
             {
               message:
                 'Unrecognize filterSpecsMixedMode: \'foobar\' (valid options are "hide", "show" and "empty-set")',
-            }
+            },
           ));
       });
 
       describe("filterSpecs", () => {
         const getValueFn = (
-          configuration: IPreprocessorConfiguration
+          configuration: IPreprocessorConfiguration,
         ): boolean => configuration.filterSpecs;
 
         const setValueFn = (
           configuration: IBaseUserConfiguration,
-          value: boolean
+          value: boolean,
         ) => (configuration.filterSpecs = value);
 
         basicBooleanExample({
@@ -738,12 +738,12 @@ describe("resolve()", () => {
 
       describe("omitFiltered", () => {
         const getValueFn = (
-          configuration: IPreprocessorConfiguration
+          configuration: IPreprocessorConfiguration,
         ): boolean => configuration.omitFiltered;
 
         const setValueFn = (
           configuration: IBaseUserConfiguration,
-          value: boolean
+          value: boolean,
         ) => (configuration.omitFiltered = value);
 
         basicBooleanExample({
@@ -757,7 +757,7 @@ describe("resolve()", () => {
 
       describe("isTrackingState", () => {
         const getValueFn = (
-          configuration: IPreprocessorConfiguration
+          configuration: IPreprocessorConfiguration,
         ): boolean => configuration.isTrackingState;
 
         context("with isTextTerminal = true", () => {

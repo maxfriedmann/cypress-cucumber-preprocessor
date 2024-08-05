@@ -18,16 +18,16 @@ export default class DataTable {
     } else {
       this.rawTable = assertAndReturn(
         sourceTable.rows,
-        "Expected a PicleTable to have rows"
+        "Expected a PicleTable to have rows",
       ).map((row) =>
         assertAndReturn(
           row.cells,
-          "Expected a PicleTableRow to have cells"
+          "Expected a PicleTableRow to have cells",
         ).map((cell) => {
           const { value } = cell;
           assert(value != null, "Expected a PicleTableCell to have a value");
           return value;
-        })
+        }),
       );
     }
   }
@@ -56,18 +56,18 @@ export default class DataTable {
 
         if (first == null || second == null || rest.length !== 0) {
           throw new Error(
-            "rowsHash can only be called on a data table where all rows have exactly two columns"
+            "rowsHash can only be called on a data table where all rows have exactly two columns",
           );
         }
 
         return [first, second];
-      })
+      }),
     );
   }
 
   transpose(): DataTable {
     const transposed = this.rawTable[0].map((x, i) =>
-      this.rawTable.map((y) => y[i])
+      this.rawTable.map((y) => y[i]),
     );
 
     return new DataTable(transposed);

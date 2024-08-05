@@ -126,7 +126,7 @@ export function retrieveInternalSpecProperties(): InternalSpecProperties {
 }
 
 function updateInternalSpecProperties(
-  newProperties: Partial<InternalSpecProperties>
+  newProperties: Partial<InternalSpecProperties>,
 ): void {
   Object.assign(retrieveInternalSpecProperties(), newProperties);
 }
@@ -144,14 +144,14 @@ function taskSpecEnvelopes(context: CompositionContext) {
       { messages: context.specEnvelopes } satisfies ITaskSpecEnvelopes,
       {
         log: false,
-      }
+      },
     );
   }
 }
 
 function taskTestCaseStarted(
   context: CompositionContext,
-  testCaseStarted: messages.TestCaseStarted
+  testCaseStarted: messages.TestCaseStarted,
 ) {
   if (context.isTrackingState) {
     cy.task(
@@ -159,14 +159,14 @@ function taskTestCaseStarted(
       testCaseStarted satisfies ITaskTestCaseStarted,
       {
         log: false,
-      }
+      },
     );
   }
 }
 
 function taskTestCaseFinished(
   context: CompositionContext,
-  testCasefinished: messages.TestCaseFinished
+  testCasefinished: messages.TestCaseFinished,
 ) {
   if (context.isTrackingState) {
     cy.task(
@@ -174,14 +174,14 @@ function taskTestCaseFinished(
       testCasefinished satisfies ITaskTestCaseFinished,
       {
         log: false,
-      }
+      },
     );
   }
 }
 
 function taskTestStepStarted(
   context: CompositionContext,
-  testStepStarted: messages.TestStepStarted
+  testStepStarted: messages.TestStepStarted,
 ) {
   if (context.isTrackingState) {
     cy.task(
@@ -189,14 +189,14 @@ function taskTestStepStarted(
       testStepStarted satisfies ITaskTestStepStarted,
       {
         log: false,
-      }
+      },
     );
   }
 }
 
 function taskTestStepFinished(
   context: CompositionContext,
-  testStepfinished: messages.TestStepFinished
+  testStepfinished: messages.TestStepFinished,
 ) {
   if (context.isTrackingState) {
     cy.task(
@@ -204,14 +204,14 @@ function taskTestStepFinished(
       testStepfinished satisfies ITaskTestStepFinished,
       {
         log: false,
-      }
+      },
     );
   }
 }
 
 function emitSkippedPickle(
   context: CompositionContext,
-  pickle: messages.Pickle
+  pickle: messages.Pickle,
 ) {
   const { registry } = context;
 
@@ -272,9 +272,9 @@ function emitSkippedPickle(
 function findPickleById(context: CompositionContext, astId: string) {
   return assertAndReturn(
     context.pickles.find(
-      (pickle) => pickle.astNodeIds && pickle.astNodeIds.includes(astId)
+      (pickle) => pickle.astNodeIds && pickle.astNodeIds.includes(astId),
     ),
-    `Expected to find a pickle associated with id = ${astId}`
+    `Expected to find a pickle associated with id = ${astId}`,
   );
 }
 
@@ -283,9 +283,9 @@ function collectExampleIds(examples: readonly messages.Examples[]) {
     .map((examples) => {
       return assertAndReturn(
         examples.tableBody,
-        "Expected to find a table body"
+        "Expected to find a table body",
       ).map((row) =>
-        assertAndReturn(row.id, "Expected table row to have an id")
+        assertAndReturn(row.id, "Expected table row to have an id"),
       );
     })
     .reduce((acum, el) => acum.concat(el), []);
@@ -305,7 +305,6 @@ function createTestStepId(options: {
 
   if (testStepIds.has(pickleId)) {
     // See https://github.com/microsoft/TypeScript/issues/9619.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     pickleStepIds = testStepIds.get(pickleId)!;
   } else {
     pickleStepIds = new Map();
@@ -327,10 +326,10 @@ function getTestStepId(options: {
   return assertAndReturn(
     assertAndReturn(
       context.testStepIds.get(pickleId),
-      "Expected to find test step IDs for pickle = " + pickleId
+      "Expected to find test step IDs for pickle = " + pickleId,
     ).get(hookIdOrPickleStepId),
     "Expected to find test step ID for hook or pickleStep = " +
-      hookIdOrPickleStepId
+      hookIdOrPickleStepId,
   );
 }
 
@@ -354,7 +353,7 @@ function createStepDescription({
 
 function createFeature(context: CompositionContext, feature: messages.Feature) {
   const suiteOptions = Object.fromEntries(
-    tagsToOptions(feature.tags).filter(isExclusivelySuiteConfiguration)
+    tagsToOptions(feature.tags).filter(isExclusivelySuiteConfiguration),
   ) as Cypress.TestConfigOverrides;
 
   describe(feature.name || "<unamed feature>", suiteOptions, () => {
@@ -398,7 +397,7 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
       } else {
         const scenarioId = assertAndReturn(
           scenario.id,
-          "Expected scenario to have an id"
+          "Expected scenario to have an id",
         );
 
         return findPickleById(context, scenarioId);
@@ -408,7 +407,7 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
   if (picklesWithinRule) {
     if (context.omitFiltered) {
       const matches = picklesWithinRule.filter((pickle) =>
-        context.testFilter.evaluate(collectTagNames(pickle.tags))
+        context.testFilter.evaluate(collectTagNames(pickle.tags)),
       );
 
       if (matches.length === 0) {
@@ -418,7 +417,7 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
   }
 
   const suiteOptions = Object.fromEntries(
-    tagsToOptions(rule.tags).filter(isExclusivelySuiteConfiguration)
+    tagsToOptions(rule.tags).filter(isExclusivelySuiteConfiguration),
   ) as Cypress.TestConfigOverrides;
 
   describe(rule.name || "<unamed rule>", suiteOptions, () => {
@@ -433,7 +432,7 @@ function createRule(context: CompositionContext, rule: messages.Rule) {
 }
 function createScenario(
   context: CompositionContext,
-  scenario: messages.Scenario
+  scenario: messages.Scenario,
 ) {
   if (scenario.examples.length > 0) {
     const exampleIds = collectExampleIds(scenario.examples);
@@ -449,7 +448,7 @@ function createScenario(
   } else {
     const scenarioId = assertAndReturn(
       scenario.id,
-      "Expected scenario to have an id"
+      "Expected scenario to have an id",
     );
 
     const pickle = findPickleById(context, scenarioId);
@@ -499,17 +498,17 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     context.astIdsMap.get(
       assertAndReturn(
         pickle.astNodeIds?.[0],
-        "Expected to find at least one astNodeId"
-      )
+        "Expected to find at least one astNodeId",
+      ),
     ),
-    `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`
+    `Expected to find scenario associated with id = ${pickle.astNodeIds?.[0]}`,
   );
 
   assert("tags" in scenario, "Expected a scenario to have a tags property");
 
   assert(
     "examples" in scenario,
-    "Expected a scenario to have a examples property"
+    "Expected a scenario to have a examples property",
   );
 
   const testSpecificOptions = tagsToOptions([
@@ -520,7 +519,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
   for (const entry of testSpecificOptions) {
     if (isExclusivelySuiteConfiguration(entry)) {
       throw new Error(
-        `The \`${entry[0]}\` configuration can only be overridden from a suite-level override (in Cucumber-terms this means on a Feature or Rule).`
+        `The \`${entry[0]}\` configuration can only be overridden from a suite-level override (in Cucumber-terms this means on a Feature or Rule).`,
       );
     }
   }
@@ -529,7 +528,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
     tags
       .filter(looksLikeOptions)
       .map(tagToCypressOptions)
-      .filter(isNotExclusivelySuiteConfiguration)
+      .filter(isNotExclusivelySuiteConfiguration),
   ) as Cypress.TestConfigOverrides;
 
   if (inheritedTestOptions.env) {
@@ -544,7 +543,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
      */
     assert(
       context.includedPickles[0].id === pickle.id,
-      "Included pickle stack is unsynchronized"
+      "Included pickle stack is unsynchronized",
     );
 
     const { remainingSteps, testCaseStartedId } =
@@ -600,7 +599,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
         for (const skippedStep of remainingSteps) {
           const hookIdOrPickleStepId = assertAndReturn(
             skippedStep.hook?.id ?? skippedStep.pickleStep?.id,
-            "Expected a step to either be a hook or a pickleStep"
+            "Expected a step to either be a hook or a pickleStep",
           );
 
           const testStepId = getTestStepId({
@@ -690,7 +689,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             });
           })
           .then(({ start, result }) =>
-            onAfterStep({ start, result, testStepId })
+            onAfterStep({ start, result, testStepId }),
           );
       } else if (step.pickleStep) {
         const pickleStep = step.pickleStep;
@@ -703,25 +702,25 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
 
         const text = assertAndReturn(
           pickleStep.text,
-          "Expected pickle step to have a text"
+          "Expected pickle step to have a text",
         );
 
         const scenarioStep = assertAndReturn(
           context.astIdsMap.get(
             assertAndReturn(
               pickleStep.astNodeIds?.[0],
-              "Expected to find at least one astNodeId"
-            )
+              "Expected to find at least one astNodeId",
+            ),
           ),
-          `Expected to find scenario step associated with id = ${pickleStep.astNodeIds?.[0]}`
+          `Expected to find scenario step associated with id = ${pickleStep.astNodeIds?.[0]}`,
         );
 
         const argument: DataTable | string | undefined = pickleStep.argument
           ?.dataTable
           ? new DataTable(pickleStep.argument.dataTable)
           : pickleStep.argument?.docString?.content
-          ? pickleStep.argument.docString.content
-          : undefined;
+            ? pickleStep.argument.docString.content
+            : undefined;
 
         cy.then(() => {
           window.testState.pickleStep = step.pickleStep;
@@ -758,10 +757,10 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                     text: createStepDescription(beforeStepHook),
                     fn: () =>
                       registry.runStepHook(this, beforeStepHook, options),
-                  })
+                  }),
                 );
               },
-              cy.wrap({} as unknown, { log: false })
+              cy.wrap({} as unknown, { log: false }),
             );
 
             return beforeHooksChain.then(() => {
@@ -769,23 +768,30 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                 return runStepWithLogGroup({
                   keyword: assertAndReturn(
                     "keyword" in scenarioStep && scenarioStep.keyword,
-                    "Expected to find a keyword in the scenario step"
+                    "Expected to find a keyword in the scenario step",
                   ),
                   argument,
                   text,
                   fn: () => registry.runStepDefininition(this, text, argument),
                 }).then((result) => {
                   return afterStepHooks
-                    .reduce((chain, afterStepHook) => {
-                      return chain.then(() =>
-                        runStepWithLogGroup({
-                          keyword: "AfterStep",
-                          text: createStepDescription(afterStepHook),
-                          fn: () =>
-                            registry.runStepHook(this, afterStepHook, options),
-                        })
-                      );
-                    }, cy.wrap({} as unknown, { log: false }))
+                    .reduce(
+                      (chain, afterStepHook) => {
+                        return chain.then(() =>
+                          runStepWithLogGroup({
+                            keyword: "AfterStep",
+                            text: createStepDescription(afterStepHook),
+                            fn: () =>
+                              registry.runStepHook(
+                                this,
+                                afterStepHook,
+                                options,
+                              ),
+                          }),
+                        );
+                      },
+                      cy.wrap({} as unknown, { log: false }),
+                    )
                     .then(() => {
                       return { start, result };
                     });
@@ -796,8 +802,8 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                     createMissingStepDefinitionMessage(
                       context,
                       pickleStep,
-                      context.registry.parameterTypeRegistry
-                    )
+                      context.registry.parameterTypeRegistry,
+                    ),
                   );
                 } else {
                   throw e;
@@ -806,7 +812,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             });
           })
           .then(({ start, result }) =>
-            onAfterStep({ start, result, testStepId })
+            onAfterStep({ start, result, testStepId }),
           );
       }
     }
@@ -814,7 +820,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
 }
 
 function collectTagNamesFromGherkinDocument(
-  gherkinDocument: messages.GherkinDocument
+  gherkinDocument: messages.GherkinDocument,
 ) {
   const tagNames: string[] = [];
 
@@ -829,7 +835,7 @@ function collectTagNamesFromGherkinDocument(
 
 function createTestFilter(
   gherkinDocument: messages.GherkinDocument,
-  environment: Cypress.ObjectLike
+  environment: Cypress.ObjectLike,
 ): Node {
   const tagsInDocument = collectTagNamesFromGherkinDocument(gherkinDocument);
 
@@ -851,7 +857,7 @@ function shouldSkipPickle(testFilter: Node, pickle: messages.Pickle) {
 function beforeHandler(this: Mocha.Context, context: CompositionContext) {
   if (!retrieveInternalSuiteProperties()?.isEventHandlersAttached) {
     fail(
-      "Missing preprocessor event handlers (this usually means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)"
+      "Missing preprocessor event handlers (this usually means you've not invoked `addCucumberPreprocessorPlugin()` or not returned the config object in `setupNodeEvents()`)",
     );
   }
 
@@ -892,7 +898,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
     if (this.currentTest?.state === "failed") {
       const error = assertAndReturn(
         this.currentTest?.err?.message,
-        "Expected to find an error message"
+        "Expected to find an error message",
       );
 
       if (HOOK_FAILURE_EXPR.test(error)) {
@@ -901,12 +907,12 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
 
       const failedStep = assertAndReturn(
         remainingSteps.shift(),
-        "Expected there to be a remaining step"
+        "Expected there to be a remaining step",
       );
 
       const hookIdOrPickleStepId = assertAndReturn(
         failedStep.hook?.id ?? failedStep.pickleStep?.id,
-        "Expected a step to either be a hook or a pickleStep"
+        "Expected a step to either be a hook or a pickleStep",
       );
 
       const testStepId = getTestStepId({
@@ -916,7 +922,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
       });
 
       const failedTestStepFinished: messages.TestStepFinished = error.includes(
-        "Step implementation missing"
+        "Step implementation missing",
       )
         ? {
             testStepId,
@@ -941,9 +947,9 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
               duration: duration(
                 assertAndReturn(
                   currentStepStartedAt,
-                  "Expected there to be a timestamp for current step"
+                  "Expected there to be a timestamp for current step",
                 ),
-                endTimestamp
+                endTimestamp,
               ),
             },
             timestamp: endTimestamp,
@@ -954,7 +960,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
       for (const skippedStep of remainingSteps) {
         const hookIdOrPickleStepId = assertAndReturn(
           skippedStep.hook?.id ?? skippedStep.pickleStep?.id,
-          "Expected a step to either be a hook or a pickleStep"
+          "Expected a step to either be a hook or a pickleStep",
         );
 
         const testStepId = getTestStepId({
@@ -986,12 +992,12 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
       if (currentStepStartedAt) {
         const skippedStep = assertAndReturn(
           remainingSteps.shift(),
-          "Expected there to be a remaining step"
+          "Expected there to be a remaining step",
         );
 
         const hookIdOrPickleStepId = assertAndReturn(
           skippedStep.hook?.id ?? skippedStep.pickleStep?.id,
-          "Expected a step to either be a hook or a pickleStep"
+          "Expected a step to either be a hook or a pickleStep",
         );
 
         const testStepId = getTestStepId({
@@ -1014,7 +1020,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
       for (const remainingStep of remainingSteps) {
         const hookIdOrPickleStepId = assertAndReturn(
           remainingStep.hook?.id ?? remainingStep.pickleStep?.id,
-          "Expected a step to either be a hook or a pickleStep"
+          "Expected a step to either be a hook or a pickleStep",
         );
 
         const testStepId = getTestStepId({
@@ -1046,7 +1052,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
       for (const remainingStep of remainingSteps) {
         const hookIdOrPickleStepId = assertAndReturn(
           remainingStep.hook?.id ?? remainingStep.pickleStep?.id,
-          "Expected a step to either be a hook or a pickleStep"
+          "Expected a step to either be a hook or a pickleStep",
         );
 
         const testStepId = getTestStepId({
@@ -1079,12 +1085,12 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
 
   const currentRetry = assertAndReturn(
     (this.currentTest as any)?._currentRetry,
-    "Expected to find an attribute _currentRetry"
+    "Expected to find an attribute _currentRetry",
   );
 
   const retries = assertAndReturn(
     (this.currentTest as any)?._retries,
-    "Expected to find an attribute _retries"
+    "Expected to find an attribute _retries",
   );
 
   const willBeRetried =
@@ -1139,7 +1145,7 @@ export default function createTests(
     stepDefinitions: string | string[];
     stepDefinitionPatterns: string[];
     stepDefinitionPaths: string[];
-  }
+  },
 ) {
   const prng = random(seed.toString());
 
@@ -1193,7 +1199,7 @@ export default function createTests(
     };
 
     const pickleStepToTestStep = (
-      pickleStep: messages.PickleStep
+      pickleStep: messages.PickleStep,
     ): messages.TestStep => {
       const stepDefinitionIds = registry
         .getMatchingStepDefinitions(pickleStep.text)
@@ -1229,7 +1235,7 @@ export default function createTests(
       data: source,
       uri: assertAndReturn(
         gherkinDocument.uri,
-        "Expected gherkin document to have URI"
+        "Expected gherkin document to have URI",
       ),
       mediaType: messages.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
     },
@@ -1295,7 +1301,7 @@ export type CreateTestsOptions = Tail<Parameters<typeof createTests>>;
 
 function strictIsInteractive(): boolean {
   const isInteractive = Cypress.config(
-    "isInteractive" as keyof Cypress.ConfigOptions
+    "isInteractive" as keyof Cypress.ConfigOptions,
   );
 
   if (typeof isInteractive === "boolean") {
@@ -1303,14 +1309,14 @@ function strictIsInteractive(): boolean {
   }
 
   throw new Error(
-    "Expected to find a Cypress configuration property `isInteractive`, but didn't"
+    "Expected to find a Cypress configuration property `isInteractive`, but didn't",
   );
 }
 
 function createMissingStepDefinitionMessage(
   context: CompositionContext,
   pickleStep: messages.PickleStep,
-  parameterTypeRegistry: ParameterTypeRegistry
+  parameterTypeRegistry: ParameterTypeRegistry,
 ) {
   const noStepDefinitionPathsTemplate = `
     Step implementation missing for "<text>".
@@ -1374,15 +1380,15 @@ function createMissingStepDefinitionMessage(
   }
 
   const snippets = new CucumberExpressionGenerator(
-    () => parameterTypeRegistry.parameterTypes
+    () => parameterTypeRegistry.parameterTypes,
   )
     .generateExpressions(pickleStep.text)
     .map((expression) =>
       generateSnippet(
         expression,
         assertAndReturn(pickleStep.type, "Expected pickleStep to have a type"),
-        parameter
-      )
+        parameter,
+      ),
     )
     .map((snippet) => indent(snippet, { count: 2 }))
     .join("\n\n");
@@ -1391,15 +1397,15 @@ function createMissingStepDefinitionMessage(
     .replaceAll("<text>", pickleStep.text)
     .replaceAll(
       "<step-definitions>",
-      prettyPrintList([stepDefinitionHints.stepDefinitions].flat())
+      prettyPrintList([stepDefinitionHints.stepDefinitions].flat()),
     )
     .replaceAll(
       "<step-definition-patterns>",
-      prettyPrintList(stepDefinitionHints.stepDefinitionPatterns)
+      prettyPrintList(stepDefinitionHints.stepDefinitionPatterns),
     )
     .replaceAll(
       "<step-definition-paths>",
-      prettyPrintList(stepDefinitionHints.stepDefinitionPaths)
+      prettyPrintList(stepDefinitionHints.stepDefinitionPaths),
     )
     .replaceAll("<snippets>", snippets);
 }

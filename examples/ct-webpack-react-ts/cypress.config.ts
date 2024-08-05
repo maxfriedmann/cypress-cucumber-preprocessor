@@ -4,7 +4,7 @@ import { devServer } from "@cypress/webpack-dev-server";
 import { addCucumberPreprocessorPlugin } from "@badeball/cypress-cucumber-preprocessor";
 
 const webpackConfig = (
-  cypressConfig: Cypress.PluginConfigOptions
+  cypressConfig: Cypress.PluginConfigOptions,
 ): Webpack.Configuration => {
   return {
     resolve: {

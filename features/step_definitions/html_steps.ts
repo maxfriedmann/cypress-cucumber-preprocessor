@@ -9,7 +9,7 @@ import ICustomWorld from "../support/ICustomWorld";
 Then("there should be a HTML report", async function (this: ICustomWorld) {
   await assert.doesNotReject(
     () => fs.access(path.join(this.tmpDir, "cucumber-report.html")),
-    "Expected there to be a HTML file"
+    "Expected there to be a HTML file",
   );
 });
 
@@ -18,7 +18,7 @@ Then(
   async function (this: ICustomWorld) {
     const dom = await JSDOM.fromFile(
       path.join(this.tmpDir, "cucumber-report.html"),
-      { runScripts: "dangerously" }
+      { runScripts: "dangerously" },
     );
 
     const dt = await findByText(
@@ -26,7 +26,7 @@ Then(
       "last run",
       {
         selector: "dt",
-      }
+      },
     );
 
     const dd = await findByText(dt.parentElement!, /\d+ seconds? ago/, {
@@ -34,7 +34,7 @@ Then(
     });
 
     assert(dd);
-  }
+  },
 );
 
 Then(
@@ -42,7 +42,7 @@ Then(
   async function (this: ICustomWorld, n: number) {
     const dom = await JSDOM.fromFile(
       path.join(this.tmpDir, "cucumber-report.html"),
-      { runScripts: "dangerously" }
+      { runScripts: "dangerously" },
     );
 
     const dt = await findByText(
@@ -50,14 +50,13 @@ Then(
       /\d+ executed/,
       {
         selector: "dt",
-      }
+      },
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const actual = parseInt(dt.textContent!, 10);
 
     assert.equal(actual, n);
-  }
+  },
 );
 
 Then(
@@ -65,7 +64,7 @@ Then(
   async function (this: ICustomWorld, n: number) {
     const dom = await JSDOM.fromFile(
       path.join(this.tmpDir, "cucumber-report.html"),
-      { runScripts: "dangerously" }
+      { runScripts: "dangerously" },
     );
 
     const dd = await findByText(
@@ -73,14 +72,13 @@ Then(
       /\d+% passed/,
       {
         selector: "dd",
-      }
+      },
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const actual = parseInt(dd.textContent!, 10);
 
     assert.equal(actual, n);
-  }
+  },
 );
 
 Then(
@@ -88,17 +86,17 @@ Then(
   async function (this: ICustomWorld) {
     const dom = await JSDOM.fromFile(
       path.join(this.tmpDir, "cucumber-report.html"),
-      { runScripts: "dangerously" }
+      { runScripts: "dangerously" },
     );
 
     const AccordionItemPanel = await findByText(
       dom.window.document.documentElement,
       (_, element) => element?.textContent?.includes("Attached Image") ?? false,
-      { selector: '[data-accordion-component="AccordionItemPanel"]' }
+      { selector: '[data-accordion-component="AccordionItemPanel"]' },
     );
 
     assert(AccordionItemPanel);
-  }
+  },
 );
 
 Then(
@@ -106,7 +104,7 @@ Then(
   async function (this: ICustomWorld, n: number, status: string) {
     const dom = await JSDOM.fromFile(
       path.join(this.tmpDir, "cucumber-report.html"),
-      { runScripts: "dangerously" }
+      { runScripts: "dangerously" },
     );
 
     const li = await findByText(
@@ -114,12 +112,11 @@ Then(
       new RegExp(`\\d+ ${status}`),
       {
         selector: "li",
-      }
+      },
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const actual = parseInt(li.textContent!, 10);
 
     assert.equal(actual, n);
-  }
+  },
 );

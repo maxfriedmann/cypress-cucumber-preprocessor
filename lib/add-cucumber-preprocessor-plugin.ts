@@ -67,11 +67,11 @@ type PreservedPluginConfigOptions = ICypressConfiguration & {
 };
 
 export function mutateConfigObjectPreservingly<
-  K extends keyof ICypressConfiguration
+  K extends keyof ICypressConfiguration,
 >(
   config: PreservedPluginConfigOptions,
   property: K,
-  value: PreservedPluginConfigOptions[K]
+  value: PreservedPluginConfigOptions[K],
 ) {
   const preserved =
     config[INTERNAL_PROPERTY_NAME] ?? (config[INTERNAL_PROPERTY_NAME] = {});
@@ -80,7 +80,7 @@ export function mutateConfigObjectPreservingly<
 }
 
 export function rebuildOriginalConfigObject(
-  config: PreservedPluginConfigOptions
+  config: PreservedPluginConfigOptions,
 ): ICypressConfiguration {
   return Object.assign({}, config, config[INTERNAL_PROPERTY_NAME]);
 }
@@ -88,7 +88,7 @@ export function rebuildOriginalConfigObject(
 export async function addCucumberPreprocessorPlugin(
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions,
-  options: AddOptions = {}
+  options: AddOptions = {},
 ) {
   config.env[INTERNAL_SUITE_PROPERTIES] = { isEventHandlersAttached: true };
 
@@ -108,13 +108,13 @@ export async function addCucumberPreprocessorPlugin(
 
   if (!options.omitAfterSpecHandler) {
     on("after:spec", (spec, results) =>
-      afterSpecHandler(config, spec, results)
+      afterSpecHandler(config, spec, results),
     );
   }
 
   if (!options.omitAfterScreenshotHandler) {
     on("after:screenshot", (details) =>
-      afterScreenshotHandler(config, details)
+      afterScreenshotHandler(config, details),
     );
   }
 
@@ -125,12 +125,12 @@ export async function addCucumberPreprocessorPlugin(
     [TASK_TEST_STEP_FINISHED]: testStepFinishedHandler.bind(
       null,
       config,
-      options
+      options,
     ),
     [TASK_TEST_CASE_FINISHED]: testCaseFinishedHandler.bind(null, config),
     [TASK_CREATE_STRING_ATTACHMENT]: createStringAttachmentHandler.bind(
       null,
-      config
+      config,
     ),
   });
 
@@ -142,7 +142,7 @@ export async function addCucumberPreprocessorPlugin(
     const node = parse(tags);
 
     const testFiles = getTestFiles(
-      config as unknown as ICypressConfiguration
+      config as unknown as ICypressConfiguration,
     ).filter((testFile) => {
       if (!testFile.endsWith(".feature")) {
         switch (preprocessor.filterSpecsMixedMode) {
@@ -170,7 +170,7 @@ export async function addCucumberPreprocessorPlugin(
         content,
         testFile,
         SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
-        options
+        options,
       );
 
       const pickles = envelopes
@@ -178,7 +178,9 @@ export async function addCucumberPreprocessorPlugin(
         .filter(notNull);
 
       return pickles.some((pickle) =>
-        node.evaluate(pickle.tags?.map((tag) => tag.name).filter(notNull) ?? [])
+        node.evaluate(
+          pickle.tags?.map((tag) => tag.name).filter(notNull) ?? [],
+        ),
       );
     });
 
@@ -194,7 +196,7 @@ export async function addCucumberPreprocessorPlugin(
     mutateConfigObjectPreservingly(
       config,
       propertyName as keyof ICypressConfiguration,
-      testFiles
+      testFiles,
     );
   }
 

@@ -5,7 +5,6 @@ import { CypressCucumberError } from "./error";
 const ensureChain = (value: unknown): Cypress.Chainable<unknown> =>
   Cypress.isCy(value) ? value : cy.wrap(value, { log: false });
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
 const nativePromiseConstructor = (async () => {})().constructor;
 
 function getMaxColumnWidths(tableArray: any) {
@@ -24,8 +23,8 @@ function padElements(tableArray: any[], maxColumnWidths: any[]) {
   return tableArray.map((row) =>
     row.map(
       (cell: string, index: any) =>
-        (cell = cell + "&nbsp;".repeat(maxColumnWidths[index] - cell.length))
-    )
+        (cell = cell + "&nbsp;".repeat(maxColumnWidths[index] - cell.length)),
+    ),
   );
 }
 
@@ -66,7 +65,7 @@ export function runStepWithLogGroup(options: {
 
   if (ret instanceof nativePromiseConstructor) {
     throw new CypressCucumberError(
-      "Cucumber preprocessor detected that you returned a native promise from a function handler, this is not supported. Using async / await is generally speaking not supported when using Cypress, period, preprocessor or not."
+      "Cucumber preprocessor detected that you returned a native promise from a function handler, this is not supported. Using async / await is generally speaking not supported when using Cypress, period, preprocessor or not.",
     );
   }
 

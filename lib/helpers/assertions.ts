@@ -20,7 +20,7 @@ export function assert(value: unknown, message: string): asserts value {
 
 export function assertAndReturn<T>(
   value: T,
-  message: string
+  message: string,
 ): Exclude<T, false | null | undefined> {
   assert(value, message);
   return value as Exclude<T, false | null | undefined>;
@@ -28,7 +28,7 @@ export function assertAndReturn<T>(
 
 export function assertIsString(
   value: unknown,
-  message: string
+  message: string,
 ): asserts value is string {
   assert(isString(value), message);
 }
