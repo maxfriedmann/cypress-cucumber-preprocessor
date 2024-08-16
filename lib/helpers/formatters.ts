@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 
-import CucumberHtmlStream from "@cucumber/html-formatter";
+import { CucumberHtmlStream } from "@cucumber/html-formatter";
 
 import PrettyFormatter from "@cucumber/pretty-formatter";
 
