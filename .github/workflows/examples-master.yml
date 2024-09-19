@@ -11,7 +11,7 @@ defaults:
 
 jobs:
   find-examples:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -24,9 +24,9 @@ jobs:
 
   example:
     needs: find-examples
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container:
-      image: cypress/base:20.5.0
+      image: cypress/base:latest
     strategy:
       matrix:
         example: ${{fromJson(needs.find-examples.outputs.matrix)}}
