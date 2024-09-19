@@ -1,5 +1,3 @@
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import { AttachmentContentEncoding, Pickle } from "@cucumber/messages";
 
 import parse from "@cucumber/tag-expressions";
@@ -38,6 +36,7 @@ import {
 
 import {
   ConfigurationFileResolver,
+  ICypressRuntimeConfiguration,
   IPreprocessorConfiguration,
 } from "./preprocessor-configuration";
 
@@ -258,7 +257,7 @@ export { IPreprocessorConfiguration };
 
 export function resolvePreprocessorConfiguration(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  cypressConfig: ICypressConfiguration,
+  cypressConfig: ICypressRuntimeConfiguration,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   environment: Record<string, unknown>,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

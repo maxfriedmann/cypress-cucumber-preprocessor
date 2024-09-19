@@ -2,32 +2,32 @@ import util from "util";
 
 import assert from "assert";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import {
+  ICypressRuntimeConfiguration,
   IUserConfiguration,
   combineIntoConfiguration,
 } from "./preprocessor-configuration";
 
 import { getStepDefinitionPatterns, pathParts } from "./step-definitions";
 
-const DUMMY_CONFIG: ICypressConfiguration = {
+const DUMMY_CONFIG: ICypressRuntimeConfiguration = {
   testingType: "e2e",
   projectRoot: "",
   reporter: "spec",
   specPattern: [],
   excludeSpecPattern: [],
   env: {},
+  isTextTerminal: false,
 };
 
 function example(
   filepath: string,
-  partialCypressConfiguration: Partial<ICypressConfiguration>,
+  partialCypressConfiguration: Partial<ICypressRuntimeConfiguration>,
   preprocessorConfiguration: IUserConfiguration,
   implicitIntegrationFolder: string,
   expected: string[],
 ) {
-  const cypressConfiguration: ICypressConfiguration = {
+  const cypressConfiguration: ICypressRuntimeConfiguration = {
     ...DUMMY_CONFIG,
     ...partialCypressConfiguration,
   };

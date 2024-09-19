@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
 import util from "util";
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
 import { getSpecs } from "find-cypress-specs";
 import {
   Expression,
@@ -19,7 +18,10 @@ import sourceMap from "source-map";
 import { assert, assertAndReturn } from "../helpers/assertions";
 import { createAstIdMap } from "../helpers/ast";
 import { ensureIsRelative } from "../helpers/paths";
-import { IPreprocessorConfiguration } from "../preprocessor-configuration";
+import {
+  ICypressRuntimeConfiguration,
+  IPreprocessorConfiguration,
+} from "../preprocessor-configuration";
 import { IStepDefinition, Registry, withRegistry } from "../registry";
 import { Position } from "../helpers/source-map";
 import {
@@ -91,7 +93,7 @@ export function position(
 }
 
 export async function diagnose(configuration: {
-  cypress: ICypressConfiguration;
+  cypress: ICypressRuntimeConfiguration;
   preprocessor: IPreprocessorConfiguration;
 }): Promise<DiagnosticResult> {
   const result: DiagnosticResult = {

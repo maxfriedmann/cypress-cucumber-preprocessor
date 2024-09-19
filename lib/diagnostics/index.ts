@@ -8,7 +8,10 @@ import {
 import { getConfig, getSpecs } from "find-cypress-specs";
 import Table from "cli-table";
 import ancestor from "common-ancestor-path";
-import { resolve as resolvePreprocessorConfiguration } from "../preprocessor-configuration";
+import {
+  ICypressRuntimeConfiguration,
+  resolve as resolvePreprocessorConfiguration,
+} from "../preprocessor-configuration";
 import { Position } from "../helpers/source-map";
 import { IStepDefinition } from "../registry";
 import { ensureIsRelative } from "../helpers/paths";
@@ -300,7 +303,7 @@ export async function execute(options: {
   env: NodeJS.ProcessEnv;
   cwd: string;
 }): Promise<void> {
-  const cypress = Object.assign(
+  const cypress: ICypressRuntimeConfiguration = Object.assign(
     {
       projectRoot: options.cwd,
       testingType: "e2e" as const,

@@ -1,13 +1,11 @@
 import { PassThrough, Transform, TransformCallback } from "stream";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import debug from "../helpers/debug";
 
 import { compile } from "../template";
 
 export default function transform(
-  configuration: ICypressConfiguration,
+  configuration: Cypress.PluginConfigOptions,
   filepath: string,
 ) {
   if (!filepath.match(".feature$")) {
@@ -41,7 +39,7 @@ export default function transform(
 export { transform };
 
 export function preprendTransformerToOptions(
-  configuration: ICypressConfiguration,
+  configuration: Cypress.PluginConfigOptions,
   options: any,
 ) {
   let wrappedTransform;

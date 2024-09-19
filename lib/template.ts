@@ -6,8 +6,6 @@ import { generateMessages } from "@cucumber/gherkin";
 
 import { IdGenerator, SourceMediaType } from "@cucumber/messages";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import { getSpecs } from "find-cypress-specs";
 
 import ancestor from "common-ancestor-path";
@@ -34,7 +32,7 @@ import type { CreateTestsOptions } from "./browser-runtime";
 const { stringify } = JSON;
 
 export async function compile(
-  configuration: ICypressConfiguration,
+  configuration: Cypress.PluginConfigOptions,
   data: string,
   uri: string,
 ) {
@@ -73,11 +71,7 @@ export async function compile(
   const pickles = envelopes.map((envelope) => envelope.pickle).filter(notNull);
 
   const implicitIntegrationFolder = assertAndReturn(
-    ancestor(
-      ...getSpecs(configuration as any)
-        .map(path.dirname)
-        .map(path.normalize),
-    ),
+    ancestor(...getSpecs(configuration).map(path.dirname).map(path.normalize)),
     "Expected to find a common ancestor path",
   );
 

@@ -2,14 +2,10 @@ import fs from "node:fs/promises";
 
 import type esbuild from "esbuild";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import { compile } from "../template";
 
-export { ICypressConfiguration };
-
 export function createEsbuildPlugin(
-  configuration: ICypressConfiguration,
+  configuration: Cypress.PluginConfigOptions,
 ): esbuild.Plugin {
   return {
     name: "feature",

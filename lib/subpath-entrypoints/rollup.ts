@@ -1,10 +1,10 @@
 import type { Plugin } from "rollup";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import { compile } from "../template";
 
-export function createRollupPlugin(config: ICypressConfiguration): Plugin {
+export function createRollupPlugin(
+  config: Cypress.PluginConfigOptions,
+): Plugin {
   return {
     name: "transform-feature",
     async transform(src: string, id: string) {

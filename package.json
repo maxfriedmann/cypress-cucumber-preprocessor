@@ -58,7 +58,6 @@
     "prepublishOnly": "npm run clean-install && npm run clear-dist && npm run build && npm run test"
   },
   "dependencies": {
-    "@badeball/cypress-configuration": "^6.1.1",
     "@cucumber/ci-environment": "^10.0.1",
     "@cucumber/cucumber": "^10.8.0",
     "@cucumber/cucumber-expressions": "^17.1.0",

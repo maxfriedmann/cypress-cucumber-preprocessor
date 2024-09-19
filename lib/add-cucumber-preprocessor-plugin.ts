@@ -8,8 +8,6 @@ import parse from "@cucumber/tag-expressions";
 
 import { generateMessages } from "@cucumber/gherkin";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import { getSpecs } from "find-cypress-specs";
 
 import { INTERNAL_PROPERTY_NAME, INTERNAL_SUITE_PROPERTIES } from "./constants";
@@ -61,12 +59,12 @@ export type AddOptions = {
   onAfterStep?: OnAfterStep;
 };
 
-type PreservedPluginConfigOptions = ICypressConfiguration & {
-  [INTERNAL_PROPERTY_NAME]?: Partial<ICypressConfiguration>;
+type PreservedPluginConfigOptions = Cypress.PluginConfigOptions & {
+  [INTERNAL_PROPERTY_NAME]?: Partial<Cypress.PluginConfigOptions>;
 };
 
 export function mutateConfigObjectPreservingly<
-  K extends keyof ICypressConfiguration,
+  K extends keyof Cypress.PluginConfigOptions,
 >(
   config: PreservedPluginConfigOptions,
   property: K,
@@ -80,7 +78,7 @@ export function mutateConfigObjectPreservingly<
 
 export function rebuildOriginalConfigObject(
   config: PreservedPluginConfigOptions,
-): ICypressConfiguration {
+): Cypress.PluginConfigOptions {
   return Object.assign({}, config, config[INTERNAL_PROPERTY_NAME]);
 }
 
@@ -192,7 +190,7 @@ export async function addCucumberPreprocessorPlugin(
      */
     mutateConfigObjectPreservingly(
       config,
-      propertyName as keyof ICypressConfiguration,
+      propertyName as keyof Cypress.PluginConfigOptions,
       testFiles,
     );
   }

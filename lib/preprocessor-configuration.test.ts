@@ -1,8 +1,3 @@
-import {
-  TestingType,
-  ICypressConfiguration,
-} from "@badeball/cypress-configuration";
-
 import assert from "assert";
 
 import {
@@ -15,12 +10,13 @@ import {
   resolve,
 } from "./preprocessor-configuration";
 
-const DUMMY_POST10_CONFIG: Omit<ICypressConfiguration, "testingType"> = {
+const DUMMY_POST10_CONFIG: Omit<ICypressRuntimeConfiguration, "testingType"> = {
   projectRoot: "",
   reporter: "spec",
   specPattern: [],
   excludeSpecPattern: [],
   env: {},
+  isTextTerminal: false,
 };
 
 type GetValueFn<T> = (configuration: IPreprocessorConfiguration) => T;
@@ -28,7 +24,7 @@ type GetValueFn<T> = (configuration: IPreprocessorConfiguration) => T;
 type SetValueFn<T> = (configuration: IBaseUserConfiguration, value: T) => void;
 
 async function test<T>(options: {
-  testingType: TestingType;
+  testingType: ICypressRuntimeConfiguration["testingType"];
   environment: Record<string, unknown>;
   configuration: IUserConfiguration;
   cypressConfiguration?: Partial<ICypressRuntimeConfiguration>;
@@ -62,7 +58,7 @@ function createUserConfiguration<T>(options: {
 }
 
 function basicBooleanExample(options: {
-  testingType: TestingType;
+  testingType: ICypressRuntimeConfiguration["testingType"];
   default: boolean;
   environmentKey: string;
   setValueFn: SetValueFn<boolean>;
@@ -188,7 +184,7 @@ function basicBooleanExample(options: {
 }
 
 function basicStringExample(options: {
-  testingType: TestingType;
+  testingType: ICypressRuntimeConfiguration["testingType"];
   default: string;
   environmentKey: string;
   setValueFn: SetValueFn<string>;

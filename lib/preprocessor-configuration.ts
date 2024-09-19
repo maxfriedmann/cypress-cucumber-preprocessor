@@ -1,5 +1,3 @@
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import { cosmiconfig } from "cosmiconfig";
 
 import util from "util";
@@ -398,9 +396,16 @@ function stringToMaybeBoolean(value: string): boolean | undefined {
   }
 }
 
-export type ICypressRuntimeConfiguration = ICypressConfiguration & {
-  isTextTerminal?: boolean;
-};
+export type ICypressRuntimeConfiguration = Pick<
+  Cypress.PluginConfigOptions,
+  | "isTextTerminal"
+  | "testingType"
+  | "projectRoot"
+  | "reporter"
+  | "specPattern"
+  | "excludeSpecPattern"
+  | "env"
+>;
 
 export type FilterSpecsMixedMode = "hide" | "show" | "empty-set";
 

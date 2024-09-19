@@ -8,11 +8,12 @@ import assert from "assert";
 
 import isPathInside from "is-path-inside";
 
-import { ICypressConfiguration } from "@badeball/cypress-configuration";
-
 import debug from "./helpers/debug";
 
-import { IPreprocessorConfiguration } from "./preprocessor-configuration";
+import {
+  ICypressRuntimeConfiguration,
+  IPreprocessorConfiguration,
+} from "./preprocessor-configuration";
 
 import { ensureIsAbsolute } from "./helpers/paths";
 
@@ -51,7 +52,7 @@ export function pathParts(relativePath: string): string[] {
 
 export function getStepDefinitionPatterns(
   configuration: {
-    cypress: Pick<ICypressConfiguration, "projectRoot">;
+    cypress: Pick<ICypressRuntimeConfiguration, "projectRoot">;
     preprocessor: Pick<
       IPreprocessorConfiguration,
       "stepDefinitions" | "implicitIntegrationFolder"
