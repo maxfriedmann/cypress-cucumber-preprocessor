@@ -1,4 +1,4 @@
-import { Plugin } from "rollup";
+import type { Plugin } from "rollup";
 
 import { ICypressConfiguration } from "@badeball/cypress-configuration";
 

@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 
-import esbuild from "esbuild";
+import type esbuild from "esbuild";
 
 import { ICypressConfiguration } from "@badeball/cypress-configuration";
 
