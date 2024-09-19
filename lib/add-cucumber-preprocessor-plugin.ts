@@ -8,10 +8,9 @@ import parse from "@cucumber/tag-expressions";
 
 import { generateMessages } from "@cucumber/gherkin";
 
-import {
-  getTestFiles,
-  ICypressConfiguration,
-} from "@badeball/cypress-configuration";
+import { ICypressConfiguration } from "@badeball/cypress-configuration";
+
+import { getSpecs } from "find-cypress-specs";
 
 import { INTERNAL_PROPERTY_NAME, INTERNAL_SUITE_PROPERTIES } from "./constants";
 
@@ -141,9 +140,7 @@ export async function addCucumberPreprocessorPlugin(
 
     const node = parse(tags);
 
-    const testFiles = getTestFiles(
-      config as unknown as ICypressConfiguration,
-    ).filter((testFile) => {
+    const testFiles = getSpecs(config).filter((testFile) => {
       if (!testFile.endsWith(".feature")) {
         switch (preprocessor.filterSpecsMixedMode) {
           case "hide":

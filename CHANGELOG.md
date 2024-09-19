@@ -10,6 +10,8 @@ Breaking changes:
 
   - User of `@badeball/cypress-cucumber-preprocessor/browserify` should change their Cypress config in accordance with the related [examples](examples).
 
+- The executable `cypress-cucumber-diagnostics` no longer respect flags such as `--project` or `--env`. The long-term plan is to rewamp dry run altogether, and run it in a Cypress environment.
+
 ## v20.1.2
 
 - Updated all dependencies, including esbuild, relates to [#1068](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1068).

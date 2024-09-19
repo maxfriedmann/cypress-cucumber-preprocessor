@@ -6,10 +6,9 @@ import { generateMessages } from "@cucumber/gherkin";
 
 import { IdGenerator, SourceMediaType } from "@cucumber/messages";
 
-import {
-  ICypressConfiguration,
-  getTestFiles,
-} from "@badeball/cypress-configuration";
+import { ICypressConfiguration } from "@badeball/cypress-configuration";
+
+import { getSpecs } from "find-cypress-specs";
 
 import ancestor from "common-ancestor-path";
 
@@ -75,7 +74,9 @@ export async function compile(
 
   const implicitIntegrationFolder = assertAndReturn(
     ancestor(
-      ...getTestFiles(configuration).map(path.dirname).map(path.normalize),
+      ...getSpecs(configuration as any)
+        .map(path.dirname)
+        .map(path.normalize),
     ),
     "Expected to find a common ancestor path",
   );

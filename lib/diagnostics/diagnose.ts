@@ -1,10 +1,8 @@
 import fs from "fs/promises";
 import path from "path";
 import util from "util";
-import {
-  getTestFiles,
-  ICypressConfiguration,
-} from "@badeball/cypress-configuration";
+import { ICypressConfiguration } from "@badeball/cypress-configuration";
+import { getSpecs } from "find-cypress-specs";
 import {
   Expression,
   ParameterTypeRegistry,
@@ -102,7 +100,7 @@ export async function diagnose(configuration: {
     ambiguousSteps: [],
   };
 
-  const testFiles = getTestFiles(configuration.cypress);
+  const testFiles = getSpecs(configuration.cypress as any, "e2e");
 
   for (const testFile of testFiles) {
     if (!testFile.endsWith(".feature")) {

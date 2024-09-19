@@ -5,10 +5,7 @@ import {
   Expression,
   RegularExpression,
 } from "@cucumber/cucumber-expressions";
-import {
-  getConfiguration as resolveCypressConfiguration,
-  getTestFiles,
-} from "@badeball/cypress-configuration";
+import { getConfig, getSpecs } from "find-cypress-specs";
 import Table from "cli-table";
 import ancestor from "common-ancestor-path";
 import { resolve as resolvePreprocessorConfiguration } from "../preprocessor-configuration";
@@ -303,13 +300,20 @@ export async function execute(options: {
   env: NodeJS.ProcessEnv;
   cwd: string;
 }): Promise<void> {
-  const cypress = resolveCypressConfiguration({
-    ...options,
-    testingType: "e2e",
-  });
+  const cypress = Object.assign(
+    {
+      projectRoot: options.cwd,
+      testingType: "e2e" as const,
+      env: {},
+      reporter: "spec",
+      specPattern: "cypress/e2e/**/*.cy.{js,jsx,ts,tsx}",
+      excludeSpecPattern: "*.hot-update.js",
+    },
+    getConfig().e2e ?? {},
+  );
 
   const implicitIntegrationFolder = assertAndReturn(
-    ancestor(...getTestFiles(cypress).map(path.dirname).map(path.normalize)),
+    ancestor(...getSpecs(cypress, "e2e").map(path.dirname).map(path.normalize)),
     "Expected to find a common ancestor path",
   );
 
@@ -326,7 +330,7 @@ export async function execute(options: {
 
   log(
     ...createLineBuffer((append) => {
-      append(createDefinitionsUsage(cypress.projectRoot, result));
+      append(createDefinitionsUsage(options.cwd, result));
 
       append("");
 
@@ -348,8 +352,8 @@ export async function execute(options: {
 
           const lines =
             "ambiguousStep" in problem
-              ? createAmbiguousStep(cypress.projectRoot, problem.ambiguousStep)
-              : createUnmatchedStep(cypress.projectRoot, problem.unmatchedStep);
+              ? createAmbiguousStep(options.cwd, problem.ambiguousStep)
+              : createUnmatchedStep(options.cwd, problem.unmatchedStep);
 
           const title = `${i + 1}) `;
 

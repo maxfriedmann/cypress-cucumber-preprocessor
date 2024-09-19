@@ -76,6 +76,7 @@
     "debug": "^4.3.6",
     "error-stack-parser": "^2.1.4",
     "esbuild": "^0.23.0",
+    "find-cypress-specs": "^1.45.1",
     "glob": "^11.0.0",
     "is-path-inside": "^3.0.3",
     "mocha": "^10.7.0",
