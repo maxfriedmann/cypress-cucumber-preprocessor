@@ -1,7 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
 import util from "util";
-import { getSpecs } from "find-cypress-specs";
 import {
   Expression,
   ParameterTypeRegistry,
@@ -29,6 +28,7 @@ import {
   getStepDefinitionPaths,
 } from "../step-definitions";
 import { notNull } from "../helpers/type-guards";
+import { getSpecs } from "../helpers/specs";
 
 export interface DiagnosticStep {
   source: string;
