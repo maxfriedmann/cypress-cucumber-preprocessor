@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+Breaking changes:
+
+- Exported member `preprocessor` of `@badeball/cypress-cucumber-preprocessor/browserify` is removed.
+
+  - User of `@badeball/cypress-cucumber-preprocessor/browserify` should change their Cypress config in accordance with the related [examples](examples).
+
 ## v20.1.2
 
 - Updated all dependencies, including esbuild, relates to [#1068](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1068).

@@ -11,14 +11,14 @@ Feature: browserify + typescript
       """
       const browserify = require("@cypress/browserify-preprocessor");
       const { addCucumberPreprocessorPlugin } = require("@badeball/cypress-cucumber-preprocessor");
-      const { preprocessor } = require("@badeball/cypress-cucumber-preprocessor/browserify");
+      const { preprendTransformerToOptions } = require("@badeball/cypress-cucumber-preprocessor/browserify");
 
       module.exports = async (on, config) => {
         await addCucumberPreprocessorPlugin(on, config);
         on(
           "file:preprocessor",
-          preprocessor(config, {
-            ...browserify.defaultOptions,
+          browserify({
+            ...preprendTransformerToOptions(config, browserify.defaultOptions),
             typescript: require.resolve("typescript")
           })
         );

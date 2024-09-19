@@ -1,16 +1,12 @@
 import { PassThrough, Transform, TransformCallback } from "stream";
 
-import { EventEmitter } from "events";
-
-import browserify from "@cypress/browserify-preprocessor";
-
 import { ICypressConfiguration } from "@badeball/cypress-configuration";
 
 import debug from "../helpers/debug";
 
 import { compile } from "../template";
 
-export function transform(
+export default function transform(
   configuration: ICypressConfiguration,
   filepath: string,
 ) {
@@ -42,14 +38,9 @@ export function transform(
   });
 }
 
-// https://docs.cypress.io/api/plugins/preprocessors-api.html#File-object
-type ICypressPreprocessorFile = EventEmitter & {
-  filePath: string;
-  outputPath: string;
-  shouldWatch: boolean;
-};
+export { transform };
 
-function preprendTransformerToOptions(
+export function preprendTransformerToOptions(
   configuration: ICypressConfiguration,
   options: any,
 ) {
@@ -75,23 +66,3 @@ function preprendTransformerToOptions(
     },
   };
 }
-
-export function preprocessor(
-  configuration: ICypressConfiguration,
-  options = browserify.defaultOptions,
-  { prependTransform = true }: { prependTransform?: boolean } = {},
-) {
-  if (prependTransform) {
-    options = preprendTransformerToOptions(configuration, options);
-  }
-
-  return function (file: ICypressPreprocessorFile) {
-    return browserify(options)(file);
-  };
-}
-
-export { ICypressConfiguration };
-
-export { compile };
-
-export default preprocessor;
