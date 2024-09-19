@@ -20,7 +20,6 @@ jobs:
       - id: set-matrix
         name: Prepare
         run: echo "matrix=$(node -p "JSON.stringify(fs.readdirSync('examples').filter(f => f !== 'readme.md'))")" >> $GITHUB_OUTPUT
-      - run: npm -v
 
   build-package:
     runs-on: ubuntu-latest
@@ -69,6 +68,9 @@ jobs:
     env:
       NPM_CONFIG_PACKAGE_LOCK: "false"
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: Checkout
         uses: actions/checkout@v4
       - name: Cache NPM modules
@@ -94,10 +96,10 @@ jobs:
           path: examples/${{ matrix.example }}
       - name: Install NPM modules
         working-directory: examples/${{ matrix.example }}
-        run: npm install
+        run: npm install --engine-strict
       - name: Install dirty build
         working-directory: examples/${{ matrix.example }}
-        run: npm install badeball-*
+        run: npm install --engine-strict badeball-*
       - name: Run Cypress
         working-directory: examples/${{ matrix.example }}
         run: |
@@ -106,3 +108,8 @@ jobs:
           else
             npx cypress run --e2e
           fi
+      - name: Versions
+        run: |
+          npx cypress --version
+          node --version
+          npm --version

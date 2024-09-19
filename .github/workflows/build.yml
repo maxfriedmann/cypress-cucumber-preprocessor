@@ -24,6 +24,9 @@ jobs:
       matrix:
         cypress-version: ${{fromJson(needs.prepare-versions.outputs.matrix)}}
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: Checkout
         uses: actions/checkout@v4
       - name: Cache NPM modules
@@ -42,15 +45,18 @@ jobs:
         env:
           CYPRESS_INSTALL_BINARY: "0"
         run: |
-          npm install --force && \
+          npm install --engine-strict && \
           npm install --no-save cypress@${{ matrix.cypress-version }} && \
           env -u CYPRESS_INSTALL_BINARY npx cypress install
       - name: Build
         run: npm run build
       - name: Test
         run: npm run test
-      - name: Version
-        run: npx cypress --version
+      - name: Versions
+        run: |
+          npx cypress --version
+          node --version
+          npm --version
 
   windows:
     runs-on: windows-latest
@@ -58,6 +64,9 @@ jobs:
       NPM_CONFIG_CACHE: ${{ github.workspace }}/.npm
       CYPRESS_CACHE_FOLDER: ${{ github.workspace }}/.cypress
     steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: Checkout
         uses: actions/checkout@v4
       - name: Cache NPM modules
@@ -72,7 +81,7 @@ jobs:
           key: cypress-windows
       - name: Dependencies
         shell: bash
-        run: npm install
+        run: npm install --engine-strict
       - name: Build
         run: npm run build
       # https://github.com/webpack/webpack/issues/12759
@@ -80,3 +89,8 @@ jobs:
         run: rm features/loaders/webpack.feature
       - name: Test
         run: npm run test:integration
+      - name: Versions
+        run: |
+          npx cypress --version
+          node --version
+          npm --version
