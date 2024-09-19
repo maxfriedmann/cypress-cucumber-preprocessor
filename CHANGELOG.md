@@ -12,6 +12,8 @@ Breaking changes:
 
 - The executable `cypress-cucumber-diagnostics` no longer respect flags such as `--project` or `--env`. The long-term plan is to rewamp dry run altogether, and run it in a Cypress environment.
 
+- `esbuild` is now an optional peer dependency. This is relevant for users using `esbuild` as their bundler, as well as users of `cypress-cucumber-diagnostics`.
+
 ## v20.1.2
 
 - Updated all dependencies, including esbuild, relates to [#1068](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1068).

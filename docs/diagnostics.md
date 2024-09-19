@@ -8,6 +8,14 @@ A diagnostics utility is provided to verify that each step matches one, and only
 $ npx cypress-cucumber-diagnostics
 ```
 
+This requires `esbuild`, which is an _optional peer dependency_ of this library.
+
+```
+$ npm install esbuild
+```
+
+The observant user might notice that some transitive dependencies will install `esbuild` for you, making the above-mentioned command unnecessary. However, this is not guaranteed and users should install it explicitly to protect themselves from future changes to the transitive dependency chain.
+
 ## Limitations
 
 In order to obtain structured information about step definitions, these files are resolved and evaluated in a Node environment. This environment differs from the normal Cypress environment in that it's not a browser environment and Cypress globals are mocked and imitated to some degree.
