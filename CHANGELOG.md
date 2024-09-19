@@ -14,6 +14,10 @@ Breaking changes:
 
 - `esbuild` is now an optional peer dependency. This is relevant for users using `esbuild` as their bundler, as well as users of `cypress-cucumber-diagnostics`.
 
+Other changees:
+
+- Re-introduce support for Node v18, fixes [#1230](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1230).
+
 ## v20.1.2
 
 - Updated all dependencies, including esbuild, relates to [#1068](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1068).
