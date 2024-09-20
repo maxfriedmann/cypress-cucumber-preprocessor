@@ -96,9 +96,6 @@ jobs:
           path: examples/${{ matrix.example }}
       - name: Install NPM modules
         working-directory: examples/${{ matrix.example }}
-        run: npm install --engine-strict
-      - name: Install dirty build
-        working-directory: examples/${{ matrix.example }}
         run: npm install --engine-strict badeball-*
       - name: Run Cypress
         working-directory: examples/${{ matrix.example }}
