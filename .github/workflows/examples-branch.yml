@@ -97,6 +97,11 @@ jobs:
       - name: Install NPM modules
         working-directory: examples/${{ matrix.example }}
         run: npm install --engine-strict badeball-*
+      # For reasons unknown to me, `npm install <path>` will not trigger postinstall scripts.
+      # See https://github.com/npm/cli/issues/4804.
+      - name: Patch packages
+        working-directory: examples/${{ matrix.example }}
+        run: npx patch-package
       - name: Run Cypress
         working-directory: examples/${{ matrix.example }}
         run: |
