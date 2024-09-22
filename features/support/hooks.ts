@@ -9,6 +9,14 @@ const projectPath = path.join(__dirname, "..", "..");
 Before(async function ({ gherkinDocument, pickle }) {
   assert(gherkinDocument.uri, "Expected gherkinDocument.uri to be present");
 
+  /**
+   * Using the URI as the directory name of the temporary project, is imperative for the test of
+   * #1196 to actually test directory names containing square brackets. Consider this before
+   * changing the following line.
+   *
+   * @see features/issues/1196 [foo].feature
+   * @see https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1196
+   */
   const relativeUri = path.relative(process.cwd(), gherkinDocument.uri);
 
   const { line } = formatterHelpers.PickleParser.getPickleLocation({

@@ -88,9 +88,9 @@ describe("getStepDefinitionPatterns()", () => {
     {},
     "/foo/bar/cypress/e2e",
     [
-      "/foo/bar/cypress/e2e/baz/**/*.{js,mjs,ts,tsx}",
-      "/foo/bar/cypress/e2e/baz.{js,mjs,ts,tsx}",
-      "/foo/bar/cypress/support/step_definitions/**/*.{js,mjs,ts,tsx}",
+      "cypress/e2e/baz/**/*.{js,mjs,ts,tsx}",
+      "cypress/e2e/baz.{js,mjs,ts,tsx}",
+      "cypress/support/step_definitions/**/*.{js,mjs,ts,tsx}",
     ],
   );
 
@@ -100,10 +100,10 @@ describe("getStepDefinitionPatterns()", () => {
       projectRoot: "/",
     },
     {
-      stepDefinitions: "/cypress/e2e/[filepath]/step_definitions/*.ts",
+      stepDefinitions: "cypress/e2e/[filepath]/step_definitions/*.ts",
     },
     "/cypress/e2e",
-    ["/cypress/e2e/foo/bar/baz/step_definitions/*.ts"],
+    ["cypress/e2e/foo/bar/baz/step_definitions/*.ts"],
   );
 
   example(
@@ -112,14 +112,14 @@ describe("getStepDefinitionPatterns()", () => {
       projectRoot: "/",
     },
     {
-      stepDefinitions: "/cypress/e2e/[filepart]/step_definitions/*.ts",
+      stepDefinitions: "cypress/e2e/[filepart]/step_definitions/*.ts",
     },
     "/cypress/e2e",
     [
-      "/cypress/e2e/foo/bar/baz/step_definitions/*.ts",
-      "/cypress/e2e/foo/bar/step_definitions/*.ts",
-      "/cypress/e2e/foo/step_definitions/*.ts",
-      "/cypress/e2e/step_definitions/*.ts",
+      "cypress/e2e/foo/bar/baz/step_definitions/*.ts",
+      "cypress/e2e/foo/bar/step_definitions/*.ts",
+      "cypress/e2e/foo/step_definitions/*.ts",
+      "cypress/e2e/step_definitions/*.ts",
     ],
   );
 

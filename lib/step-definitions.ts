@@ -15,15 +15,19 @@ import {
   IPreprocessorConfiguration,
 } from "./preprocessor-configuration";
 
-import { ensureIsAbsolute } from "./helpers/paths";
-
 export async function getStepDefinitionPaths(
+  prjectRoot: string,
   stepDefinitionPatterns: string[],
 ): Promise<string[]> {
   return (
     await Promise.all(
       stepDefinitionPatterns.map((pattern) =>
-        glob.glob(pattern, { nodir: true, windowsPathsNoEscape: true }),
+        glob.glob(pattern, {
+          cwd: prjectRoot,
+          absolute: true,
+          nodir: true,
+          windowsPathsNoEscape: true,
+        }),
       ),
     )
   ).reduce((acum, el) => acum.concat(el), []);
@@ -84,24 +88,22 @@ export function getStepDefinitionPatterns(
 
   const stepDefinitions = [configuration.preprocessor.stepDefinitions].flat();
 
-  return stepDefinitions
-    .flatMap((pattern) => {
-      if (pattern.includes("[filepath]") && pattern.includes("[filepart]")) {
-        throw new Error(
-          `Pattern cannot contain both [filepath] and [filepart], but got ${util.inspect(
-            pattern,
-          )}`,
-        );
-      } else if (pattern.includes("[filepath]")) {
-        return pattern.replace("[filepath]", filepathReplacement);
-      } else if (pattern.includes("[filepart]")) {
-        return [
-          ...parts.map((part) => pattern.replace("[filepart]", part)),
-          path.normalize(pattern.replace("[filepart]", ".")),
-        ];
-      } else {
-        return pattern;
-      }
-    })
-    .map((pattern) => ensureIsAbsolute(projectRoot, pattern));
+  return stepDefinitions.flatMap((pattern) => {
+    if (pattern.includes("[filepath]") && pattern.includes("[filepart]")) {
+      throw new Error(
+        `Pattern cannot contain both [filepath] and [filepart], but got ${util.inspect(
+          pattern,
+        )}`,
+      );
+    } else if (pattern.includes("[filepath]")) {
+      return pattern.replace("[filepath]", filepathReplacement);
+    } else if (pattern.includes("[filepart]")) {
+      return [
+        ...parts.map((part) => pattern.replace("[filepart]", part)),
+        path.normalize(pattern.replace("[filepart]", ".")),
+      ];
+    } else {
+      return pattern;
+    }
+  });
 }

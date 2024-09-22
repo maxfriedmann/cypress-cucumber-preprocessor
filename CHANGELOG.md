@@ -20,6 +20,8 @@ Other changees:
 
 - Generate a temporary messages report in case of `JsonFormatter` errors, relates to [#1161](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1161).
 
+- Support project directories containing square brackets, EG. `/home/[foo] my project/`, relates to [#1196](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1196).
+
 ## v20.1.2
 
 - Updated all dependencies, including esbuild, relates to [#1068](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1068).

@@ -115,6 +115,7 @@ export async function diagnose(configuration: {
     );
 
     const stepDefinitions = await getStepDefinitionPaths(
+      configuration.cypress.projectRoot,
       stepDefinitionPatterns,
     );
 

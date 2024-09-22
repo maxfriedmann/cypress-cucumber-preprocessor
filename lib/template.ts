@@ -93,19 +93,16 @@ export async function compile(
       preprocessor,
     },
     uri,
-  );
+  ).map((pattern) => ensureIsRelative(configuration.projectRoot, pattern));
 
   debug(
     `for ${inspect(
       ensureIsRelative(configuration.projectRoot, uri),
-    )} yielded patterns ${inspect(
-      stepDefinitionPatterns.map((pattern) =>
-        ensureIsRelative(configuration.projectRoot, pattern),
-      ),
-    )}`,
+    )} yielded patterns ${inspect(stepDefinitionPatterns)}`,
   );
 
   const stepDefinitionPaths = await getStepDefinitionPaths(
+    configuration.projectRoot,
     stepDefinitionPatterns,
   );
 
