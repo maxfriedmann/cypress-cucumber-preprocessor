@@ -8,6 +8,8 @@ import parse from "@cucumber/tag-expressions";
 
 import { generateMessages } from "@cucumber/gherkin";
 
+import { getSpecs } from "find-cypress-specs";
+
 import { INTERNAL_PROPERTY_NAME, INTERNAL_SUITE_PROPERTIES } from "./constants";
 
 import {
@@ -45,8 +47,6 @@ import { memoize } from "./helpers/memoize";
 import { assertNever } from "./helpers/assertions";
 
 import debug from "./helpers/debug";
-
-import { getSpecs } from "./helpers/specs";
 
 const resolve = memoize(origResolve);
 

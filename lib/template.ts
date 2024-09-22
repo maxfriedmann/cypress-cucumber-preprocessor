@@ -6,6 +6,8 @@ import { generateMessages } from "@cucumber/gherkin";
 
 import { IdGenerator, SourceMediaType } from "@cucumber/messages";
 
+import { getSpecs } from "find-cypress-specs";
+
 import ancestor from "common-ancestor-path";
 
 import { assertAndReturn } from "./helpers/assertions";
@@ -26,8 +28,6 @@ import { rebuildOriginalConfigObject } from "./add-cucumber-preprocessor-plugin"
 import debug from "./helpers/debug";
 
 import type { CreateTestsOptions } from "./browser-runtime";
-
-import { getSpecs } from "./helpers/specs";
 
 const { stringify } = JSON;
 

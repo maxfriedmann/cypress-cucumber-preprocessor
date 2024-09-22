@@ -74,7 +74,7 @@
     "cosmiconfig": "^9.0.0",
     "debug": "^4.3.6",
     "error-stack-parser": "^2.1.4",
-    "find-cypress-specs": "^1.45.1",
+    "find-cypress-specs": "^1.45.2",
     "glob": "^10.4.5",
     "is-path-inside": "^3.0.3",
     "mocha": "^10.7.0",
