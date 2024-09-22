@@ -375,8 +375,35 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
       },
     );
 
-    for (const message of state.messages.accumulation) {
-      eventBroadcaster.emit("envelope", message);
+    try {
+      for (const message of state.messages.accumulation) {
+        eventBroadcaster.emit("envelope", message);
+      }
+    } catch (e) {
+      const message = (messagesOutput: string) =>
+        `JsonFormatter failed with an error shown below. This might be a bug, please report at ${homepage} and make sure to attach the messages report in your ticket (${messagesOutput}).\n`;
+
+      if (preprocessor.messages.enabled) {
+        console.warn(chalk.yellow(message(preprocessor.messages.output)));
+      } else {
+        const temporaryMessagesOutput = path.join(
+          await fs.mkdtemp(
+            path.join(os.tmpdir(), "cypress-cucumber-preprocessor-"),
+          ),
+          "cucumber-messages.ndjson",
+        );
+
+        await fs.writeFile(
+          temporaryMessagesOutput,
+          state.messages.accumulation
+            .map((message) => JSON.stringify(message))
+            .join("\n") + "\n",
+        );
+
+        console.warn(chalk.yellow(message(temporaryMessagesOutput)));
+      }
+
+      throw e;
     }
 
     assertIsString(
