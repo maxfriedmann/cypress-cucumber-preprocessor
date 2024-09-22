@@ -27,6 +27,7 @@ jobs:
     container:
       image: cypress/base:latest
     strategy:
+      fail-fast: false
       matrix:
         example: ${{fromJson(needs.find-examples.outputs.matrix)}}
     env:

@@ -25,6 +25,7 @@ jobs:
     container:
       image: cypress/browsers:latest
     strategy:
+      fail-fast: false
       matrix:
         cypress-version: ${{fromJson(needs.prepare-versions.outputs.matrix)}}
     steps:
