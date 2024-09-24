@@ -58,7 +58,7 @@ function runStepDefininition(
     runStepWithLogGroup({
       keyword: "Step",
       text,
-      fn: () => getRegistry().runStepDefininition(world, text, argument),
+      fn: () => getRegistry().runStepDefininition(world, text, false, argument),
     });
   });
 }

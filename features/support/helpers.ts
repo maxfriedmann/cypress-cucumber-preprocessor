@@ -2,6 +2,7 @@ import assert from "assert";
 import { version as cypressVersion } from "cypress/package.json";
 import { promises as fs } from "fs";
 import path from "path";
+import ICustomWorld from "./ICustomWorld";
 
 export async function writeFile(filePath: string, fileContent: string) {
   await fs.mkdir(path.dirname(filePath), { recursive: true });
@@ -114,3 +115,12 @@ export function isPost12() {
 export function isPre12() {
   return !isPost12();
 }
+
+/**
+ * Shamelessly copied from the RegExp.escape proposal.
+ */
+export const rescape = (s: string) =>
+  String(s).replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
+
+export const expectLastRun = (world: ICustomWorld) =>
+  assertAndReturn(world.lastRun, "Expected to find information about last run");

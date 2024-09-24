@@ -8,6 +8,7 @@ import {
   formatterHelpers,
   IFormatterOptions,
   JsonFormatter,
+  UsageFormatter,
 } from "@cucumber/cucumber";
 
 import messages from "@cucumber/messages";
@@ -45,12 +46,64 @@ export function createJsonFormatter(
     .map((s) => {
       return {
         id: s.id,
-        uri: "not available",
-        line: 0,
+        uri: s.sourceReference.uri,
+        line: s.sourceReference.location?.line,
       };
     });
 
   new JsonFormatter({
+    eventBroadcaster,
+    eventDataCollector,
+    log(chunk) {
+      assertIsString(
+        chunk,
+        "Expected a JSON output of string, but got " + typeof chunk,
+      );
+      log(chunk);
+    },
+    supportCodeLibrary: {
+      stepDefinitions,
+    } as any,
+    colorFns: null as any,
+    cwd: null as any,
+    parsedArgvOptions: {},
+    snippetBuilder: null as any,
+    stream: null as any,
+    cleanup: null as any,
+  });
+
+  return eventBroadcaster;
+}
+
+export function createUsageFormatter(
+  envelopes: messages.Envelope[],
+  log: (chunk: string) => void,
+): EventEmitter {
+  const eventBroadcaster = new EventEmitter();
+
+  const eventDataCollector = new formatterHelpers.EventDataCollector(
+    eventBroadcaster,
+  );
+
+  const stepDefinitions = envelopes
+    .map((m) => m.stepDefinition)
+    .filter(notNull)
+    .map((s) => {
+      return {
+        id: s.id,
+        uri: s.sourceReference.uri,
+        line: s.sourceReference.location?.line,
+        unwrappedCode: "",
+        expression: {
+          source: s.pattern.source,
+          constructor: {
+            name: "foo",
+          },
+        },
+      };
+    });
+
+  new UsageFormatter({
     eventBroadcaster,
     eventDataCollector,
     log(chunk) {

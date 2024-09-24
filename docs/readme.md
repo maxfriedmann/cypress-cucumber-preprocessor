@@ -7,15 +7,17 @@
 * [Step definitions](step-definitions.md)
 * [Tags](tags.md)
 * [Pretty output](pretty-output.md)
+* [Source maps](source-maps.md)
+* [Dry run](dry-run.md)
 * Reports
   * [Messages report](messages-report.md)
   * [JSON report](json-report.md)
   * [HTML report](html-report.md)
+  * [Usage report](usage-report.md)
 * [Localisation](localisation.md)
 * [Configuration](configuration.md)
 * [Test configuration](test-configuration.md)
 * CLI utilities
-  * [Diagnostics / dry run](diagnostics.md)
   * [JSON formatter](json-formatter.md)
   * [HTML formatter](html-formatter.md)
   * [Parallelization using Cypress Cloud & merging reports](merging-reports.md)

@@ -145,6 +145,40 @@ function validateUserConfigurationEntry(
       };
       return { [key]: messagesConfig };
     }
+    case "usage": {
+      if (typeof value !== "object" || value == null) {
+        throw new Error(
+          `Expected an object (usage), but got ${util.inspect(value)}`,
+        );
+      }
+      if (
+        !hasOwnProperty(value, "enabled") ||
+        typeof value.enabled !== "boolean"
+      ) {
+        throw new Error(
+          `Expected a boolean (usage.enabled), but got ${util.inspect(
+            value.enabled,
+          )}`,
+        );
+      }
+      let output: string | undefined;
+      if (hasOwnProperty(value, "output")) {
+        if (isString(value.output)) {
+          output = value.output;
+        } else {
+          throw new Error(
+            `Expected a string (usage.output), but got ${util.inspect(
+              value.output,
+            )}`,
+          );
+        }
+      }
+      const messagesConfig = {
+        enabled: value.enabled,
+        output,
+      };
+      return { [key]: messagesConfig };
+    }
     case "pretty": {
       if (typeof value !== "object" || value == null) {
         throw new Error(
@@ -188,6 +222,14 @@ function validateUserConfigurationEntry(
       if (!isBoolean(value)) {
         throw new Error(
           `Expected a boolean (omitFiltered), but got ${util.inspect(value)}`,
+        );
+      }
+      return { [key]: value };
+    }
+    case "dryRun": {
+      if (!isBoolean(value)) {
+        throw new Error(
+          `Expected a boolean (dryRun), but got ${util.inspect(value)}`,
         );
       }
       return { [key]: value };
@@ -379,6 +421,20 @@ function validateEnvironmentOverrides(
     }
   }
 
+  if (hasOwnProperty(environment, "dryRun")) {
+    const { dryRun } = environment;
+
+    if (isBoolean(dryRun)) {
+      overrides.dryRun = dryRun;
+    } else if (isString(dryRun)) {
+      overrides.dryRun = stringToMaybeBoolean(dryRun);
+    } else {
+      throw new Error(
+        `Expected a boolean (dryRun), but got ${util.inspect(dryRun)}`,
+      );
+    }
+  }
+
   return overrides;
 }
 
@@ -417,10 +473,13 @@ interface IEnvironmentOverrides {
   jsonOutput?: string;
   htmlEnabled?: boolean;
   htmlOutput?: string;
+  usageEnabled?: boolean;
+  usageOutput?: string;
   prettyEnabled?: boolean;
   filterSpecsMixedMode?: FilterSpecsMixedMode;
   filterSpecs?: boolean;
   omitFiltered?: boolean;
+  dryRun?: boolean;
 }
 
 export interface IBaseUserConfiguration {
@@ -437,12 +496,17 @@ export interface IBaseUserConfiguration {
     enabled: boolean;
     output?: string;
   };
+  usage?: {
+    enabled: boolean;
+    output?: string;
+  };
   pretty?: {
     enabled: boolean;
   };
   filterSpecsMixedMode?: FilterSpecsMixedMode;
   filterSpecs?: boolean;
   omitFiltered?: boolean;
+  dryRun?: boolean;
 }
 
 export interface IUserConfiguration extends IBaseUserConfiguration {
@@ -464,6 +528,10 @@ export interface IPreprocessorConfiguration {
     enabled: boolean;
     output: string;
   };
+  readonly usage: {
+    enabled: boolean;
+    output: string;
+  };
   readonly pretty: {
     enabled: boolean;
   };
@@ -472,6 +540,7 @@ export interface IPreprocessorConfiguration {
   readonly omitFiltered: boolean;
   readonly implicitIntegrationFolder: string;
   readonly isTrackingState: boolean;
+  readonly dryRun: boolean;
 }
 
 const DEFAULT_STEP_DEFINITIONS = [
@@ -544,6 +613,19 @@ export function combineIntoConfiguration(
       "cucumber-messages.ndjson",
   };
 
+  const usage: IPreprocessorConfiguration["usage"] = {
+    enabled:
+      overrides.usageEnabled ??
+      specific?.usage?.enabled ??
+      unspecific.usage?.enabled ??
+      false,
+    output:
+      overrides.usageOutput ??
+      specific?.usage?.output ??
+      unspecific.usage?.output ??
+      "stdout",
+  };
+
   const usingPrettyReporter = cypress.reporter.endsWith(
     COMPILED_REPORTER_ENTRYPOINT,
   );
@@ -580,12 +662,16 @@ export function combineIntoConfiguration(
     unspecific.omitFiltered ??
     false;
 
+  const dryRun: IPreprocessorConfiguration["dryRun"] =
+    overrides.dryRun ?? specific?.dryRun ?? unspecific.dryRun ?? false;
+
   const isTrackingState =
     (cypress.isTextTerminal ?? false) &&
     (messages.enabled ||
       json.enabled ||
       html.enabled ||
       pretty.enabled ||
+      usage.enabled ||
       usingPrettyReporter);
 
   return {
@@ -594,11 +680,13 @@ export function combineIntoConfiguration(
     json,
     html,
     pretty,
+    usage,
     filterSpecsMixedMode,
     filterSpecs,
     omitFiltered,
     implicitIntegrationFolder,
     isTrackingState,
+    dryRun,
   };
 }
 

@@ -7,7 +7,7 @@ import childProcess from "child_process";
 import stripAnsi from "strip-ansi";
 import * as glob from "glob";
 import ICustomWorld from "../support/ICustomWorld";
-import { assertAndReturn } from "../support/helpers";
+import { expectLastRun, rescape } from "../support/helpers";
 
 const isCI = process.env.CI === "true";
 
@@ -90,14 +90,6 @@ When(
 );
 
 When(
-  "I run diagnostics",
-  { timeout: 60 * 1000 },
-  async function (this: ICustomWorld) {
-    await this.runDiagnostics();
-  },
-);
-
-When(
   "I merge the messages reports",
   { timeout: 60 * 1000 },
   async function (this: ICustomWorld) {
@@ -115,9 +107,6 @@ When(
     await fs.writeFile(absoluteFilePath, expectLastRun(this).output);
   },
 );
-
-const expectLastRun = (world: ICustomWorld) =>
-  assertAndReturn(world.lastRun, "Expected to find information about last run");
 
 Then("it passes", function (this: ICustomWorld) {
   assert.equal(expectLastRun(this).exitCode, 0, "Expected a zero exit code");
@@ -193,11 +182,6 @@ Then(
     }
   },
 );
-
-/**
- * Shamelessly copied from the RegExp.escape proposal.
- */
-const rescape = (s: string) => String(s).replace(/[\\^$*+?.()|[\]{}]/g, "\\$&");
 
 const runScenarioExpr = (scenarioName: string) =>
   new RegExp(`(?:✓|√) ${rescape(scenarioName)}( \\(\\d+ms\\))?\\n`);

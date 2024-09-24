@@ -107,7 +107,7 @@ export class Registry {
 
   public stepHooks: IStepHook[] = [];
 
-  constructor(private experimentalSourceMap: boolean) {
+  constructor(private experimentalSourceMap: boolean = true) {
     this.defineStep = this.defineStep.bind(this);
     this.runStepDefininition = this.runStepDefininition.bind(this);
     this.defineParameterType = this.defineParameterType.bind(this);
@@ -159,7 +159,7 @@ export class Registry {
     this.preliminaryStepDefinitions.push({
       description,
       implementation,
-      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      position: maybeRetrievePositionFromSourceMap(),
     });
   }
 
@@ -183,7 +183,7 @@ export class Registry {
       node: parseMaybeTags(options.tags),
       implementation: fn,
       keyword: keyword,
-      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      position: maybeRetrievePositionFromSourceMap(),
       order: order ?? DEFAULT_HOOK_ORDER,
       ...remainingOptions,
     });
@@ -207,7 +207,7 @@ export class Registry {
       node: parseMaybeTags(options.tags),
       implementation: fn,
       keyword: keyword,
-      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      position: maybeRetrievePositionFromSourceMap(),
       order: order ?? DEFAULT_HOOK_ORDER,
       ...remainingOptions,
     });
@@ -229,7 +229,7 @@ export class Registry {
     this.runHooks.push({
       implementation: fn,
       keyword: keyword,
-      position: maybeRetrievePositionFromSourceMap(this.experimentalSourceMap),
+      position: maybeRetrievePositionFromSourceMap(),
       order: options.order ?? DEFAULT_HOOK_ORDER,
     });
   }
@@ -283,6 +283,7 @@ export class Registry {
   public runStepDefininition(
     world: Mocha.Context,
     text: string,
+    dryRun: boolean,
     argument?: DataTable | string,
   ): unknown {
     const stepDefinition = this.resolveStepDefintion(text);
@@ -293,6 +294,10 @@ export class Registry {
 
     if (argument) {
       args.push(argument);
+    }
+
+    if (dryRun) {
+      return;
     }
 
     return stepDefinition.implementation.apply(world, args);

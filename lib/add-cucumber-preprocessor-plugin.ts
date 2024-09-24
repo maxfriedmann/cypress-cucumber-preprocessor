@@ -195,5 +195,9 @@ export async function addCucumberPreprocessorPlugin(
     );
   }
 
+  if (preprocessor.dryRun) {
+    config.supportFile = false;
+  }
+
   return config;
 }

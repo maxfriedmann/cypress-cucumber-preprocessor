@@ -33,7 +33,10 @@ import { resolve as origResolve } from "./preprocessor-configuration";
 
 import { ensureIsAbsolute } from "./helpers/paths";
 
-import { createTimestamp } from "./helpers/messages";
+import {
+  createTimestamp,
+  removeDuplicatedStepDefinitions,
+} from "./helpers/messages";
 
 import { memoize } from "./helpers/memoize";
 
@@ -47,11 +50,14 @@ import {
   createHtmlStream,
   createJsonFormatter,
   createPrettyFormatter,
+  createUsageFormatter,
 } from "./helpers/formatters";
 
 import { useColors } from "./helpers/colors";
 
 import { notNull } from "./helpers/type-guards";
+
+import { indent } from "./helpers/strings";
 
 import { version as packageVersion } from "./version";
 
@@ -342,6 +348,8 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
     },
   };
 
+  removeDuplicatedStepDefinitions(state.messages.accumulation);
+
   if (preprocessor.messages.enabled) {
     const messagesPath = ensureIsAbsolute(
       config.projectRoot,
@@ -429,6 +437,39 @@ export async function afterRunHandler(config: Cypress.PluginConfigOptions) {
       createHtmlStream(),
       output,
     );
+  }
+
+  if (preprocessor.usage.enabled) {
+    let usageOutput: string | undefined;
+
+    const eventBroadcaster = createUsageFormatter(
+      state.messages.accumulation,
+      (chunk) => {
+        usageOutput = chunk;
+      },
+    );
+
+    for (const message of state.messages.accumulation) {
+      eventBroadcaster.emit("envelope", message);
+    }
+
+    assertIsString(
+      usageOutput,
+      "Expected usage formatter to have finished, but it never returned",
+    );
+
+    if (preprocessor.usage.output === "stdout") {
+      console.log(indent(usageOutput, { count: 2 }));
+    } else {
+      const usagePath = ensureIsAbsolute(
+        config.projectRoot,
+        preprocessor.usage.output,
+      );
+
+      await fs.mkdir(path.dirname(usagePath), { recursive: true });
+
+      await fs.writeFile(usagePath, usageOutput);
+    }
   }
 }
 

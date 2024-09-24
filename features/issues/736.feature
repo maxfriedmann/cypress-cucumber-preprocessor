@@ -16,6 +16,10 @@ Feature: create output directories
         "html": {
           "enabled": true,
           "output": "baz/cucumber-report.html"
+        },
+        "usage": {
+          "enabled": true,
+          "output": "qux/usage-report.html"
         }
       }
       """

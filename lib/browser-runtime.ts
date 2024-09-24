@@ -70,6 +70,7 @@ import {
   isNotExclusivelySuiteConfiguration,
   tagsToOptions,
 } from "./helpers/options";
+import { Position } from "./helpers/source-map";
 
 type Node = ReturnType<typeof parse>;
 
@@ -92,12 +93,24 @@ interface CompositionContext {
     stepDefinitionPatterns: string[];
     stepDefinitionPaths: string[];
   };
+  dryRun: boolean;
 }
 
-const sourceReference: messages.SourceReference = {
-  uri: "not available",
-  location: { line: 0 },
-};
+function getSourceReferenceFromPosition(
+  position?: Position,
+): messages.SourceReference {
+  if (position) {
+    return {
+      uri: position.source,
+      location: { line: position.line, column: position.column },
+    };
+  } else {
+    return {
+      uri: "not available",
+      location: { line: 0, column: 0 },
+    };
+  }
+}
 
 interface IStep {
   hook?: ICaseHook;
@@ -106,6 +119,8 @@ interface IStep {
 
 const internalPropertiesReplacementText =
   "Internal properties of cypress-cucumber-preprocessor omitted from report.";
+
+const noopFn = () => {};
 
 export interface InternalSpecProperties {
   pickle: messages.Pickle;
@@ -356,20 +371,24 @@ function createFeature(context: CompositionContext, feature: messages.Feature) {
     tagsToOptions(feature.tags).filter(isExclusivelySuiteConfiguration),
   ) as Cypress.TestConfigOverrides;
 
+  const mochaGlobals =
+    globalThis["__cypress_cucumber_preprocessor_mocha_dont_use_this"] ??
+    globalThis;
+
   describe(feature.name || "<unamed feature>", suiteOptions, () => {
-    before(function () {
+    mochaGlobals.before(function () {
       beforeHandler.call(this, context);
     });
 
-    beforeEach(function () {
+    mochaGlobals.beforeEach(function () {
       beforeEachHandler.call(this, context);
     });
 
-    after(function () {
+    mochaGlobals.after(function () {
       afterHandler.call(this, context);
     });
 
-    afterEach(function () {
+    mochaGlobals.afterEach(function () {
       afterEachHandler.call(this, context);
     });
 
@@ -458,7 +477,7 @@ function createScenario(
 }
 
 function createPickle(context: CompositionContext, pickle: messages.Pickle) {
-  const { registry, gherkinDocument, pickles, testFilter } = context;
+  const { registry, gherkinDocument, pickles, testFilter, dryRun } = context;
   const testCaseId = pickle.id;
   const pickleSteps = pickle.steps ?? [];
   const scenarioName = pickle.name || "<unamed scenario>";
@@ -681,7 +700,9 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             };
 
             return runStepWithLogGroup({
-              fn: () => registry.runCaseHook(this, hook, options),
+              fn: dryRun
+                ? noopFn
+                : () => registry.runCaseHook(this, hook, options),
               keyword: hook.keyword,
               text: createStepDescription(hook),
             }).then((result) => {
@@ -755,8 +776,10 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   runStepWithLogGroup({
                     keyword: "BeforeStep",
                     text: createStepDescription(beforeStepHook),
-                    fn: () =>
-                      registry.runStepHook(this, beforeStepHook, options),
+                    fn: dryRun
+                      ? noopFn
+                      : () =>
+                          registry.runStepHook(this, beforeStepHook, options),
                   }),
                 );
               },
@@ -772,7 +795,8 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   ),
                   argument,
                   text,
-                  fn: () => registry.runStepDefininition(this, text, argument),
+                  fn: () =>
+                    registry.runStepDefininition(this, text, dryRun, argument),
                 }).then((result) => {
                   return afterStepHooks
                     .reduce(
@@ -781,12 +805,14 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                           runStepWithLogGroup({
                             keyword: "AfterStep",
                             text: createStepDescription(afterStepHook),
-                            fn: () =>
-                              registry.runStepHook(
-                                this,
-                                afterStepHook,
-                                options,
-                              ),
+                            fn: dryRun
+                              ? noopFn
+                              : () =>
+                                  registry.runStepHook(
+                                    this,
+                                    afterStepHook,
+                                    options,
+                                  ),
                           }),
                         );
                       },
@@ -865,7 +891,7 @@ function beforeHandler(this: Mocha.Context, context: CompositionContext) {
 
   for (const hook of registry.resolveBeforeAllHooks()) {
     runStepWithLogGroup({
-      fn: () => registry.runRunHook(this, hook),
+      fn: context.dryRun ? noopFn : () => registry.runRunHook(this, hook),
       keyword: "BeforeAll",
     });
   }
@@ -1127,7 +1153,7 @@ function afterHandler(this: Mocha.Context, context: CompositionContext) {
 
   for (const hook of registry.resolveAfterAllHooks()) {
     runStepWithLogGroup({
-      fn: () => registry.runRunHook(this, hook),
+      fn: context.dryRun ? noopFn : () => registry.runRunHook(this, hook),
       keyword: "AfterAll",
     });
   }
@@ -1146,6 +1172,7 @@ export default function createTests(
     stepDefinitionPatterns: string[];
     stepDefinitionPaths: string[];
   },
+  dryRun: boolean,
 ) {
   const prng = random(seed.toString());
 
@@ -1171,7 +1198,9 @@ export default function createTests(
           type,
           source: stepDefinition.expression.source,
         },
-        sourceReference,
+        sourceReference: getSourceReferenceFromPosition(
+          stepDefinition.position,
+        ),
       };
     });
 
@@ -1256,7 +1285,7 @@ export default function createTests(
       hook: {
         id: hook.id,
         name: hook.name,
-        sourceReference,
+        sourceReference: getSourceReferenceFromPosition(hook.position),
       },
     });
   }
@@ -1288,6 +1317,7 @@ export default function createTests(
     omitFiltered,
     isTrackingState,
     stepDefinitionHints,
+    dryRun,
   };
 
   if (gherkinDocument.feature) {
