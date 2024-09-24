@@ -1,6 +1,6 @@
 import { Registry, assignRegistry, freeRegistry } from "../registry";
 
-const registry = new Registry(false);
+const registry = new Registry();
 
 assignRegistry(registry);
 

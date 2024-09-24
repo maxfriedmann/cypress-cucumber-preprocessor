@@ -1,0 +1,53 @@
+[
+  {
+    "description": "",
+    "elements": [
+      {
+        "description": "",
+        "id": "a-feature-name;a-scenario-name",
+        "keyword": "Scenario",
+        "line": 2,
+        "name": "a scenario name",
+        "steps": [
+          {
+            "keyword": "Before",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "arguments": [],
+            "keyword": "Given ",
+            "line": 3,
+            "name": "a step",
+            "match": {
+              "location": "cypress/support/step_definitions/steps.js:4"
+            },
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          },
+          {
+            "keyword": "After",
+            "hidden": true,
+            "result": {
+              "status": "passed",
+              "duration": 0
+            }
+          }
+        ],
+        "tags": [],
+        "type": "scenario"
+      }
+    ],
+    "id": "a-feature-name",
+    "line": 1,
+    "keyword": "Feature",
+    "name": "a feature name",
+    "tags": [],
+    "uri": "cypress/e2e/a.feature"
+  }
+]

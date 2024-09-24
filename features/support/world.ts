@@ -54,22 +54,6 @@ export default class CustomWorld implements ICustomWorld {
     });
   }
 
-  runDiagnostics({
-    extraArgs = [],
-    extraEnv = {},
-    expectedExitCode,
-  }: ExtraOptions = {}) {
-    return this.runCommand({
-      cmd: "node",
-      args: [
-        path.join(projectPath, bin["cypress-cucumber-diagnostics"]),
-        ...extraArgs,
-      ],
-      extraEnv,
-      expectedExitCode,
-    });
-  }
-
   runMergeMessages({
     extraArgs = [],
     extraEnv = {},

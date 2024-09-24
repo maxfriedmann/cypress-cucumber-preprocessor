@@ -122,6 +122,8 @@ export async function compile(
 
   const prepareRegistryPath = prepareLibPath("helpers", "prepare-registry");
 
+  const dryRun = prepareLibPath("helpers", "dry-run");
+
   const ensureRelativeToProjectRoot = (path: string) =>
     ensureIsRelative(configuration.projectRoot, path);
 
@@ -139,9 +141,11 @@ export async function compile(
       ),
       stepDefinitionPaths: stepDefinitionPaths.map(ensureRelativeToProjectRoot),
     },
+    preprocessor.dryRun,
   ];
 
   return `
+    ${preprocessor.dryRun ? `require(${dryRun})` : ""}
     const { getAndFreeRegistry } = require(${prepareRegistryPath});
     const { default: createTests } = require(${createTestsPath});
     ${stepDefinitionPaths

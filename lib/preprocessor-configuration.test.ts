@@ -751,6 +751,25 @@ describe("resolve()", () => {
         });
       });
 
+      describe("dryRun", () => {
+        const getValueFn = (
+          configuration: IPreprocessorConfiguration,
+        ): boolean => configuration.dryRun;
+
+        const setValueFn = (
+          configuration: IBaseUserConfiguration,
+          value: boolean,
+        ) => (configuration.dryRun = value);
+
+        basicBooleanExample({
+          testingType,
+          default: false,
+          environmentKey: "dryRun",
+          getValueFn,
+          setValueFn,
+        });
+      });
+
       describe("isTrackingState", () => {
         const getValueFn = (
           configuration: IPreprocessorConfiguration,

@@ -2,7 +2,6 @@
   "dependencies": {
     "@badeball/cypress-cucumber-preprocessor": "latest",
     "@bahmutov/cypress-esbuild-preprocessor": "latest",
-    "cypress": "latest",
-    "esbuild": "latest"
+    "cypress": "latest"
   }
 }

@@ -10,9 +10,9 @@ Breaking changes:
 
   - User of `@badeball/cypress-cucumber-preprocessor/browserify` should change their Cypress config in accordance with the related [examples](examples).
 
-- The executable `cypress-cucumber-diagnostics` no longer respect flags such as `--project` or `--env`. The long-term plan is to rewamp dry run altogether, and run it in a Cypress environment.
+- The executable `cypress-cucumber-diagnostics` has been replaced by a [`dryRun` option](docs/dry-run.md), relates to [#1120](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1120) and [#1129](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1129).
 
-- `esbuild` is now an optional peer dependency. This is relevant for users using `esbuild` as their bundler, as well as users of `cypress-cucumber-diagnostics`.
+  - This is a massive overhaul of a feature that was originally ill-thought-out. I'm curious about the reception.
 
 Other changees:
 
