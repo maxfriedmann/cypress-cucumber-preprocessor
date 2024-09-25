@@ -22,6 +22,8 @@ Other changees:
 
 - Support project directories containing square brackets, EG. `/home/[foo] my project/`, relates to [#1196](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1196).
 
+- Allow features in arbitrary locations, fixes [#1225](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1225).
+
 ## v20.1.2
 
 - Updated all dependencies, including esbuild, relates to [#1068](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1068).

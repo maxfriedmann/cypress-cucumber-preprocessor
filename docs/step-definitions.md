@@ -2,7 +2,7 @@
 
 # Step definitions
 
-Step definitions are resolved using search paths that are configurable through the `stepDefinitions` property. The preprocessor uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig), which means you can place configuration options in EG. `.cypress-cucumber-preprocessorrc.json` or `package.json`. The default search paths are shown below.
+Step definitions are resolved using search paths that are configurable through the `stepDefinitions` property. The preprocessor uses [cosmiconfig](https://github.com/davidtheclark/cosmiconfig), which means you can place configuration options in EG. `.cypress-cucumber-preprocessorrc.json` or `package.json`. The default (almost true[^1]) search paths are shown below.
 
 ```json
 {
@@ -147,3 +147,36 @@ All of these will be used to replace `[filepart]`. Thus, a single configuration 
 The library makes use of [glob](https://github.com/isaacs/node-glob) to turn patterns into a list of files. This has some implications, explained below (list is non-exhaustive and will be expanded on demand).
 
 * Single term inside braces, EG. `foo/bar.{js}`, doesn't work as you might expect, ref. https://github.com/isaacs/node-glob/issues/434.
+
+[^1]: I claim that the default configuration is of that below and this is almost always true.
+
+    ```json
+    {
+      "stepDefinitions": [
+        "cypress/e2e/[filepath]/**/*.{js,ts}",
+        "cypress/e2e/[filepath].{js,ts}",
+        "cypress/support/step_definitions/**/*.{js,ts}",
+      ]
+    }
+    ```
+
+    The reality is a bit more complex, in order to support a variety of use-cases out-of-the-box.
+    Most users will place their feature files in `cypress/e2e` and in those cases, the default
+    configuration will be that of my claim.
+
+    However, users that decide on a different location, let's say. `cypress/features` - in their
+    case, the default behavior of the preprocessor will be _as if_ you configured `stepDefinitions`
+    shown like below.
+
+    ```json
+    {
+      "stepDefinitions": [
+        "cypress/features/[filepath]/**/*.{js,ts}",
+        "cypress/features/[filepath].{js,ts}",
+        "cypress/support/step_definitions/**/*.{js,ts}",
+      ]
+    }
+    ```
+
+    Essentially, the first part of the two first elements, is determined finding out the common
+    ancestor path of all your feature files and thus the default configuration is dynamic.

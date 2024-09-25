@@ -84,14 +84,11 @@ export async function compile(
   const { stepDefinitions } = preprocessor;
 
   debug(
-    `resolving step definitions using template(s) ${inspect(stepDefinitions)}`,
+    `resolving step definitio|ns using template(s) ${inspect(stepDefinitions)}`,
   );
 
   const stepDefinitionPatterns = getStepDefinitionPatterns(
-    {
-      cypress: configuration,
-      preprocessor,
-    },
+    preprocessor,
     uri,
   ).map((pattern) => ensureIsRelative(configuration.projectRoot, pattern));
 

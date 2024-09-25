@@ -38,15 +38,12 @@ function example(
     cypressConfiguration.projectRoot
   }`, () => {
     const actual = getStepDefinitionPatterns(
-      {
-        cypress: cypressConfiguration,
-        preprocessor: combineIntoConfiguration(
-          preprocessorConfiguration,
-          {},
-          cypressConfiguration,
-          implicitIntegrationFolder,
-        ),
-      },
+      combineIntoConfiguration(
+        preprocessorConfiguration,
+        {},
+        cypressConfiguration,
+        implicitIntegrationFolder,
+      ),
       filepath,
     );
 
@@ -122,21 +119,4 @@ describe("getStepDefinitionPatterns()", () => {
       "cypress/e2e/step_definitions/*.ts",
     ],
   );
-
-  it("should error when provided a path not within cwd", () => {
-    assert.throws(() => {
-      getStepDefinitionPatterns(
-        {
-          cypress: {
-            projectRoot: "/baz",
-          },
-          preprocessor: {
-            stepDefinitions: [],
-            implicitIntegrationFolder: "/foo/bar/cypress/e2e",
-          },
-        },
-        "/foo/bar/cypress/e2e/baz.feature",
-      );
-    }, "/foo/bar/cypress/features/baz.feature is not within /baz");
-  });
 });

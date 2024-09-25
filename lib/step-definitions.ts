@@ -6,14 +6,9 @@ import util from "util";
 
 import assert from "assert";
 
-import isPathInside from "is-path-inside";
-
 import debug from "./helpers/debug";
 
-import {
-  ICypressRuntimeConfiguration,
-  IPreprocessorConfiguration,
-} from "./preprocessor-configuration";
+import { IPreprocessorConfiguration } from "./preprocessor-configuration";
 
 export async function getStepDefinitionPaths(
   prjectRoot: string,
@@ -55,27 +50,15 @@ export function pathParts(relativePath: string): string[] {
 }
 
 export function getStepDefinitionPatterns(
-  configuration: {
-    cypress: Pick<ICypressRuntimeConfiguration, "projectRoot">;
-    preprocessor: Pick<
-      IPreprocessorConfiguration,
-      "stepDefinitions" | "implicitIntegrationFolder"
-    >;
-  },
+  configuration: Pick<
+    IPreprocessorConfiguration,
+    "stepDefinitions" | "implicitIntegrationFolder"
+  >,
   filepath: string,
 ): string[] {
-  const projectRoot = configuration.cypress.projectRoot;
-
-  if (!isPathInside(filepath, projectRoot)) {
-    throw new Error(`${filepath} is not inside ${projectRoot}`);
-  }
-
   const filepathReplacement = glob.escape(
     trimFeatureExtension(
-      path.relative(
-        configuration.preprocessor.implicitIntegrationFolder,
-        filepath,
-      ),
+      path.relative(configuration.implicitIntegrationFolder, filepath),
     ),
     { windowsPathsNoEscape: true },
   );
@@ -86,7 +69,7 @@ export function getStepDefinitionPatterns(
 
   debug(`replacing [filepart] with ${util.inspect(parts)}`);
 
-  const stepDefinitions = [configuration.preprocessor.stepDefinitions].flat();
+  const stepDefinitions = [configuration.stepDefinitions].flat();
 
   return stepDefinitions.flatMap((pattern) => {
     if (pattern.includes("[filepath]") && pattern.includes("[filepart]")) {
