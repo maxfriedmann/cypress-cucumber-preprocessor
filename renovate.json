@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "npm:unpublishSafe", "schedule:daily"],
+  "automerge": true,
+  "packageRules": [
+    {
+      "matchManagers": ["npm"],
+      "matchDepTypes": ["devDependencies"],
+      "enabled": false
+    }
+  ],
+  "ignoreDeps": ["source-map"]
+}
