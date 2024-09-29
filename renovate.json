@@ -8,5 +8,6 @@
       "matchDepTypes": ["devDependencies"],
       "enabled": false
     }
-  ]
+  ],
+  "ignoreDeps": ["source-map"]
 }
