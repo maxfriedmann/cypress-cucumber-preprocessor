@@ -138,46 +138,48 @@ export async function addCucumberPreprocessorPlugin(
 
     const node = parse(tags);
 
-    const testFiles = getSpecs(config).filter((testFile) => {
-      if (!testFile.endsWith(".feature")) {
-        switch (preprocessor.filterSpecsMixedMode) {
-          case "hide":
-            return false;
-          case "show":
-            return true;
-          case "empty-set":
-            return node.evaluate([]);
-          default:
-            assertNever(preprocessor.filterSpecsMixedMode);
+    const testFiles = getSpecs(config, "foobar" as any, true).filter(
+      (testFile) => {
+        if (!testFile.endsWith(".feature")) {
+          switch (preprocessor.filterSpecsMixedMode) {
+            case "hide":
+              return false;
+            case "show":
+              return true;
+            case "empty-set":
+              return node.evaluate([]);
+            default:
+              assertNever(preprocessor.filterSpecsMixedMode);
+          }
         }
-      }
 
-      const content = fs.readFileSync(testFile).toString("utf-8");
+        const content = fs.readFileSync(testFile).toString("utf-8");
 
-      const options = {
-        includeSource: false,
-        includeGherkinDocument: false,
-        includePickles: true,
-        newId: IdGenerator.incrementing(),
-      };
+        const options = {
+          includeSource: false,
+          includeGherkinDocument: false,
+          includePickles: true,
+          newId: IdGenerator.incrementing(),
+        };
 
-      const envelopes = generateMessages(
-        content,
-        testFile,
-        SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
-        options,
-      );
+        const envelopes = generateMessages(
+          content,
+          testFile,
+          SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
+          options,
+        );
 
-      const pickles = envelopes
-        .map((envelope) => envelope.pickle)
-        .filter(notNull);
+        const pickles = envelopes
+          .map((envelope) => envelope.pickle)
+          .filter(notNull);
 
-      return pickles.some((pickle) =>
-        node.evaluate(
-          pickle.tags?.map((tag) => tag.name).filter(notNull) ?? [],
-        ),
-      );
-    });
+        return pickles.some((pickle) =>
+          node.evaluate(
+            pickle.tags?.map((tag) => tag.name).filter(notNull) ?? [],
+          ),
+        );
+      },
+    );
 
     debug(`Resolved specs ${inspect(testFiles)}`);
 

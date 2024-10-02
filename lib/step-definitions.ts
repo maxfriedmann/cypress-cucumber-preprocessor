@@ -56,6 +56,22 @@ export function getStepDefinitionPatterns(
   >,
   filepath: string,
 ): string[] {
+  /**
+   * The reason for these assertions is that when giving relative paths to path.relative, the result
+   * will depend on CWD, which is affected by EG. the --config-file parameter [1].
+   *
+   * [1] https://github.com/badeball/cypress-cucumber-preprocessor/issues/1243
+   */
+  assert(
+    path.isAbsolute(configuration.implicitIntegrationFolder),
+    `Expected an absolute path for implicit integration folder but got ${configuration.implicitIntegrationFolder}`,
+  );
+
+  assert(
+    path.isAbsolute(filepath),
+    `Expected an absolute path for spec but got ${filepath}`,
+  );
+
   const filepathReplacement = glob.escape(
     trimFeatureExtension(
       path.relative(configuration.implicitIntegrationFolder, filepath),

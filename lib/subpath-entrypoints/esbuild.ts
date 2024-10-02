@@ -75,8 +75,6 @@ export function createEsbuildPlugin(
           if (needPrettify) {
             debug("esbuild: prettifying sources");
 
-            /**
-             */
             sourceMap.sources = sourceMap.sources.map((source: string) => {
               return path.relative(
                 configuration.projectRoot,
@@ -95,9 +93,17 @@ export function createEsbuildPlugin(
             "base64",
           );
 
+          /**
+           * Why `${"sourceMappingURL"}` you may ask. This is so esbuild doesn't crap itself upon
+           * errors, where it would search for source maps and find THIS code line, which is not a
+           * valid source map (obvously).
+           *
+           * Without this, esbuild would error with "Unexpected token z in JSON at position 0" every
+           * time an error occurred during build time.
+           */
           await fs.appendFile(
             outfile,
-            `//# sourceMappingURL=data:application/json;base64,${encoded}\n`,
+            `//# ${"sourceMappingURL"}=data:application/json;base64,${encoded}\n`,
           );
         });
       }
