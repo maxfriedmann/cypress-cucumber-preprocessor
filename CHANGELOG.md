@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v21.0.2
 
 - Cache requested source maps, fixes [#1245](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1245).
 
