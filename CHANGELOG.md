@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v21.0.3
 
 - Correctly represent consecutive BeforeAll & AfterAll hooks in the command log, relates to [#1250](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1250).
 
