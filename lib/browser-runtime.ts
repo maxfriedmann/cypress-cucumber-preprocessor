@@ -889,12 +889,17 @@ function beforeHandler(this: Mocha.Context, context: CompositionContext) {
 
   const { registry } = context;
 
-  for (const hook of registry.resolveBeforeAllHooks()) {
-    runStepWithLogGroup({
-      fn: context.dryRun ? noopFn : () => registry.runRunHook(this, hook),
-      keyword: "BeforeAll",
-    });
-  }
+  registry.resolveBeforeAllHooks().reduce(
+    (chain, hook) => {
+      return chain.then(() =>
+        runStepWithLogGroup({
+          fn: context.dryRun ? noopFn : () => registry.runRunHook(this, hook),
+          keyword: "BeforeAll",
+        }),
+      );
+    },
+    cy.wrap({} as unknown, { log: false }),
+  );
 
   taskSpecEnvelopes(context);
 
@@ -1151,12 +1156,17 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
 function afterHandler(this: Mocha.Context, context: CompositionContext) {
   const { registry } = context;
 
-  for (const hook of registry.resolveAfterAllHooks()) {
-    runStepWithLogGroup({
-      fn: context.dryRun ? noopFn : () => registry.runRunHook(this, hook),
-      keyword: "AfterAll",
-    });
-  }
+  registry.resolveAfterAllHooks().reduce(
+    (chain, hook) => {
+      return chain.then(() =>
+        runStepWithLogGroup({
+          fn: context.dryRun ? noopFn : () => registry.runRunHook(this, hook),
+          keyword: "AfterAll",
+        }),
+      );
+    },
+    cy.wrap({} as unknown, { log: false }),
+  );
 }
 
 export default function createTests(
