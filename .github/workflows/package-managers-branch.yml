@@ -1,0 +1,147 @@
+name: Package managers (branch)
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  EXAMPLE_TO_RUN:  webpack-cjs
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/base:latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Change owner
+        run: "chown root: ."
+      - name: Dependencies
+        env:
+          CYPRESS_INSTALL_BINARY: "0"
+        run: |
+          npm install
+      - name: Build
+        run: npm run build
+      - name: Pack
+        run: npm pack
+      - name: Store dirty build
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          path: badeball-*
+
+  npm:
+    needs:
+     - build-package
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/base:latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: latest
+      - name: Checkout
+        uses: actions/checkout@v4
+      # In lack of native support, https://github.com/actions/checkout/issues/172.
+      - name: Make checkout sparse
+        run: |
+          shopt -s extglob
+          rm -rf examples/!(${{ env.EXAMPLE_TO_RUN }})
+          rm -rf !(examples)
+      - name: Retrieve dirty build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: examples/${{ env.EXAMPLE_TO_RUN }}
+      - name: Install NPM modules
+        working-directory: examples/${{ env.EXAMPLE_TO_RUN }}
+        run: npm install --package-lock=false badeball-*
+      - name: Run Cypress
+        working-directory: examples/${{ env.EXAMPLE_TO_RUN }}
+        run: npx cypress run --e2e
+      - name: Versions
+        run: |
+          npx cypress --version
+          node --version
+          npm --version
+
+  pnpm:
+    needs:
+     - build-package
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/base:latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: latest
+      - name: Install pnpm
+        run: npm install --global pnpm@latest
+      - name: Checkout
+        uses: actions/checkout@v4
+      # In lack of native support, https://github.com/actions/checkout/issues/172.
+      - name: Make checkout sparse
+        run: |
+          shopt -s extglob
+          rm -rf examples/!(${{ env.EXAMPLE_TO_RUN }})
+          rm -rf !(examples)
+      - name: Retrieve dirty build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: examples/${{ env.EXAMPLE_TO_RUN }}
+      - name: Install NPM modules
+        working-directory: examples/${{ env.EXAMPLE_TO_RUN }}
+        run: pnpm add ./badeball-*
+      - name: Run Cypress
+        working-directory: examples/${{ env.EXAMPLE_TO_RUN }}
+        run: pnpm exec cypress run --e2e
+      - name: Versions
+        run: |
+          pnpm exec cypress --version
+          node --version
+          pnpm --version
+
+  yarn:
+    needs:
+     - build-package
+    runs-on: ubuntu-latest
+    container:
+      image: cypress/base:latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: latest
+      - name: Install yarn
+        run: npm install --global yarn@latest
+      - name: Checkout
+        uses: actions/checkout@v4
+      # In lack of native support, https://github.com/actions/checkout/issues/172.
+      - name: Make checkout sparse
+        run: |
+          shopt -s extglob
+          rm -rf examples/!(${{ env.EXAMPLE_TO_RUN }})
+          rm -rf !(examples)
+      - name: Retrieve dirty build
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+          path: examples/${{ env.EXAMPLE_TO_RUN }}
+      - name: Install NPM modules
+        working-directory: examples/${{ env.EXAMPLE_TO_RUN }}
+        run: yarn add --no-lockfile badeball-*
+      - name: Run Cypress
+        working-directory: examples/${{ env.EXAMPLE_TO_RUN }}
+        run: yarn exec cypress run --e2e
+      - name: Versions
+        run: |
+          yarn exec cypress --version
+          node --version
+          yarn --version
