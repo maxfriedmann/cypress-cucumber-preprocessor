@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file.
 
 - Correctly represent consecutive BeforeAll & AfterAll hooks in the command log, relates to [#1250](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1250).
 
+- Cache instances of SourceMapConsumer, fixes [#1256](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1256).
+
 ## v21.0.2
 
 - Cache requested source maps, fixes [#1245](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1245).

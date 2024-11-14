@@ -21,7 +21,7 @@ function sourceMapWarn(message: string) {
   isSourceMapWarned = true;
 }
 
-const cache = new Map<string, string | undefined>();
+const cache = new Map<string, SourceMapConsumer | undefined>();
 
 /**
  * Taken from https://github.com/evanw/node-source-map-support/blob/v0.5.21/source-map-support.js#L148-L177.
@@ -63,24 +63,10 @@ export function retrieveSourceMapURL(source: string) {
   return lastMatch[1];
 }
 
-export function cachedRetrieveSourceMapURL(source: string): string | undefined {
-  if (cache.has(source)) {
-    return cache.get(source);
-  } else {
-    const result = retrieveSourceMapURL(source);
-    cache.set(source, result);
-    return result;
-  }
-}
-
-export function maybeRetrievePositionFromSourceMap(): Position | undefined {
-  const stack = ErrorStackParser.parse(new Error());
-
-  if (stack[0].fileName == null) {
-    return;
-  }
-
-  const sourceMappingURL = cachedRetrieveSourceMapURL(stack[0].fileName);
+export function createSourceMapConsumer(
+  source: string,
+): SourceMapConsumer | undefined {
+  const sourceMappingURL = retrieveSourceMapURL(source);
 
   if (!sourceMappingURL) {
     return;
@@ -97,7 +83,33 @@ export function maybeRetrievePositionFromSourceMap(): Position | undefined {
     return;
   }
 
-  const sourceMap = new SourceMapConsumer(rawSourceMap);
+  return new SourceMapConsumer(rawSourceMap);
+}
+
+export function cachedCreateSourceMapConsumer(
+  source: string,
+): SourceMapConsumer | undefined {
+  if (cache.has(source)) {
+    return cache.get(source);
+  } else {
+    const result = createSourceMapConsumer(source);
+    cache.set(source, result);
+    return result;
+  }
+}
+
+export function maybeRetrievePositionFromSourceMap(): Position | undefined {
+  const stack = ErrorStackParser.parse(new Error());
+
+  if (stack[0].fileName == null) {
+    return;
+  }
+
+  const sourceMap = cachedCreateSourceMapConsumer(stack[0].fileName);
+
+  if (!sourceMap) {
+    return;
+  }
 
   const relevantFrame = stack[3];
 
