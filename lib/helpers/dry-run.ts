@@ -8,7 +8,14 @@ globalThis[globalPropertyName] = {
   afterEach: globalThis.afterEach,
 };
 
-window.before = () => {};
-window.beforeEach = () => {};
-window.after = () => {};
-window.afterEach = () => {};
+/**
+ * {} isn't strictly speaking a Mocha.Hook, so if Cypress decides to update their shipped Mocha
+ * version to v11, which introduces #5231 [1], then this might become problematic. The
+ * @types/mocha package did however update their types within its v10 line.
+ *
+ * [1] https://github.com/mochajs/mocha/issues/5231
+ */
+window.before = () => ({}) as Mocha.Hook;
+window.beforeEach = () => ({}) as Mocha.Hook;
+window.after = () => ({}) as Mocha.Hook;
+window.afterEach = () => ({}) as Mocha.Hook;
