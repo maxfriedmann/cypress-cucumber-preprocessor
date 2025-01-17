@@ -33,6 +33,7 @@ Before(async function ({ gherkinDocument, pickle }) {
     `
       Cypress.Commands.add("expectCommandLogEntry", ({ method, message }) => {
         const selector = \`.command-info:has(> .command-method:contains('\${method}')) .command-message-text:contains('\${message}')\`;
+        cy.wait(0); // For unknown reasons, this became important with Cypress v14.
         cy.then(() => {}).should(() => {
           expect(Cypress.$(top.document).find(selector)).to.exist;
         });

@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+Breaking changes:
+
+- Dropped support for Cypress v10.
+
+Other changes:
+
+- Added support for Cypress v14,  fixes [#1267](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1267).
+
 ## v21.0.3
 
 - Correctly represent consecutive BeforeAll & AfterAll hooks in the command log, relates to [#1250](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1250).

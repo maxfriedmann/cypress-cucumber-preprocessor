@@ -1,6 +1,6 @@
 import * as preprocessor from "@badeball/cypress-cucumber-preprocessor";
 
-import { mount } from "cypress/react18"
+import { mount } from "cypress/react"
 
 import App from "../../src/App";
 
