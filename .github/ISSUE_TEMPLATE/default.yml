@@ -1,0 +1,46 @@
+name: foo
+description: foo
+body:
+  - type: textarea
+    attributes:
+      label: Current behavior
+      description: A description including screenshots, stack traces, DEBUG logs, etc.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Desired behavior
+      description: A clear description of what you want to happen.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Cypress version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Preprocessor version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Node version
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Operating system
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I've read the [FAQ](https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/docs/faq.md).
+          required: true
+        - label: I've read [instructions for logging issues](https://github.com/badeball/cypress-cucumber-preprocessor/blob/master/CONTRIBUTING.md#bug-reports).
+          required: true
+        - label: I'm not using `cypress-cucumber-preprocessor@4.3.1` (package name has changed and it is no longer the most recent version, see [#689](https://github.com/badeball/cypress-cucumber-preprocessor/issues/689)).
+          required: true
