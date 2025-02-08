@@ -1,4 +1,4 @@
-import messages from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 export const TASK_SPEC_ENVELOPES =
   "cypress-cucumber-preprocessor:spec-envelopes";

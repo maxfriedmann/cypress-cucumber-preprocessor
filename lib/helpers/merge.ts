@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 
-import * as messages from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 import { notNull } from "./type-guards";
 

@@ -1,4 +1,4 @@
-import { AttachmentContentEncoding, Pickle } from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 import parse from "@cucumber/tag-expressions";
 
@@ -41,6 +41,8 @@ import {
 } from "./preprocessor-configuration";
 
 import { AddOptions } from "./add-cucumber-preprocessor-plugin";
+
+import { AttachmentContentEncoding } from "./helpers/messages-enums";
 
 function defineStep<T extends unknown[], C extends Mocha.Context>(
   description: string | RegExp,
@@ -162,7 +164,7 @@ function defineAfterAll(
 function createStringAttachment(
   data: string,
   mediaType: string,
-  encoding: AttachmentContentEncoding,
+  encoding: messages.AttachmentContentEncoding,
 ) {
   const taskData: ITaskCreateStringAttachment = {
     data,
@@ -215,7 +217,7 @@ const NOT_FEATURE_ERROR =
   "Expected to find internal properties, but didn't. This is likely because you're calling doesFeatureMatch() in a non-feature spec. Use doesFeatureMatch() in combination with isFeature() if you have both feature and non-feature specs";
 
 function doesFeatureMatch(expression: string) {
-  let pickle: Pickle;
+  let pickle: messages.Pickle;
 
   try {
     pickle = retrieveInternalSpecProperties().pickle;

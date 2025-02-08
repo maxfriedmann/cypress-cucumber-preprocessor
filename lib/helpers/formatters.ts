@@ -11,7 +11,7 @@ import {
   UsageFormatter,
 } from "@cucumber/cucumber";
 
-import messages from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 import chalk from "chalk";
 

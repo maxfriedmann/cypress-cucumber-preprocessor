@@ -6,7 +6,7 @@ import { Writable } from "stream";
 
 import { NdjsonToMessageStream } from "@cucumber/message-streams";
 
-import messages from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 import { createJsonFormatter } from "../helpers/formatters";
 
