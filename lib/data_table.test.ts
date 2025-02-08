@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import messages from "@cucumber/messages";
+import * as messages from "@cucumber/messages";
 
 import DataTable from "./data_table";
 

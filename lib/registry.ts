@@ -8,7 +8,7 @@ import {
 
 import parse from "@cucumber/tag-expressions";
 
-import { IdGenerator } from "@cucumber/messages";
+import type { IdGenerator } from "@cucumber/messages";
 
 import { assertAndReturn } from "./helpers/assertions";
 

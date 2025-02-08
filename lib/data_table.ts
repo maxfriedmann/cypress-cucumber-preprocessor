@@ -1,4 +1,4 @@
-import messages from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 import { assert, assertAndReturn } from "./helpers/assertions";
 

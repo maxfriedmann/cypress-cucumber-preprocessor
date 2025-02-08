@@ -1,4 +1,4 @@
-import * as messages from "@cucumber/messages";
+import type * as messages from "@cucumber/messages";
 
 import parse from "@cucumber/tag-expressions";
 
@@ -71,6 +71,12 @@ import {
   tagsToOptions,
 } from "./helpers/options";
 import { Position } from "./helpers/source-map";
+
+import {
+  SourceMediaType,
+  StepDefinitionPatternType,
+  TestStepResultStatus,
+} from "./helpers/messages-enums";
 
 type Node = ReturnType<typeof parse>;
 
@@ -268,7 +274,7 @@ function emitSkippedPickle(
       testStepId,
       testCaseStartedId,
       testStepResult: {
-        status: messages.TestStepResultStatus.SKIPPED,
+        status: TestStepResultStatus.SKIPPED,
         duration: {
           seconds: 0,
           nanos: 0,
@@ -596,7 +602,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             testStepId,
             testCaseStartedId,
             testStepResult: {
-              status: messages.TestStepResultStatus.PENDING,
+              status: TestStepResultStatus.PENDING,
               duration: duration(start, end),
             },
             timestamp: end,
@@ -606,7 +612,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             testStepId,
             testCaseStartedId,
             testStepResult: {
-              status: messages.TestStepResultStatus.SKIPPED,
+              status: TestStepResultStatus.SKIPPED,
               duration: duration(start, end),
             },
             timestamp: end,
@@ -637,7 +643,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
             testStepId,
             testCaseStartedId,
             testStepResult: {
-              status: messages.TestStepResultStatus.SKIPPED,
+              status: TestStepResultStatus.SKIPPED,
               duration: {
                 seconds: 0,
                 nanos: 0,
@@ -657,7 +663,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
           testStepId,
           testCaseStartedId,
           testStepResult: {
-            status: messages.TestStepResultStatus.PASSED,
+            status: TestStepResultStatus.PASSED,
             duration: duration(start, end),
           },
           timestamp: end,
@@ -959,7 +965,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
             testStepId,
             testCaseStartedId,
             testStepResult: {
-              status: messages.TestStepResultStatus.UNDEFINED,
+              status: TestStepResultStatus.UNDEFINED,
               duration: {
                 seconds: 0,
                 nanos: 0,
@@ -972,8 +978,8 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
             testCaseStartedId,
             testStepResult: {
               status: error.includes("Multiple matching step definitions for")
-                ? messages.TestStepResultStatus.AMBIGUOUS
-                : messages.TestStepResultStatus.FAILED,
+                ? TestStepResultStatus.AMBIGUOUS
+                : TestStepResultStatus.FAILED,
               message: error,
               duration: duration(
                 assertAndReturn(
@@ -1010,7 +1016,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           testStepId,
           testCaseStartedId,
           testStepResult: {
-            status: messages.TestStepResultStatus.SKIPPED,
+            status: TestStepResultStatus.SKIPPED,
             duration: {
               seconds: 0,
               nanos: 0,
@@ -1041,7 +1047,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           testStepId,
           testCaseStartedId,
           testStepResult: {
-            status: messages.TestStepResultStatus.SKIPPED,
+            status: TestStepResultStatus.SKIPPED,
             duration: duration(currentStepStartedAt, endTimestamp),
           },
           timestamp: endTimestamp,
@@ -1070,7 +1076,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           testStepId,
           testCaseStartedId,
           testStepResult: {
-            status: messages.TestStepResultStatus.SKIPPED,
+            status: TestStepResultStatus.SKIPPED,
             duration: {
               seconds: 0,
               nanos: 0,
@@ -1102,7 +1108,7 @@ function afterEachHandler(this: Mocha.Context, context: CompositionContext) {
           testStepId,
           testCaseStartedId,
           testStepResult: {
-            status: messages.TestStepResultStatus.UNKNOWN,
+            status: TestStepResultStatus.UNKNOWN,
             duration: {
               seconds: 0,
               nanos: 0,
@@ -1199,8 +1205,8 @@ export default function createTests(
     registry.stepDefinitions.map((stepDefinition) => {
       const type: messages.StepDefinitionPatternType =
         stepDefinition.expression instanceof RegularExpression
-          ? messages.StepDefinitionPatternType.REGULAR_EXPRESSION
-          : messages.StepDefinitionPatternType.CUCUMBER_EXPRESSION;
+          ? StepDefinitionPatternType.REGULAR_EXPRESSION
+          : StepDefinitionPatternType.CUCUMBER_EXPRESSION;
 
       return {
         id: stepDefinition.id,
@@ -1276,7 +1282,7 @@ export default function createTests(
         gherkinDocument.uri,
         "Expected gherkin document to have URI",
       ),
-      mediaType: messages.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
+      mediaType: SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN,
     },
   });
 

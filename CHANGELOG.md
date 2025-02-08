@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+- Import types-only from `@cucumber/messages`, fixes [#1273](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1273).
+
 ## v22.0.0
 
 Breaking changes:
