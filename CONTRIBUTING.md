@@ -143,7 +143,7 @@ fix issues blindly, that much should be obvious.
 A reduced test case / minimal, reproducible example is something so minimal
 that it barely illustrates the issue at hand and nothing more. A minimal,
 reproducible example should ideally be the foundation for a test.  It's
-something that should be comitted into the codebase to ensure that it never
+something that should be committed into the codebase to ensure that it never
 resurfaces again.
 
 Almost everyone that creates a bug report here will be asked to provide this.

@@ -96,7 +96,7 @@ export function createEsbuildPlugin(
           /**
            * Why `${"sourceMappingURL"}` you may ask. This is so esbuild doesn't crap itself upon
            * errors, where it would search for source maps and find THIS code line, which is not a
-           * valid source map (obvously).
+           * valid source map (obviously).
            *
            * Without this, esbuild would error with "Unexpected token z in JSON at position 0" every
            * time an error occurred during build time.

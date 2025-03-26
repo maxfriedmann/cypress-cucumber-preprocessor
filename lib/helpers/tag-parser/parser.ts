@@ -2,11 +2,11 @@ import { TagParserError } from "./errors";
 
 import {
   isAt,
-  isClosingParanthesis,
+  isClosingParenthesis,
   isComma,
   isDigit,
   isEqual,
-  isOpeningParanthesis,
+  isOpeningParenthesis,
   isQuote,
   isWordChar,
   Tokenizer,
@@ -133,8 +133,8 @@ export default class Parser {
 
     next = expectToken(tokens.next());
 
-    if (!isOpeningParanthesis(next.value.value)) {
-      throw createUnexpectedToken(next.value, "expected opening paranthesis");
+    if (!isOpeningParenthesis(next.value.value)) {
+      throw createUnexpectedToken(next.value, "expected opening parenthesis");
     }
 
     const isObjectMode = isEqual(expectToken(tokens.peak(2)).value.value);
@@ -179,8 +179,8 @@ export default class Parser {
 
     if (next.done) {
       throw createUnexpectedEndOfString();
-    } else if (!isClosingParanthesis(next.value.value)) {
-      throw createUnexpectedToken(next.value, "expected closing paranthesis");
+    } else if (!isClosingParenthesis(next.value.value)) {
+      throw createUnexpectedToken(next.value, "expected closing parenthesis");
     }
 
     if (isObjectMode) {

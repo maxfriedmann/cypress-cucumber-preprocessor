@@ -65,7 +65,7 @@ Custom parameter types can be registered using `defineParameterType()`. They sha
 
 ## Pending steps
 
-You can return `"pending"` from a step defintion or a chain to mark a step as pending. This will halt the execution and Cypress will report the test as "skipped". This is generally used for marking steps as "unimplemented" and allows you to commit unfinished work without breaking the test suite.
+You can return `"pending"` from a step definition or a chain to mark a step as pending. This will halt the execution and Cypress will report the test as "skipped". This is generally used for marking steps as "unimplemented" and allows you to commit unfinished work without breaking the test suite.
 
 ```ts
 import { When } from "@badeball/cypress-cucumber-preprocessor";
@@ -87,7 +87,7 @@ When("a step", () => {
 
 ## Skipped steps
 
-You can return `"skipped"` from a step defintion or a chain to mark a step as pending. This will halt the execution and Cypress will report the test as "skipped". This however is generally used for conditionally short circuiting a test.
+You can return `"skipped"` from a step definition or a chain to mark a step as pending. This will halt the execution and Cypress will report the test as "skipped". This however is generally used for conditionally short circuiting a test.
 
 ```ts
 import { When } from "@badeball/cypress-cucumber-preprocessor";

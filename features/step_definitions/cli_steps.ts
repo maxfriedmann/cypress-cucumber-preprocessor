@@ -252,11 +252,11 @@ Then(
 
 Then(
   "I should see exactly {int} instance(s) of {string} in stderr",
-  function (this: ICustomWorld, expectedOccurences: number, output: string) {
-    const actualyOccurences =
+  function (this: ICustomWorld, expectedOccurrences: number, output: string) {
+    const actualOccurrences =
       expectLastRun(this).stderr.match(new RegExp(rescape(output), "g"))
         ?.length ?? 0;
 
-    assert.equal(actualyOccurences, expectedOccurences);
+    assert.equal(actualOccurrences, expectedOccurrences);
   },
 );

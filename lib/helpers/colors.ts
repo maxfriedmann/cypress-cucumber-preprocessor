@@ -6,7 +6,7 @@ import chalk from "chalk";
  * [1] https://github.com/cypress-io/cypress/blob/v12.13.0/cli/lib/util.js#L348-L363
  */
 export function useColors() {
-  // if we've been explictly told not to support
+  // if we've been explicitly told not to support
   // color then turn this off
   if (process.env.NO_COLOR) {
     return false;

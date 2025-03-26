@@ -522,16 +522,16 @@ export async function beforeSpecHandler(
       return;
   }
 
-  // This will be the case for reloads occuring in a before(), in which case we do nothing,
+  // This will be the case for reloads occurring in a before(), in which case we do nothing,
   // because "received-envelopes" would anyway be the next natural state.
   if (state.state === "before-spec") {
     return;
   }
 
   switch (state.state) {
-    case "received-envelopes": // This will be the case for reloading occuring in a beforeEach().
-    case "step-started": // This will be the case for reloading occuring in a step.
-    case "test-finished": // This will be the case for reloading occuring in any after-ish hook (and possibly beforeEach).
+    case "received-envelopes": // This will be the case for reloading occurring in a beforeEach().
+    case "step-started": // This will be the case for reloading occurring in a step.
+    case "test-finished": // This will be the case for reloading occurring in any after-ish hook (and possibly beforeEach).
       if (state.spec.relative === spec.relative) {
         state = {
           state: "has-reloaded",

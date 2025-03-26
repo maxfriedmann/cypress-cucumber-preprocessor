@@ -1,6 +1,6 @@
 # https://github.com/badeball/cypress-cucumber-preprocessor/issues/1140
 
-Feature: no imlicit report
+Feature: no implicit report
   Scenario: JSON enabled
     Given additional preprocessor configuration
       """

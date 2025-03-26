@@ -1,7 +1,7 @@
 # https://github.com/badeball/cypress-cucumber-preprocessor/issues/1034
 
 Feature: HTML report
-  Scenario: skipepd test
+  Scenario: skipped test
     Given additional preprocessor configuration
       """
       {

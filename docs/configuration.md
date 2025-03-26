@@ -57,7 +57,7 @@ $ DEBUG=cypress:electron,cypress-configuration,cypress-cucumber-preprocessor cyp
 
 ## Configuration overrides
 
-Configuration options can be overriden using (Cypress-) [environment variable](https://docs.cypress.io/guides/guides/environment-variables). The `filterSpecs` options (described in [docs/tags.md](tags.md)) can for instance be overriden by running Cypress like shown below.
+Configuration options can be overridden using (Cypress-) [environment variable](https://docs.cypress.io/guides/guides/environment-variables). The `filterSpecs` options (described in [docs/tags.md](tags.md)) can for instance be overridden by running Cypress like shown below.
 
 ```
 $ cypress run -e filterSpecs=true

@@ -11,14 +11,14 @@ import debug from "./helpers/debug";
 import { IPreprocessorConfiguration } from "./preprocessor-configuration";
 
 export async function getStepDefinitionPaths(
-  prjectRoot: string,
+  projectRoot: string,
   stepDefinitionPatterns: string[],
 ): Promise<string[]> {
   return (
     await Promise.all(
       stepDefinitionPatterns.map((pattern) =>
         glob.glob(pattern, {
-          cwd: prjectRoot,
+          cwd: projectRoot,
           absolute: true,
           nodir: true,
           windowsPathsNoEscape: true,

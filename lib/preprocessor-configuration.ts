@@ -24,9 +24,9 @@ function isPlainObject(value: any): value is object {
 }
 
 function isFilterSpecsMixedMode(value: any): value is FilterSpecsMixedMode {
-  const availablesModes = ["hide", "show", "empty-set"];
+  const availableModes = ["hide", "show", "empty-set"];
 
-  return typeof value === "string" && availablesModes.indexOf(value) !== -1;
+  return typeof value === "string" && availableModes.indexOf(value) !== -1;
 }
 
 function validateUserConfigurationEntry(

@@ -153,7 +153,7 @@ export async function compile(
     const { getAndFreeRegistry } = require(${prepareRegistryPath});
     const { default: createTests } = require(${createTestsPath});
     ${stepDefinitionPaths
-      .map((stepDefintion) => `require(${stringify(stepDefintion)});`)
+      .map((stepDefinition) => `require(${stringify(stepDefinition)});`)
       .join("\n    ")}
 
     const registry = getAndFreeRegistry();
