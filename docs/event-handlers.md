@@ -2,7 +2,7 @@
 
 # :warning: On event handlers
 
-This plugin will register multiple types of life-cycle event handlers. However, only a single event handler can exist for each type of event (due to a limitation in Cypress). Thus, if you attempt to define any of the same handlers, your handler will either be overriden by this plugin or you will override this plugin's handler. Either way, the behavior will be surprising.
+This plugin will register multiple types of life-cycle event handlers. However, only a single event handler can exist for each type of event (due to a limitation in Cypress). Thus, if you attempt to define any of the same handlers, your handler will either be overridden by this plugin or you will override this plugin's handler. Either way, the behavior will be surprising.
 
 There's an (multiple actually) open [issue](https://github.com/cypress-io/cypress/issues/22428) at Cypress tracking this limitation.
 

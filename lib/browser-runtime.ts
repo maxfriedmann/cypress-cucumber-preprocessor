@@ -802,7 +802,7 @@ function createPickle(context: CompositionContext, pickle: messages.Pickle) {
                   argument,
                   text,
                   fn: () =>
-                    registry.runStepDefininition(this, text, dryRun, argument),
+                    registry.runStepDefinition(this, text, dryRun, argument),
                 }).then((result) => {
                   return afterStepHooks
                     .reduce(

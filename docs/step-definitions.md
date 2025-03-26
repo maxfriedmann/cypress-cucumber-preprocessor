@@ -22,7 +22,7 @@ The default configuration means that if you have a file `cypress/e2e/duckduckgo.
 
 ## Pairing explained
 
-From Cucumber you might be familiar with the fact that step definitons *aren't* linked to particular feature files, as per their [docs](https://cucumber.io/docs/cucumber/step-definitions):
+From Cucumber you might be familiar with the fact that step definitions *aren't* linked to particular feature files, as per their [docs](https://cucumber.io/docs/cucumber/step-definitions):
 
 > Step definitions aren’t linked to a particular feature file or scenario. The file, class or package name of a step definition does not affect what Gherkin steps it will match. The only thing that matters is the step definition’s expression.
 
@@ -58,7 +58,7 @@ Let's consider the following directory structure.
 
 The last value is used to replace `[filepath]` in each member of the configured `stepDefinitions`. For our example above this would yield `["cypress/e2e/foo/a.js"]`. This resulting array is used as search patterns for files containing step definitions (internally using [glob](https://github.com/isaacs/node-glob)).
 
-When `a.feature` is run, the preprocessor will only looks for step definitions in `cypress/e2e/foo/a.js`. Furthermore, only hooks defined in said file will take effect. The feature file is now said to be *paired* with that file containing step definitions.
+When `a.feature` is run, the preprocessor will only look for step definitions in `cypress/e2e/foo/a.js`. Furthermore, only hooks defined in said file will take effect. The feature file is now said to be *paired* with that file containing step definitions.
 
 The observant reader will now understand that the `[filepath]` template value allows you to create a hierarchy of step definitions that matches the structure of your feature files. It also allows to you put step definitions in an entirely separate directory.
 

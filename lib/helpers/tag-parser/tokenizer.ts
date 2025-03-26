@@ -1,8 +1,8 @@
 import { TagTokenizerError } from "./errors";
 
 export const isAt = (char: string): boolean => char === "@";
-export const isOpeningParanthesis = (char: string): boolean => char === "(";
-export const isClosingParanthesis = (char: string): boolean => char === ")";
+export const isOpeningParenthesis = (char: string): boolean => char === "(";
+export const isClosingParenthesis = (char: string): boolean => char === ")";
 export const isWordChar = (char: string): boolean => /[a-zA-Z]/.test(char);
 export const isQuote = (char: string): boolean => char === '"' || char === "'";
 export const isDigit = (char: string): boolean => /[0-9]/.test(char);
@@ -27,8 +27,8 @@ export class Tokenizer {
 
       if (
         isAt(curchar) ||
-        isOpeningParanthesis(curchar) ||
-        isClosingParanthesis(curchar) ||
+        isOpeningParenthesis(curchar) ||
+        isClosingParenthesis(curchar) ||
         isComma(curchar) ||
         isEqual(curchar)
       ) {

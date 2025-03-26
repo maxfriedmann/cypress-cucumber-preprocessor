@@ -42,7 +42,7 @@ Breaking changes:
 
   - This is a massive overhaul of a feature that was originally ill-thought-out. I'm curious about the reception.
 
-Other changees:
+Other changes:
 
 - Re-introduce support for Node v18, fixes [#1230](https://github.com/badeball/cypress-cucumber-preprocessor/discussions/1230).
 
@@ -110,7 +110,7 @@ Breaking changes:
 
 Other changes:
 
-- Emit meta information (lib version, node version, os, ci) in meesage reports, fixes [#1133](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1133).
+- Emit meta information (lib version, node version, os, ci) in message reports, fixes [#1133](https://github.com/badeball/cypress-cucumber-preprocessor/issues/1133).
 
   - This is in line with how cucumber-js behaves.
 
@@ -534,7 +534,7 @@ Breaking changes:
 
 Other changes:
 
-- Configuration values can now be overriden using (Cypress-) [environment variable](https://docs.cypress.io/guides/guides/environment-variables).
+- Configuration values can now be overridden using (Cypress-) [environment variable](https://docs.cypress.io/guides/guides/environment-variables).
 
 ## v9.2.1
 

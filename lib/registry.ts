@@ -109,7 +109,7 @@ export class Registry {
 
   constructor(private experimentalSourceMap: boolean = true) {
     this.defineStep = this.defineStep.bind(this);
-    this.runStepDefininition = this.runStepDefininition.bind(this);
+    this.runStepDefinition = this.runStepDefininition.bind(this);
     this.defineParameterType = this.defineParameterType.bind(this);
     this.defineBefore = this.defineBefore.bind(this);
     this.defineAfter = this.defineAfter.bind(this);
@@ -248,7 +248,7 @@ export class Registry {
     );
   }
 
-  public resolveStepDefintion(text: string) {
+  public resolveStepDefinition(text: string) {
     const matchingStepDefinitions = this.getMatchingStepDefinitions(text);
 
     if (matchingStepDefinitions.length === 0) {
@@ -280,13 +280,13 @@ export class Registry {
     }
   }
 
-  public runStepDefininition(
+  public runStepDefinition(
     world: Mocha.Context,
     text: string,
     dryRun: boolean,
     argument?: DataTable | string,
   ): unknown {
-    const stepDefinition = this.resolveStepDefintion(text);
+    const stepDefinition = this.resolveStepDefinition(text);
 
     const args = stepDefinition.expression
       .match(text)!

@@ -51,7 +51,7 @@ function defineStep<T extends unknown[], C extends Mocha.Context>(
   getRegistry().defineStep(description, implementation);
 }
 
-function runStepDefininition(
+function runStepDefinition(
   world: Mocha.Context,
   text: string,
   argument?: DataTable | string,
@@ -60,7 +60,7 @@ function runStepDefininition(
     runStepWithLogGroup({
       keyword: "Step",
       text,
-      fn: () => getRegistry().runStepDefininition(world, text, false, argument),
+      fn: () => getRegistry().runStepDefinition(world, text, false, argument),
     });
   });
 }
@@ -236,7 +236,7 @@ export {
   defineStep as When,
   defineStep as Then,
   defineStep,
-  runStepDefininition as Step,
+  runStepDefinition as Step,
   defineParameterType,
   defineBefore as Before,
   defineAfter as After,

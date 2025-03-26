@@ -13,7 +13,7 @@
 
 This preprocessor aims to provide a developer experience and behavior similar to that of [Cucumber](https://cucumber.io/), to Cypress.
 
-> :information_source: The repositor has recently moved from `github.com/TheBrainFamily` to `github.com/badeball`. Read more about the transfer of ownership [here](https://github.com/badeball/cypress-cucumber-preprocessor/issues/689).
+> :information_source: The repository has recently moved from `github.com/TheBrainFamily` to `github.com/badeball`. Read more about the transfer of ownership [here](https://github.com/badeball/cypress-cucumber-preprocessor/issues/689).
 
 ## Installation
 
@@ -76,4 +76,4 @@ $ npm run test # runs all of the above
 
 ## Attribution
 
-A special thanks goes out to [Łukasz Gandecki](https://github.com/lgandecki) for developing and maintaning the cypress-cucumber integration before me, in addition to [all other contributors](https://github.com/badeball/cypress-cucumber-preprocessor/graphs/contributors). Some of the work has partially been sponsored by [Klaveness Digital](https://www.klavenessdigital.com/).
+A special thanks goes out to [Łukasz Gandecki](https://github.com/lgandecki) for developing and maintaining the cypress-cucumber integration before me, in addition to [all other contributors](https://github.com/badeball/cypress-cucumber-preprocessor/graphs/contributors). Some of the work has partially been sponsored by [Klaveness Digital](https://www.klavenessdigital.com/).

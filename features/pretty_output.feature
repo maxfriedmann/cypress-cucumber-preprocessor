@@ -8,7 +8,7 @@ Feature: pretty output
       }
       """
 
-  Rule: it should handle basic scenarioes
+  Rule: it should handle basic scenarios
 
     Scenario: passing scenario
       Given a file named "cypress/e2e/a.feature" with:
