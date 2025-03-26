@@ -109,7 +109,7 @@ export class Registry {
 
   constructor(private experimentalSourceMap: boolean = true) {
     this.defineStep = this.defineStep.bind(this);
-    this.runStepDefinition = this.runStepDefininition.bind(this);
+    this.runStepDefinition = this.runStepDefinition.bind(this);
     this.defineParameterType = this.defineParameterType.bind(this);
     this.defineBefore = this.defineBefore.bind(this);
     this.defineAfter = this.defineAfter.bind(this);
