@@ -21,16 +21,19 @@ body:
       required: true
   - type: input
     attributes:
+      description: Don't write "latest", as this information becomes erroneous as soon as another version is released.
       label: Cypress version
     validations:
       required: true
   - type: input
     attributes:
+      description: Don't write "latest", as this information becomes erroneous as soon as another version is released.
       label: Preprocessor version
     validations:
       required: true
   - type: input
     attributes:
+      description: Don't write "latest", as this information becomes erroneous as soon as another version is released.
       label: Node version
     validations:
       required: true
