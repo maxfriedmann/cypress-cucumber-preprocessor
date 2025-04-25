@@ -17,6 +17,13 @@ async function setupNodeEvents(
     }),
   );
 
+  on("before:browser:launch", (browser, launchOptions) => {
+    if (browser.name === "chrome") {
+      launchOptions.args.push("--guest");
+    }
+    return launchOptions;
+});
+
   // Make sure to return the config object as it might have been modified by the plugin.
   return config;
 }
